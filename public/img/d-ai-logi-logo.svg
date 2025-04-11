@@ -1,0 +1,38 @@
+<svg viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Tło - lekki gradient -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0f8ff" />
+      <stop offset="100%" stop-color="#e6f0ff" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Główne logo -->
+  <g transform="translate(100, 150)">
+    <!-- d -->
+    <text x="0" y="0" font-family="Arial, sans-serif" font-weight="bold" font-size="70" fill="#444444">d</text>
+    
+    <!-- Wyraźny myślnik -->
+    <text x="40" y="0" font-family="Arial, sans-serif" font-weight="bold" font-size="70" fill="#444444">-</text>
+    
+    <!-- AI z technologicznym akcentem -->
+    <text x="65" y="0" font-family="Arial, sans-serif" font-weight="bold" font-size="70" fill="#1e90ff">AI</text>
+    
+    <!-- Wyraźny myślnik -->
+    <text x="130" y="0" font-family="Arial, sans-serif" font-weight="bold" font-size="70" fill="#444444">-</text>
+    
+    <!-- logi -->
+    <text x="155" y="0" font-family="Arial, sans-serif" font-weight="bold" font-size="70" fill="#444444">logi</text>
+    
+    <!-- Elementy graficzne symbolizujące dialog/interakcję w harmonizującym kolorze -->
+    <circle cx="45" cy="-20" r="10" fill="#7cb9e8" opacity="0.3" /> <!-- Przygaszona kropka przy "d" -->
+    <circle cx="75" cy="-35" r="6" fill="#7cb9e8" opacity="0.6" />
+    <circle cx="100" cy="-15" r="8" fill="#7cb9e8" opacity="0.8" />
+    
+    <!-- Symbol dialogu/interakcji -->
+    <path d="M20,-60 Q150,-100 250,-60" stroke="#1e90ff" stroke-width="2" fill="none" stroke-dasharray="4,2" />
+  </g>
+  
+  <!-- Tagline -->
+  <text x="250" y="200" font-family="Arial, sans-serif" font-size="16" fill="#666666" text-anchor="middle">Bohaterowie AI na Twojej scenie</text>
+</svg>
