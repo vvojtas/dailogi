@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+### TESTING
+- Write unit tests using JUnit 5 and Spring Boot Test.
+- Use MockMvc for testing web layers.
+- Implement integration tests using @SpringBootTest.
+- Use @DataJpaTest for repository layer tests.

@@ -12,6 +12,7 @@
 - Spring security do mechanizmu authenticacji i authoryzacji
 - Spring web do wystawienia REST API
 - JUnit 5 i Mockito do testowania jednostkowego i integracyjnego
+- Lombok redukuje kod szablonowy
 
 ## Baza danych
 - PostgreSQL - relacyjna baza danych

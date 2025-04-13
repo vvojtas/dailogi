@@ -1,0 +1,72 @@
+---
+description: 
+globs: be/**/*
+alwaysApply: false
+---
+## BACKEND
+
+### Guidelines for JAVA
+- Use Java 17 or later features when applicable (e.g., records, sealed classes, pattern matching).
+- Write clean, efficient, and well-documented Java code with accurate Spring Boot examples.
+- Use Spring Boot best practices and conventions throughout your code.
+- Implement RESTful API design patterns when creating web services.
+- Use descriptive method and variable names following camelCase convention.
+- Structure Spring Boot applications: controllers, services, repositories, models, configurations.
+
+#### SPRING_BOOT
+- Use Spring Boot for simplified configuration and rapid development with sensible defaults
+- Implement proper use of annotations (e.g., @SpringBootApplication, @RestController, @Service).
+- Prefer constructor-based dependency injection over `@Autowired`
+- Utilize Spring Boot's auto-configuration features effectively.
+- If a well-known library simplifies the solution, suggest using it instead of generating a custom implementation
+- Use DTOs as immutable `record` types
+- Use Bean Validation annotations (e.g., `@Size`, `@Email`, etc.) instead of manual validation logic
+- Use `@Valid` on request parameters annotated with `@RequestBody`
+- Use custom exceptions for business-related scenarios
+- Centralize exception handling with `@ControllerAdvice` and return a consistent error DTO: `{{error_dto}}`
+- REST controllers should handle only routing and I/O mapping, not business logic
+- Use SLF4J for logging instead of `System.out.println`
+- Prefer using lambdas and streams over imperative loops and conditionals where appropriate
+- Use `Optional` to avoid `NullPointerException`
+
+
+#### SPRING_DATA_JPA
+- Define repositories as interfaces extending `JpaRepository` or `CrudRepository`
+- Never expose JPA entities in API responses – always map them to DTOs
+- Use `@Transactional` at the service layer for state-changing methods, and keep transactions as short as possible
+- Use `@Transactional(readOnly = true)` for read-only operations
+- Use `@EntityGraph` or fetch joins to avoid the N+1 select problem
+- Use `@Query` for complex queries
+- Use projections (DTOs) in multi-join queries with `@Query`
+- Use Specifications for dynamic filtering
+- Use pagination when working with large datasets
+- Use `@Version` for optimistic locking in concurrent updates
+- Avoid `CascadeType.REMOVE` on large entity relationships
+- Use HikariCP for efficient connection pooling
+
+#### LOMBOK
+- Use Lombok where it clearly simplifies the code
+- Use constructor injection with `@RequiredArgsConstructor`
+- Prefer Java `record` over Lombok’s `@Value` when applicable
+- Avoid using `@Data` in non-DTO classes, instead, use specific annotations like `@Getter`, `@Setter`, and `@ToString`
+- Apply Lombok annotations to fields rather than the class if only some fields require them
+- Use Lombok’s `@Slf4j` to generate loggers
+
+
+### CONFIGURATION
+- Use application.yml for configuration.
+- Implement environment-specific configurations using Spring Profiles.
+- Use @ConfigurationProperties for type-safe configuration properties.
+
+
+### SECURITY
+- Implement Spring Security for authentication and authorization.
+- Use proper password encoding (e.g., BCrypt).
+- Implement CORS configuration when necessary.
+
+
+### BUILD
+- Use Maven for dependency management and build processes.
+- Implement proper profiles for different environments (dev, test, prod).
+- Use Docker for containerization
+    
