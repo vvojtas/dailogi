@@ -3,9 +3,9 @@ description:
 globs: 
 alwaysApply: true
 ---
-# AI Rules for {app-name}
+# AI Rules for d-AI-logi
 
-{project-description}
+d-AI-logi is an interactive web application that lets users create and observe dialogues between various AI personas. Users can choose predefined characters or design their own, and then set up a scene with 2–3 characters by defining a conversation topic.
 
 ## Tech Stack
 
@@ -14,6 +14,8 @@ alwaysApply: true
 - React 19
 - Tailwind 4
 - Shadcn/ui
+- Java 21
+- Spring
 
 ## Project Structure
 
