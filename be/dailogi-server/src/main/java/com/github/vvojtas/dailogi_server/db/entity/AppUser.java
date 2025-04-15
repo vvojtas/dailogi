@@ -11,7 +11,7 @@ import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "AppUser", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+@Table(name = "AppUser")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,8 +22,11 @@ public class AppUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = true, length = 255)
     private String email;
+
+    @Column(nullable = false, length = 50, unique = true)
+    private String name;
 
     @Column(name = "password_hash", nullable = false, columnDefinition = "TEXT")
     private String passwordHash;
