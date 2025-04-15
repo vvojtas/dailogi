@@ -230,10 +230,12 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
 
 *   ID: US-017
 *   Tytuł: Automatyczne zapisywanie zakończonego dialogu
-*   Opis: Jako użytkownik, chcę aby każdy pomyślnie zakończony (lub przerwany błędem) dialog był automatycznie zapisywany w mojej historii dialogów (do limitu 50), abym mógł do niego wrócić później.
+*   Opis: Jako użytkownik, chcę móc wybrane najciekawsze dialogi zapisać w mojej historii dialogów (do limitu 50), abym mógł do nich wrócić później.
 *   Kryteria akceptacji:
-    *   Po zakończeniu generowania dialogu (osiągnięcie limitu tur lub błąd), cała konwersacja wraz z informacją o uczestniczących postaciach i opisie sceny jest zapisywana w bazie danych powiązanej z użytkownikiem.
-    *   Jeśli użytkownik osiągnął limit 50 zapisanych dialogów, najstarszy dialog jest usuwany, aby zrobić miejsce na nowy (strategia FIFO).
+    *   Istnieje przycisk inicjujący zapis zakończonego dialogu (po osiągnięciu limitu tur lub błądzie)
+    *   Użytkownik podaje nazwę pod którą chce zapisać dialog
+    *   Cała konwersacja wraz z informacją o uczestniczących postaciach i opisie sceny jest zapisywana w bazie danych powiązanej z użytkownikiem.
+    *   Jeśli użytkownik osiągnął limit 50 zapisanych dialogów, zapis nowego dialogu jest blokowany.
 
 *   ID: US-018
 *   Tytuł: Przeglądanie historii dialogów
@@ -252,6 +254,14 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
     *   Widok prezentuje całą zapisaną konwersację w formacie czatu (dymki z awatarami/nazwami), identycznym jak podczas obserwacji generowania.
     *   Wyświetlane są również informacje o scenie (uczestnicy, opis, użyte LLM).
 
+*   ID: US-020
+*   Tytuł: Usuwanie postaci AI
+*   Opis: Jako użytkownik, chcę móc usunąć stworzoną przeze mnie postać dialogi, abym mógł pozbyć się niepotrzebnych lub wadliwych wpisów z mojej kolekcji.
+*   Kryteria akceptacji:
+    *   Z poziomu listy dialogów mogę zainicjować proces usuwania wybranej dialogu.
+    *   Wyświetlane jest potwierdzenie z pytaniem, czy na pewno chcę usunąć dialog.
+    *   Po potwierdzeniu dialog jest trwale usuwany z bazy danych.
+    *   Dialog znika z listy moich dialogów.
 
 ## 6. Metryki sukcesu
 Sukces wersji MVP będzie mierzony za pomocą następujących kryteriów:
