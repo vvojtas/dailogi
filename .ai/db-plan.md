@@ -137,6 +137,7 @@ Poniżej znajduje się kompleksowy plan struktury bazy danych wraz z tabelami, r
 
 ## 4. Dodatkowe uwagi i decyzje projektowe
 
+- Proste polecenia SQL, aby rozwiązanie było niezależne od bazy danych (np. Postgress, lub H2)
 - Wszystkie klucze główne używają typu `BIGINT`, co zapewnia skalowalność.  
 - Wszystkie znaczniki czasu (`created_at`, `updated_at`, `timestamp`) są przechowywane w strefie UTC.  
 - Awatary przechowywane są jako BLOB (`BYTEA`), a ich ładowanie można zoptymalizować (lazy loading) na poziomie aplikacji przy użyciu Hibernate.  
