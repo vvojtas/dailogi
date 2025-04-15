@@ -14,4 +14,5 @@ spring:
       enabled: true
       path: /h2-console
       settings:
-        web-allow-others: false 
+        web-allow-others: false
+        

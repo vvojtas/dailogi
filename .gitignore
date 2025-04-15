@@ -23,4 +23,8 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
+### VS Code ###
+.vscode/
+
+### 10x prompts that should not go to public repo ###
 prompts/
