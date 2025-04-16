@@ -26,6 +26,9 @@ public class DialogueMessage {
     @JoinColumn(name = "character_id", nullable = false)
     private Character character;
 
+    @Column(name = "character_id", insertable = false, updatable = false)
+    private Long characterId;
+
     @Column(name = "turn_number", nullable = false)
     private Integer turnNumber;
 
