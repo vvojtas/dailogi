@@ -14,76 +14,6 @@
 
 ### Authentication
 
-#### Register User
-- **Method**: POST
-- **Path**: `/api/auth/register`
-- **Description**: Register a new user account
-- **Request Body**:
-  ```json
-  {
-    "email": "string",
-    "name": "string",
-    "password": "string"
-  }
-  ```
-- **Response Body**:
-  ```json
-  {
-    "id": "long",
-    "email": "string",
-    "name": "string",
-    "created_at": "timestamp"
-  }
-  ```
-- **Success Codes**: 201 Created
-- **Error Codes**: 400 Bad Request (validation error), 409 Conflict (email already exists)
-
-#### Login User
-- **Method**: POST
-- **Path**: `/api/auth/login`
-- **Description**: Authenticate user and get JWT token
-- **Request Body**:
-  ```json
-  {
-    "email": "string",
-    "password": "string"
-  }
-  ```
-- **Response Body**:
-  ```json
-  {
-    "token": "string",
-    "user": {
-      "id": "long",
-      "name": "string",
-      "email": "string",
-      "is_special_user": "boolean"
-    }
-  }
-  ```
-- **Success Codes**: 200 OK
-- **Error Codes**: 401 Unauthorized (invalid credentials)
-
-### Users
-
-#### Get Current User
-- **Method**: GET
-- **Path**: `/api/users/current`
-- **Description**: Get current authenticated user information
-- **Response Body**:
-  ```json
-  {
-    "id": "long",
-    "name": "string",
-    "email": "string",
-    "is_special_user": "boolean",
-    "created_at": "timestamp",
-    "has_api_key": "boolean"
-  }
-  ```
-- **Success Codes**: 200 OK
-- **Error Codes**: 401 Unauthorized (not authenticated)
-
 ### API Keys
 
 #### Save OpenRouter API Key
@@ -410,34 +340,6 @@
 - **Error Codes**: 401 Unauthorized, 403 Forbidden (not owner), 404 Not Found
 
 ## 3. Authentication and Authorization
-
-The API will implement JWT (JSON Web Token) based authentication:
-
-1. **Authentication Flow**:
-   - Users register or login through the `/api/auth` endpoints
-   - Upon successful authentication, the server returns a JWT token
-   - The client includes this token in the Authorization header of subsequent requests
-
-2. **Token Structure**:
-   - Header: Algorithm and token type
-   - Payload: User ID, name, is_special_user flag, expiration time
-   - Signature: Signed with server secret
-
-3. **Token Validation**:
-   - All protected endpoints validate the JWT token
-   - Expired tokens are rejected
-   - Tokens with invalid signatures are rejected
-
-4. **Authorization Logic**:
-   - Regular users can only access their own resources
-   - Global characters are accessible by all users
-   - Special users can use the global API key
-   - Character deletion is restricted if the character is used in any dialogue
-
-5. **Implementation Details**:
-   - Spring Security will be used for authentication and authorization
-   - Token expiration set to 24 hours
-   - Refresh token mechanism not included in MVP
 
 ## 4. Validation and Business Logic
 
