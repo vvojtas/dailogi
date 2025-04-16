@@ -14,6 +14,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // Disable CSRF protection
         http.csrf(csrf -> csrf.disable())
+            .requiresChannel(channel -> channel.anyRequest().requiresSecure())    
             // Permit all requests without authentication
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
