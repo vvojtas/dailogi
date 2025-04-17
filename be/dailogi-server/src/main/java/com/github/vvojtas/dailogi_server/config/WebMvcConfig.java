@@ -7,6 +7,7 @@ import org.springframework.core.io.Resource;
 import java.io.IOException;
 import org.springframework.web.servlet.resource.PathResourceResolver;
 import com.github.vvojtas.dailogi_server.properties.ImgPathProperties;
+import org.springframework.lang.NonNull;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
@@ -18,14 +19,14 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/favicon.ico")
                 .addResourceLocations(imgPathProperties.getPath())
                 .setCachePeriod(3600)
                 .resourceChain(true)
                 .addResolver(new PathResourceResolver() {
                     @Override
-                    protected Resource getResource(String resourcePath, Resource location) throws IOException {
+                    protected Resource getResource(@NonNull String resourcePath, @NonNull Resource location) throws IOException {
                         Resource requestedResource = location.createRelative("favico.ico");
                         return (requestedResource.exists() && requestedResource.isReadable()) ? requestedResource : null;
                     }

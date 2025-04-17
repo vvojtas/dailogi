@@ -3,8 +3,8 @@ package com.github.vvojtas.dailogi_server.service.auth;
 import com.github.vvojtas.dailogi_server.db.entity.AppUser;
 import com.github.vvojtas.dailogi_server.db.repository.AppUserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.Authentication;
+//import org.springframework.security.core.context.SecurityContextHolder;
+//import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,0 +1,5 @@
+{"properties": [{
+  "name": "dailogi.img.path",
+  "type": "java.lang.String",
+  "description": "Path to directory containing images (ie. favicon.ico)"
+}]}
