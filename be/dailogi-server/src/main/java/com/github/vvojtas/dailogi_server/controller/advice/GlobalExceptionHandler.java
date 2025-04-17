@@ -9,7 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-
+import org.springframework.security.access.AccessDeniedException;
+import com.github.vvojtas.dailogi_server.exception.ResourceNotFoundException;
 import com.github.vvojtas.dailogi_server.model.common.response.ErrorResponseDTO;
 
 import java.time.OffsetDateTime;
@@ -66,6 +67,36 @@ public class GlobalExceptionHandler {
                 "Invalid parameter type",
                 "TYPE_MISMATCH",
                 details,
+                OffsetDateTime.now()
+            ));
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleResourceNotFoundException(ResourceNotFoundException e) {
+        log.warn("Resource not found", e);
+        
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new ErrorResponseDTO(
+                "Resource not found",
+                "RESOURCE_NOT_FOUND",
+                Map.of("type", e.getType()),
+                OffsetDateTime.now()
+            ));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponseDTO> handleAccessDeniedException(AccessDeniedException e) {
+        log.warn("Access denied", e);
+        
+        return ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new ErrorResponseDTO(
+                "Access denied",
+                "ACCESS_DENIED",
+                Map.of("error", e.getMessage()),
                 OffsetDateTime.now()
             ));
     }

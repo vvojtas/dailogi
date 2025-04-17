@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class CurrentUser {
+public class CurrentUserService {
 
     private final AppUserRepository appUserRepository;
 
