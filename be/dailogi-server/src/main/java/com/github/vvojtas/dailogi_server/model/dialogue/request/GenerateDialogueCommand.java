@@ -1,8 +1,7 @@
 package com.github.vvojtas.dailogi_server.model.dialogue.request; 
  
 import com.fasterxml.jackson.annotation.JsonProperty; 
-import java.util.List; 
-import com.github.vvojtas.dailogi_server.model.dialogue.request.DialogueCharacterConfigCommand; 
+import java.util.List;  
  
 /** 
  * Command model for generating a dialogue 

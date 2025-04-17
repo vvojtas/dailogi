@@ -2,7 +2,6 @@ package com.github.vvojtas.dailogi_server.model.character.response;
  
 import com.fasterxml.jackson.annotation.JsonProperty; 
 import java.util.List; 
-import com.github.vvojtas.dailogi_server.model.character.response.CharacterDTO; 
  
 /** 
  * DTO for paginated list of characters 

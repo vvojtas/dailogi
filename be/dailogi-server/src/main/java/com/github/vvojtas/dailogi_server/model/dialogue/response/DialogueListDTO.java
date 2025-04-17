@@ -1,8 +1,7 @@
 package com.github.vvojtas.dailogi_server.model.dialogue.response; 
  
 import com.fasterxml.jackson.annotation.JsonProperty; 
-import java.util.List; 
-import com.github.vvojtas.dailogi_server.model.dialogue.response.DialogueSummaryDTO; 
+import java.util.List;
  
 /** 
  * DTO for paginated list of dialogues 

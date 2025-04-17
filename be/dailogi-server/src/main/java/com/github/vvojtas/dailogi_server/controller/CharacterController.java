@@ -1,0 +1,120 @@
+package com.github.vvojtas.dailogi_server.controller;
+
+import com.github.vvojtas.dailogi_server.model.character.response.CharacterListDTO;
+import com.github.vvojtas.dailogi_server.model.common.response.ErrorResponseDTO;
+import com.github.vvojtas.dailogi_server.service.CharacterService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+
+@RestController
+@RequestMapping("/api/characters")
+@RequiredArgsConstructor
+@Validated
+@Tag(name = "Characters", description = "Endpoints for managing characters in the system")
+@SecurityRequirement(name = "bearer-jwt")
+public class CharacterController {
+
+    private static final int MAX_PAGE_SIZE = 50;
+    private final CharacterService characterService;
+
+    @Operation(
+        summary = "Get paginated list of characters",
+        description = """
+            Retrieves a paginated list of characters available to the current user.
+            The list includes user's personal characters and optionally global characters.
+            Results are sorted with personal characters first, then global characters, both groups sorted by name.
+            Requires authentication.
+            """
+    )
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully retrieved characters",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = CharacterListDTO.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid request parameters",
+            content = @Content(
+                mediaType = "application/json",
+                schema =@Schema(implementation = ErrorResponseDTO.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Unauthorized - user not authenticated",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponseDTO.class)
+            )
+        )
+    })
+    @GetMapping
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<CharacterListDTO> getCharacters(
+        @Parameter(
+            description = "Flag indicating whether to include global characters in the results",
+            example = "true"
+        )
+        @RequestParam(defaultValue = "true") boolean includeGlobal,
+        
+        @Parameter(
+            description = "Page number (0-based). Must be non-negative.",
+            example = "0"
+        )
+        @RequestParam(defaultValue = "0") @Min(value = 0, message = "Page number must be non-negative") int page,
+        
+        @Parameter(
+            description = "Number of items per page. Must be between 1 and 50.",
+            example = "20"
+        )
+        @RequestParam(defaultValue = "20") 
+        @Min(value = 1, message = "Page size must be greater than 0")
+        @Max(value = MAX_PAGE_SIZE, message = "Page size must not exceed " + MAX_PAGE_SIZE) 
+        int size
+    ) {
+        CharacterListDTO result = characterService.getCharacters(includeGlobal, PageRequest.of(page, size));
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Total-Count", String.valueOf(result.totalElements()));
+        
+        // Add pagination links
+        if (page > 0) {
+            headers.add("Link", buildPageLink(page - 1, size, includeGlobal, "prev"));
+        }
+        if (page < result.totalPages() - 1) {
+            headers.add("Link", buildPageLink(page + 1, size, includeGlobal, "next"));
+        }
+        
+        return ResponseEntity.ok()
+            .headers(headers)
+            .body(result);
+    }
+    
+    private String buildPageLink(int page, int size, boolean includeGlobal, String rel) {
+        return String.format("</api/characters?page=%d&size=%d&include_global=%b>; rel=\"%s\"",
+            page, size, includeGlobal, rel);
+    }
+}

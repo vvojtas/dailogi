@@ -1,3 +1,7 @@
+dailogi:
+  img:
+    path: "file:../../public/img/"
+
 spring:
   config:
       import: optional:file:.env[.properties]

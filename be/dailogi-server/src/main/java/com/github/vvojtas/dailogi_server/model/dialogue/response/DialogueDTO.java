@@ -3,8 +3,6 @@ package com.github.vvojtas.dailogi_server.model.dialogue.response;
 import com.fasterxml.jackson.annotation.JsonProperty; 
 import java.time.OffsetDateTime; 
 import java.util.List; 
-import com.github.vvojtas.dailogi_server.model.dialogue.response.DialogueCharacterConfigDTO; 
-import com.github.vvojtas.dailogi_server.model.dialogue.response.DialogueMessageDTO; 
  
 /** 
  * Detailed DTO for Dialogue entity with character configs and messages 
