@@ -5,6 +5,7 @@ import com.github.vvojtas.dailogi_server.model.character.response.CharacterDTO;
 import com.github.vvojtas.dailogi_server.model.common.response.ErrorResponseDTO;
 import com.github.vvojtas.dailogi_server.service.CharacterService;
 import com.github.vvojtas.dailogi_server.model.character.request.CreateCharacterCommand;
+import com.github.vvojtas.dailogi_server.model.character.request.UpdateCharacterCommand;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,6 +27,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -236,5 +238,78 @@ public class CharacterController {
     ) {
         CharacterDTO character = characterService.createCharacter(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(character);
+    }
+
+    @Operation(
+        summary = "Update an existing character",
+        description = """
+            Updates an existing character with new data.
+            The character must be owned by the current user.
+            The character name must remain unique for the user.
+            Requires authentication.
+            """
+    )
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "200",
+            description = "Character updated successfully",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = CharacterDTO.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid request parameters",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponseDTO.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Unauthorized - user not authenticated",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponseDTO.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden - user does not own this character",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponseDTO.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Character not found",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponseDTO.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "409",
+            description = "Character with the same name already exists for this user",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponseDTO.class)
+            )
+        )
+    })
+    @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<CharacterDTO> updateCharacter(
+        @Parameter(
+            description = "ID of the character to update. Must be a character owned by the current user.",
+            example = "1"
+        )
+        @PathVariable Long id,
+        
+        @Valid @RequestBody UpdateCharacterCommand command
+    ) {
+        return ResponseEntity.ok(characterService.updateCharacter(id, command));
     }
 }

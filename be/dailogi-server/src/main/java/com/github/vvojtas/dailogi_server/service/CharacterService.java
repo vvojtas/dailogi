@@ -24,6 +24,7 @@ import com.github.vvojtas.dailogi_server.db.repository.LLMRepository;
 import com.github.vvojtas.dailogi_server.model.character.request.CreateCharacterCommand;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+import com.github.vvojtas.dailogi_server.model.character.request.UpdateCharacterCommand;
 
 @Slf4j
 @Service
@@ -66,8 +67,15 @@ public class CharacterService {
     }
 
     private boolean isOwnedOrGlobal(Character character, AppUser currentUser) {
-        if (character.getIsGlobal()) return true;
+        return isOwned(character, currentUser) || isGlobal(character);
+    }
+
+    private boolean isOwned(Character character, AppUser currentUser) {
         return currentUser.getId().equals(character.getUser().getId());
+    }
+
+    private boolean isGlobal(Character character) {
+        return character.getIsGlobal();
     }
 
     @Transactional
@@ -98,6 +106,41 @@ public class CharacterService {
             LLM defaultLlm = llmRepository.findById(command.defaultLlmId())
                 .orElseThrow(() -> new ResourceNotFoundException("llm", "LLM not found with id: " + command.defaultLlmId()));
             character.setDefaultLlm(defaultLlm);
+        }
+        
+        try {
+            character = characterRepository.save(character);
+            return characterMapper.toDTO(character);
+        } catch (DataIntegrityViolationException e) {
+            if (e.getMessage().contains("unique_character_name")) {
+                throw new DuplicateResourceException("character", "Character with name '" + command.name() + "' already exists");
+            }
+            throw e;
+        }
+    }
+
+    @Transactional
+    public CharacterDTO updateCharacter(Long id, UpdateCharacterCommand command) {
+        log.debug("Updating character with id={}, name={}", id, command.name());
+        
+        Character character = characterRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("character", "Character not found with id: " + id));
+            
+        AppUser currentUser = currentUserService.getUser();
+        if (!isOwned(character, currentUser)) {
+            throw new AccessDeniedException("User does not have permission to update this character");
+        }
+        
+        character.setName(command.name())
+                .setShortDescription(command.shortDescription())
+                .setDescription(command.description());
+        
+        if (command.defaultLlmId() != null) {
+            LLM defaultLlm = llmRepository.findById(command.defaultLlmId())
+                .orElseThrow(() -> new ResourceNotFoundException("llm", "LLM not found with id: " + command.defaultLlmId()));
+            character.setDefaultLlm(defaultLlm);
+        } else {
+            character.setDefaultLlm(null);
         }
         
         try {
