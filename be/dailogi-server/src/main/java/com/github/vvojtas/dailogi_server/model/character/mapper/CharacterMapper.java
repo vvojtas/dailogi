@@ -20,13 +20,23 @@ public class CharacterMapper {
             character.getShortDescription(),
             character.getDescription(),
             character.getAvatar() != null,
-            character.getAvatar() != null ? 
-                "data:image/png;base64," + Base64.getEncoder().encodeToString(character.getAvatar()) : 
-                null,
+            createAvatarUrl(character.getAvatar()),
             character.getIsGlobal(),
             character.getDefaultLlm() != null ? character.getDefaultLlm().getId() : null,
             character.getCreatedAt(),
             character.getUpdatedAt()
         );
+    }
+
+    /**
+     * Creates a data URL for an avatar image
+     * @param avatarBytes the avatar image bytes
+     * @return the data URL string for the avatar
+     */
+    public String createAvatarUrl(byte[] avatarBytes) {
+        if (avatarBytes == null) {
+            return null;
+        }
+        return "data:image/png;base64," + Base64.getEncoder().encodeToString(avatarBytes);
     }
 } 

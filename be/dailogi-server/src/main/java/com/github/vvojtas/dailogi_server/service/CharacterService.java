@@ -24,18 +24,26 @@ import com.github.vvojtas.dailogi_server.model.character.request.CreateCharacter
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import com.github.vvojtas.dailogi_server.model.character.request.UpdateCharacterCommand;
+import org.springframework.web.multipart.MultipartFile;
+import javax.imageio.ImageIO;
+import java.io.IOException;
+import java.awt.image.BufferedImage;
+import com.github.vvojtas.dailogi_server.model.character.response.CharacterAvatarResponseDTO;
+import com.github.vvojtas.dailogi_server.model.character.request.UploadAvatarCommand;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CharacterService {
 
-    private final CharacterRepository characterRepository;
-    private final CharacterListMapper characterListMapper;
-    private final CurrentUserService currentUserService;
-    private final CharacterMapper characterMapper;
-    private final LLMRepository llmRepository;
     private final UserLimitProperties userLimitProperties;
+    private final CurrentUserService currentUserService;
+    private final CharacterRepository characterRepository;
+    private final LLMRepository llmRepository;
+    private final CharacterListMapper characterListMapper;
+    private final CharacterMapper characterMapper;
+    
+    
 
     /**
      * Retrieves a paginated list of characters available to the current user.
@@ -61,6 +69,12 @@ public class CharacterService {
         
         log.debug("Found {} characters (total {} in all pages)", 
             characters.getNumberOfElements(), characters.getTotalElements());
+            
+        log.info("Retrieved {} characters (page {} of {}) for user {}", 
+            characters.getNumberOfElements(), 
+            pageable.getPageNumber() + 1,
+            characters.getTotalPages(),
+            currentUser.getId());
         
         return characterListMapper.toDTO(characters, pageable);
     }
@@ -93,7 +107,9 @@ public class CharacterService {
             throw new AccessDeniedException("User does not have access to this character");
         }
         
-        log.debug("Returning character details for id={}", id);
+        log.info("Retrieved character: id={}, name={}, isGlobal={} for user {}", 
+            character.getId(), character.getName(), character.getIsGlobal(), currentUser.getId());
+            
         return characterMapper.toDTO(character);
     }
 
@@ -287,5 +303,96 @@ public class CharacterService {
      */
     private boolean isGlobal(Character character) {
         return character.getIsGlobal();
+    }
+
+    /**
+     * Uploads or replaces the avatar for a character.
+     * The character must be owned by the current user.
+     * Only PNG files up to 1MB and exactly 256x256 pixels are accepted.
+     * 
+     * @param id the ID of the character to update avatar for
+     * @param command the command containing the avatar file
+     * @return the updated character avatar information as DTO
+          * @throws IOException 
+          * @throws ResourceNotFoundException if the character does not exist
+          * @throws AccessDeniedException if the user does not own the character
+          * @throws ResponseStatusException with BAD_REQUEST if file validation fails
+          */
+         @Transactional
+         public CharacterAvatarResponseDTO uploadAvatar(Long id, UploadAvatarCommand command) {
+        log.debug("Starting avatar upload for character with id={}", id);
+        
+        // Validate character exists and is owned by current user
+        Character character = characterRepository.findById(id)
+            .orElseThrow(() -> {
+                log.warn("Attempt to upload avatar for non-existent character with id={}", id);
+                return new ResourceNotFoundException("character", "Character not found with id: " + id);
+            });
+            
+        AppUser currentUser = currentUserService.getUser();
+        if (!isOwned(character, currentUser)) {
+            log.warn("User {} attempted to upload avatar for character {} owned by user {}", 
+                currentUser.getId(), id, character.getUser().getId());
+            throw new AccessDeniedException("User does not have permission to update this character's avatar");
+        }
+        
+        MultipartFile file = command.file();
+        
+        // Validate file type - PNG only
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.equals("image/png")) {
+            log.warn("Invalid file type {} for avatar upload", contentType);
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Only PNG files are allowed"
+            );
+        }
+        
+        // Validate file size (1MB = 1048576 bytes)
+        if (file.getSize() > 1048576) {
+            log.warn("File size {} exceeds maximum allowed size of 1MB", file.getSize());
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "File size must not exceed 1MB"
+            );
+        }
+        
+        // Read and validate image dimensions
+        BufferedImage img;
+        try {
+            img = ImageIO.read(file.getInputStream());
+            if (img == null) {
+                log.warn("Failed to read image file");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid image file");
+            }
+            
+            if (img.getWidth() != 256 || img.getHeight() != 256) {
+                log.warn("Invalid image dimensions: {}x{}", img.getWidth(), img.getHeight());
+                throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Image dimensions must be exactly 256x256 pixels"
+                );
+            }
+            
+            // Save the avatar
+            character.setAvatar(file.getBytes());
+            character = characterRepository.save(character);
+            
+            log.info("Successfully uploaded avatar for character: id={}, name={}", 
+                character.getId(), character.getName());
+            
+            return new CharacterAvatarResponseDTO(
+                character.getId(),
+                true,
+                characterMapper.createAvatarUrl(character.getAvatar())
+            );
+            
+        } catch (IOException e) {
+            log.error("Failed to process avatar file: {}", e.getMessage(), e);
+            throw new ResponseStatusException(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Failed to process avatar file"
+            );
+        }
     }
 } 
