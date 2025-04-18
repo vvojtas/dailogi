@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -311,5 +312,68 @@ public class CharacterController {
         @Valid @RequestBody UpdateCharacterCommand command
     ) {
         return ResponseEntity.ok(characterService.updateCharacter(id, command));
+    }
+
+    @Operation(
+        summary = "Delete a character",
+        description = """
+            Deletes a character owned by the current user.
+            The character must not be used in any dialogues.
+            Requires authentication.
+            """
+    )
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "200",
+            description = "Character deleted successfully",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = String.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Unauthorized - user not authenticated",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponseDTO.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden - user does not own this character",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponseDTO.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Character not found",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponseDTO.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "409",
+            description = "Character is used in dialogues",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponseDTO.class)
+            )
+        )
+    })
+    @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<String> deleteCharacter(
+        @Parameter(
+            description = "ID of the character to delete. Must be a character owned by the current user.",
+            example = "1"
+        )
+        @PathVariable Long id
+    ) {
+        characterService.deleteCharacter(id);
+        return ResponseEntity.ok().body("Character successfully deleted");
     }
 }
