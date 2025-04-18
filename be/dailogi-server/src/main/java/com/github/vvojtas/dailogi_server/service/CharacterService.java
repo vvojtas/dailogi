@@ -113,7 +113,7 @@ public class CharacterService {
         
         AppUser currentUser = currentUserService.getUser();
         log.debug("Creating character for user {}", currentUser.getId());
-        
+
         // Check if user has reached the character limit
         long userCharacterCount = characterRepository.countByUser(currentUser);
         if (userCharacterCount >= userLimitProperties.getMaxCharactersPerUser()) {

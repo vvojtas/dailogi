@@ -111,7 +111,7 @@ public class GlobalExceptionHandler {
             .body(new ErrorResponseDTO(
                 "An unexpected error occurred",
                 "INTERNAL_ERROR",
-                Map.of("error", e.getMessage()),
+                Map.of("error", e.getClass().getSimpleName()),
                 OffsetDateTime.now()
             ));
     }
