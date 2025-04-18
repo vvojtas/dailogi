@@ -27,4 +27,10 @@ server:
     key-store-type: PKCS12
     key-alias: dailogi
   http2:
-    enabled: true 
+    enabled: true
+
+dailogi:
+  user:
+    limits:
+      # Maximum number of characters a user can create (default: 50)
+      max-characters-per-user: 50 

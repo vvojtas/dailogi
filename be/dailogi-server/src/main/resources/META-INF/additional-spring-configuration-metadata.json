@@ -1,5 +1,19 @@
-{"properties": [{
-  "name": "dailogi.img.path",
-  "type": "java.lang.String",
-  "description": "Path to directory containing images (ie. favicon.ico)"
-}]}
+{
+  "groups": [
+    {
+      "name": "dailogi.user.limits",
+      "type": "com.github.vvojtas.dailogi_server.properties.UserLimitProperties",
+      "sourceType": "com.github.vvojtas.dailogi_server.properties.UserLimitProperties",
+      "description": "Configuration properties for user-specific limits."
+    }
+  ],
+  "properties": [
+    {
+      "name": "dailogi.user.limits.max-characters-per-user",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.vvojtas.dailogi_server.properties.UserLimitProperties",
+      "description": "Maximum number of characters a user can create.",
+      "defaultValue": 50
+    }
+  ]
+}

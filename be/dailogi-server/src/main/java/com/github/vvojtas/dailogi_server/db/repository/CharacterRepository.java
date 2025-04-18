@@ -23,4 +23,11 @@ public interface CharacterRepository extends JpaRepository<Character, Long> {
         @Param("includeGlobal") boolean includeGlobal,
         Pageable pageable
     );
+
+    /**
+     * Count the number of characters owned by a user
+     * @param user The user to count characters for
+     * @return The number of characters owned by the user
+     */
+    long countByUser(AppUser user);
 } 

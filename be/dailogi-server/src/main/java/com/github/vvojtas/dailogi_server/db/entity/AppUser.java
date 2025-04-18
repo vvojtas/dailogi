@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -16,6 +18,8 @@ import java.time.OffsetDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@Accessors(chain = true)
 public class AppUser {
 
     @Id
@@ -32,6 +36,7 @@ public class AppUser {
     private String passwordHash;
 
     @Column(name = "is_special_user", nullable = false)
+    @Builder.Default
     private Boolean isSpecialUser = false;
 
     @CreationTimestamp

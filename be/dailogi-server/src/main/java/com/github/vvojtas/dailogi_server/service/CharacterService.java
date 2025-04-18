@@ -5,6 +5,7 @@ import com.github.vvojtas.dailogi_server.db.repository.CharacterRepository;
 import com.github.vvojtas.dailogi_server.model.character.mapper.CharacterListMapper;
 import com.github.vvojtas.dailogi_server.model.character.response.CharacterListDTO;
 import com.github.vvojtas.dailogi_server.service.auth.CurrentUserService;
+import com.github.vvojtas.dailogi_server.properties.UserLimitProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,13 @@ import com.github.vvojtas.dailogi_server.exception.ResourceNotFoundException;
 import com.github.vvojtas.dailogi_server.model.character.response.CharacterDTO;
 import com.github.vvojtas.dailogi_server.model.character.mapper.CharacterMapper;
 import com.github.vvojtas.dailogi_server.db.entity.AppUser;
+import org.springframework.dao.DataIntegrityViolationException;
+import com.github.vvojtas.dailogi_server.exception.DuplicateResourceException;
+import com.github.vvojtas.dailogi_server.db.entity.LLM;
+import com.github.vvojtas.dailogi_server.db.repository.LLMRepository;
+import com.github.vvojtas.dailogi_server.model.character.request.CreateCharacterCommand;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
 @Service
@@ -26,6 +34,8 @@ public class CharacterService {
     private final CharacterListMapper characterListMapper;
     private final CurrentUserService currentUserService;
     private final CharacterMapper characterMapper;
+    private final LLMRepository llmRepository;
+    private final UserLimitProperties userLimitProperties;
 
     @Transactional(readOnly = true)
     public CharacterListDTO getCharacters(boolean includeGlobal, Pageable pageable) {
@@ -58,5 +68,46 @@ public class CharacterService {
     private boolean isOwnedOrGlobal(Character character, AppUser currentUser) {
         if (character.getIsGlobal()) return true;
         return currentUser.getId().equals(character.getUser().getId());
+    }
+
+    @Transactional
+    public CharacterDTO createCharacter(CreateCharacterCommand command) {
+        log.debug("Creating character with name={}", command.name());
+        
+        AppUser currentUser = currentUserService.getUser();
+        
+        // Check if user has reached the character limit
+        long userCharacterCount = characterRepository.countByUser(currentUser);
+        if (userCharacterCount >= userLimitProperties.getMaxCharactersPerUser()) {
+            throw new ResponseStatusException(
+                HttpStatus.UNPROCESSABLE_ENTITY,
+                String.format("Cannot create more characters. Maximum limit of %d characters reached.", 
+                    userLimitProperties.getMaxCharactersPerUser())
+            );
+        }
+        
+        Character character = Character.builder()
+            .user(currentUser)
+            .name(command.name())
+            .shortDescription(command.shortDescription())
+            .description(command.description())
+            .isGlobal(false)
+            .build();
+        
+        if (command.defaultLlmId() != null) {
+            LLM defaultLlm = llmRepository.findById(command.defaultLlmId())
+                .orElseThrow(() -> new ResourceNotFoundException("llm", "LLM not found with id: " + command.defaultLlmId()));
+            character.setDefaultLlm(defaultLlm);
+        }
+        
+        try {
+            character = characterRepository.save(character);
+            return characterMapper.toDTO(character);
+        } catch (DataIntegrityViolationException e) {
+            if (e.getMessage().contains("unique_character_name")) {
+                throw new DuplicateResourceException("character", "Character with name '" + command.name() + "' already exists");
+            }
+            throw e;
+        }
     }
 } 

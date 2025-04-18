@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import jakarta.persistence.*;
@@ -17,6 +19,8 @@ import java.time.OffsetDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@Accessors(chain = true)
 public class Character {
 
     @Id
@@ -41,6 +45,7 @@ public class Character {
     private byte[] avatar;
 
     @Column(name = "is_global", nullable = false)
+    @Builder.Default
     private Boolean isGlobal = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
