@@ -83,12 +83,12 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
 
 *   ID: US-001
 *   Tytuł: Rejestracja nowego użytkownika
-*   Opis: Jako nowy użytkownik, chcę móc założyć konto w aplikacji, podając adres e-mail i hasło, abym mógł korzystać z jej funkcjonalności.
+*   Opis: Jako nowy użytkownik, chcę móc założyć konto w aplikacji, podając nazwę użytkownika i hasło, abym mógł korzystać z jej funkcjonalności.
 *   Kryteria akceptacji:
-    *   Formularz rejestracji zawiera pola na nazwę użytkownika, adres e-mail i hasło (z potwierdzeniem).
-    *   Walidacja sprawdza poprawność formatu e-mail i minimalną długość hasła.
+    *   Formularz rejestracji zawiera pola na nazwę użytkownika i hasło (z potwierdzeniem).
+    *   Walidacja sprawdza poprawność nazwy użytkownika i minimalną długość hasła.
     *   Po pomyślnej rejestracji użytkownik jest informowany o sukcesie i może się zalogować.
-    *   W przypadku błędu (np. zajęty e-mail) wyświetlany jest odpowiedni komunikat.
+    *   W przypadku błędu (np. zajęta nazwa użytkownika) wyświetlany jest odpowiedni komunikat.
 
 *   ID: US-002
 *   Tytuł: Logowanie do aplikacji
