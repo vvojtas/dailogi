@@ -85,16 +85,16 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
 *   Tytuł: Rejestracja nowego użytkownika
 *   Opis: Jako nowy użytkownik, chcę móc założyć konto w aplikacji, podając adres e-mail i hasło, abym mógł korzystać z jej funkcjonalności.
 *   Kryteria akceptacji:
-    *   Formularz rejestracji zawiera pola na adres e-mail i hasło (z potwierdzeniem).
+    *   Formularz rejestracji zawiera pola na nazwę użytkownika, adres e-mail i hasło (z potwierdzeniem).
     *   Walidacja sprawdza poprawność formatu e-mail i minimalną długość hasła.
     *   Po pomyślnej rejestracji użytkownik jest informowany o sukcesie i może się zalogować.
     *   W przypadku błędu (np. zajęty e-mail) wyświetlany jest odpowiedni komunikat.
 
 *   ID: US-002
 *   Tytuł: Logowanie do aplikacji
-*   Opis: Jako zarejestrowany użytkownik, chcę móc zalogować się do aplikacji przy użyciu mojego e-maila i hasła, abym mógł uzyskać dostęp do moich postaci, historii dialogów i tworzyć nowe sceny.
+*   Opis: Jako zarejestrowany użytkownik, chcę móc zalogować się do aplikacji przy nazwy użytkownika i hasła, abym mógł uzyskać dostęp do moich postaci, historii dialogów i tworzyć nowe sceny.
 *   Kryteria akceptacji:
-    *   Formularz logowania zawiera pola na adres e-mail i hasło.
+    *   Formularz logowania zawiera pola na nazwę użytkownika i hasło.
     *   Po pomyślnym zalogowaniu użytkownik jest przekierowany na stronę startową aplikacji.
     *   W przypadku podania błędnych danych logowania wyświetlany jest odpowiedni komunikat.
     *   Sesja użytkownika jest utrzymywana po zalogowaniu.
@@ -120,7 +120,7 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
 
 *   ID: US-005
 *   Tytuł: Tworzenie nowej postaci AI
-*   Opis: Jako użytkownik, chcę móc stworzyć nową, własną postać AI, podając jej nazwę, pełny opis charakteru (do 500 słów) i skrócony opis, abym mógł jej używać w scenach dialogowych.
+*   Opis: Jako zalogowany użytkownik, chcę móc stworzyć nową, własną postać AI, podając jej nazwę, pełny opis charakteru (do 500 słów) i skrócony opis, abym mógł jej używać w scenach dialogowych.
 *   Kryteria akceptacji:
     *   Formularz tworzenia postaci zawiera pola na: Nazwę (tekst, wymagane), Opis (textarea, wymagane, limit 500 słów), Skrócony Opis (tekst, wymagane).
     *   Walidacja sprawdza, czy wymagane pola są wypełnione i czy opis nie przekracza limitu znaków.
@@ -129,7 +129,7 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
 
 *   ID: US-006
 *   Tytuł: Dodawanie awatara do postaci
-*   Opis: Jako użytkownik, podczas tworzenia lub edycji postaci, chcę móc opcjonalnie wgrać plik graficzny (JPG/PNG, max 1MB, 256x256px) jako awatar mojej postaci, aby nadać jej wizualną reprezentację.
+*   Opis: Jako zalogowany użytkownik, podczas tworzenia lub edycji postaci, chcę móc opcjonalnie wgrać plik graficzny (JPG/PNG, max 1MB, 256x256px) jako awatar mojej postaci, aby nadać jej wizualną reprezentację.
 *   Kryteria akceptacji:
     *   Formularz tworzenia/edycji postaci zawiera opcjonalne pole do wgrania pliku awatara.
     *   Walidacja sprawdza format pliku (JPG/PNG), rozmiar (max 1MB) i wymiary (max 256x256px).
@@ -139,7 +139,7 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
 
 *   ID: US-007
 *   Tytuł: Przeglądanie listy własnych postaci
-*   Opis: Jako użytkownik, chcę móc przejrzeć listę wszystkich stworzonych przeze mnie postaci AI, widząc ich nazwy i awatary, abym mógł zarządzać moją kolekcją.
+*   Opis: Jako zalogowany użytkownik, chcę móc przejrzeć listę wszystkich stworzonych przeze mnie postaci AI, widząc ich nazwy i awatary, abym mógł zarządzać moją kolekcją.
 *   Kryteria akceptacji:
     *   Istnieje dedykowana sekcja/strona wyświetlająca listę postaci użytkownika.
     *   Każda pozycja na liście pokazuje co najmniej nazwę i awatar (lub placeholder) postaci.
@@ -148,7 +148,7 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
 
 *   ID: US-008
 *   Tytuł: Edycja istniejącej postaci AI
-*   Opis: Jako użytkownik, chcę móc edytować stworzoną przeze mnie postać AI, zmieniając jej nazwę, opis, skrócony opis lub awatar, abym mógł poprawić lub zaktualizować jej dane.
+*   Opis: Jako zalogowany użytkownik, chcę móc edytować stworzoną przeze mnie postać AI, zmieniając jej nazwę, opis, skrócony opis lub awatar, abym mógł poprawić lub zaktualizować jej dane.
 *   Kryteria akceptacji:
     *   Z poziomu listy postaci mogę przejść do formularza edycji wybranej postaci.
     *   Formularz edycji jest wstępnie wypełniony aktualnymi danymi postaci.
@@ -158,7 +158,7 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
 
 *   ID: US-009
 *   Tytuł: Usuwanie postaci AI
-*   Opis: Jako użytkownik, chcę móc usunąć stworzoną przeze mnie postać AI, abym mógł pozbyć się niepotrzebnych lub błędnych postaci z mojej kolekcji.
+*   Opis: Jako zalogowany użytkownik, chcę móc usunąć stworzoną przeze mnie postać AI, abym mógł pozbyć się niepotrzebnych lub błędnych postaci z mojej kolekcji.
 *   Kryteria akceptacji:
     *   Z poziomu listy postaci mogę zainicjować proces usuwania wybranej postaci.
     *   Wyświetlane jest potwierdzenie z pytaniem, czy na pewno chcę usunąć postać.
@@ -178,7 +178,7 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
 *   Tytuł: Wybór postaci do sceny
 *   Opis: Jako użytkownik, podczas konfiguracji sceny, chcę móc wybrać od 2 do 3 postaci spośród moich własnych postaci oraz postaci z biblioteki predefiniowanej, aby określić uczestników dialogu.
 *   Kryteria akceptacji:
-    *   Interfejs pozwala na przeglądanie dostępnych postaci (własnych i z biblioteki).
+    *   Interfejs pozwala na przeglądanie dostępnych postaci (własnych i z biblioteki; dla niezalogowanego użytkownika - tylko z bilbioteki).
     *   Mogę wybrać minimum 2 i maksimum 3 postacie.
     *   Wybrane postacie są wyraźnie oznaczone.
     *   Interfejs uniemożliwia wybór mniej niż 2 lub więcej niż 3 postaci.
@@ -202,7 +202,7 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
 
 *   ID: US-014
 *   Tytuł: Inicjacja generowania dialogu
-*   Opis: Jako użytkownik, po skonfigurowaniu sceny (wybraniu postaci, opcjonalnym opisie, wyborze LLM), chcę móc kliknąć przycisk "Rozpocznij dialog" (lub podobny), aby zainicjować automatyczne generowanie rozmowy.
+*   Opis: Jako zalogowany użytkownik, po skonfigurowaniu sceny (wybraniu postaci, opcjonalnym opisie, wyborze LLM), chcę móc kliknąć przycisk "Rozpocznij dialog" (lub podobny), aby zainicjować automatyczne generowanie rozmowy.
 *   Kryteria akceptacji:
     *   Przycisk inicjujący jest dostępny po spełnieniu minimalnych warunków konfiguracji sceny (wybrane 2-3 postacie, wybrane LLM dla każdej).
     *   Kliknięcie przycisku rozpoczyna proces komunikacji z API OpenRouter i generowania dialogu tura po turze.
@@ -210,7 +210,7 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
 
 *   ID: US-015
 *   Tytuł: Obserwacja generowanego dialogu
-*   Opis: Jako użytkownik, po zainicjowaniu generowania dialogu, chcę móc obserwować pojawiające się wypowiedzi postaci w czasie rzeczywistym (lub z niewielkim opóźnieniem), wyświetlane w formie dymków czatu z awatarem i nazwą postaci.
+*   Opis: Jako zalogowany użytkownik, po zainicjowaniu generowania dialogu, chcę móc obserwować pojawiające się wypowiedzi postaci w czasie rzeczywistym (lub z niewielkim opóźnieniem), wyświetlane w formie dymków czatu z awatarem i nazwą postaci.
 *   Kryteria akceptacji:
     *   Widok dialogu prezentuje rozmowę w formie czatu (dymki).
     *   Każdy dymek zawiera treść wypowiedzi, nazwę postaci mówiącej i jej awatar (lub placeholder).
@@ -219,7 +219,7 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
 
 *   ID: US-016
 *   Tytuł: Obsługa błędu podczas generowania dialogu
-*   Opis: Jako użytkownik, jeśli podczas generowania dialogu wystąpi błąd komunikacji z API OpenRouter (np. nieprawidłowy klucz, brak środków, błąd serwera), chcę zobaczyć dotychczas wygenerowaną część dialogu oraz czytelny komunikat o błędzie.
+*   Opis: Jako zalogowany użytkownik, jeśli podczas generowania dialogu wystąpi błąd komunikacji z API OpenRouter (np. nieprawidłowy klucz, brak środków, błąd serwera), chcę zobaczyć dotychczas wygenerowaną część dialogu oraz czytelny komunikat o błędzie.
 *   Kryteria akceptacji:
     *   W przypadku błędu API, proces generowania dialogu jest przerywany.
     *   W widoku dialogu wyświetlana jest cała rozmowa wygenerowana przed wystąpieniem błędu.
@@ -229,8 +229,8 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
 ### Historia Dialogów
 
 *   ID: US-017
-*   Tytuł: Automatyczne zapisywanie zakończonego dialogu
-*   Opis: Jako użytkownik, chcę móc wybrane najciekawsze dialogi zapisać w mojej historii dialogów (do limitu 50), abym mógł do nich wrócić później.
+*   Tytuł: Zapisywanie zakończonego dialogu
+*   Opis: Jako zalogowany użytkownik, chcę móc wybrane najciekawsze dialogi zapisać w mojej historii dialogów (do limitu 50), abym mógł do nich wrócić później.
 *   Kryteria akceptacji:
     *   Istnieje przycisk inicjujący zapis zakończonego dialogu (po osiągnięciu limitu tur lub błądzie)
     *   Użytkownik podaje nazwę pod którą chce zapisać dialog
@@ -239,7 +239,7 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
 
 *   ID: US-018
 *   Tytuł: Przeglądanie historii dialogów
-*   Opis: Jako użytkownik, chcę móc przejrzeć listę moich zapisanych dialogów, widząc podstawowe informacje o każdym z nich (np. uczestniczące postacie, data), abym mógł łatwo znaleźć interesującą mnie rozmowę.
+*   Opis: Jako zalogowany użytkownik, chcę móc przejrzeć listę moich zapisanych dialogów, widząc podstawowe informacje o każdym z nich (np. uczestniczące postacie, data), abym mógł łatwo znaleźć interesującą mnie rozmowę.
 *   Kryteria akceptacji:
     *   Istnieje dedykowana sekcja/strona "Historia dialogów".
     *   Lista wyświetla zapisane dialogi w porządku chronologicznym (od najnowszego do najstarszego).
@@ -248,7 +248,7 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
 
 *   ID: US-019
 *   Tytuł: Odczytywanie zapisanego dialogu
-*   Opis: Jako użytkownik, chcę móc otworzyć zapisany dialog z listy historii, aby ponownie przeczytać całą rozmowę, która się odbyła.
+*   Opis: Jako zalogowany użytkownik, chcę móc otworzyć zapisany dialog z listy historii, aby ponownie przeczytać całą rozmowę, która się odbyła.
 *   Kryteria akceptacji:
     *   Kliknięcie na pozycję dialogu na liście historii otwiera widok tego konkretnego dialogu.
     *   Widok prezentuje całą zapisaną konwersację w formacie czatu (dymki z awatarami/nazwami), identycznym jak podczas obserwacji generowania.
@@ -256,7 +256,7 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
 
 *   ID: US-020
 *   Tytuł: Usuwanie postaci AI
-*   Opis: Jako użytkownik, chcę móc usunąć stworzoną przeze mnie postać dialogi, abym mógł pozbyć się niepotrzebnych lub wadliwych wpisów z mojej kolekcji.
+*   Opis: Jako użytkownik, chcę móc usunąć stworzony przeze mnie dialog, abym mógł pozbyć się niepotrzebnych lub wadliwych wpisów z mojej kolekcji.
 *   Kryteria akceptacji:
     *   Z poziomu listy dialogów mogę zainicjować proces usuwania wybranej dialogu.
     *   Wyświetlane jest potwierdzenie z pytaniem, czy na pewno chcę usunąć dialog.
