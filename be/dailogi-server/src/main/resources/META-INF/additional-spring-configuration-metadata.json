@@ -5,6 +5,18 @@
       "type": "com.github.vvojtas.dailogi_server.properties.UserLimitProperties",
       "sourceType": "com.github.vvojtas.dailogi_server.properties.UserLimitProperties",
       "description": "Configuration properties for user-specific limits."
+    },
+    {
+      "name": "dailogi.img",
+      "type": "com.github.vvojtas.dailogi_server.properties.ImgPathProperties",
+      "sourceType": "com.github.vvojtas.dailogi_server.properties.ImgPathProperties",
+      "description": "Configuration properties for image paths."
+    },
+    {
+      "name": "jwt",
+      "type": "com.github.vvojtas.dailogi_server.properties.JwtProperties",
+      "sourceType": "com.github.vvojtas.dailogi_server.properties.JwtProperties",
+      "description": "Configuration properties for JWT."
     }
   ],
   "properties": [
@@ -14,6 +26,25 @@
       "sourceType": "com.github.vvojtas.dailogi_server.properties.UserLimitProperties",
       "description": "Maximum number of characters a user can create.",
       "defaultValue": 50
+    },
+    {
+      "name": "dailogi.img.path",
+      "type": "java.lang.String",
+      "sourceType": "com.github.vvojtas.dailogi_server.properties.ImgPathProperties",
+      "description": "Path to the image directory."
+    },
+    {
+      "name": "jwt.secret",
+      "type": "java.lang.String",
+      "sourceType": "com.github.vvojtas.dailogi_server.properties.JwtProperties",
+      "description": "Secret key for signing JWT tokens."
+    },
+    {
+      "name": "jwt.expiration-ms",
+      "type": "java.lang.Long",
+      "sourceType": "com.github.vvojtas.dailogi_server.properties.JwtProperties",
+      "description": "Expiration time for JWT tokens in milliseconds.",
+      "defaultValue": 3600000
     }
   ]
 }
