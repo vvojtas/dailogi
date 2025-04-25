@@ -1,4 +1,4 @@
-package com.github.vvojtas.dailogi_server.mapper;
+package com.github.vvojtas.dailogi_server.model.llm.mapper;
 
 import com.github.vvojtas.dailogi_server.db.entity.LLM;
 import com.github.vvojtas.dailogi_server.model.llm.response.LLMDTO;

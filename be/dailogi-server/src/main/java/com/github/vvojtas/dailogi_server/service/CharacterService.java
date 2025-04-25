@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.awt.image.BufferedImage;
 import com.github.vvojtas.dailogi_server.model.character.response.CharacterAvatarResponseDTO;
 import com.github.vvojtas.dailogi_server.model.character.request.UploadAvatarCommand;
+import org.springframework.security.core.Authentication;
 
 @Slf4j
 @Service
@@ -50,32 +51,51 @@ public class CharacterService {
      * The list includes user's personal characters and optionally global characters.
      * Results are sorted with personal characters first, then global characters, both groups sorted by name.
      * 
-     * @param includeGlobal whether to include global characters in the results
+     * @param includeGlobal whether to include global characters in the results (ignored if user is not authenticated)
      * @param pageable pagination parameters
+     * @param authentication the current authentication object (can be null for anonymous users)
      * @return paginated list of characters as DTO
      */
     @Transactional(readOnly = true)
-    public CharacterListDTO getCharacters(boolean includeGlobal, Pageable pageable) {
-        log.debug("Getting characters with includeGlobal={}, pageable={}", includeGlobal, pageable);
-        
-        AppUser currentUser = currentUserService.getUser();
-        log.debug("Fetching characters for user {}", currentUser.getId());
-        
-        Page<Character> characters = characterRepository.findAllByUserAndGlobal(
-            currentUser,
-            includeGlobal,
-            pageable
-        );
-        
-        log.debug("Found {} characters (total {} in all pages)", 
-            characters.getNumberOfElements(), characters.getTotalElements());
+    public CharacterListDTO getCharacters(boolean includeGlobal, Pageable pageable, Authentication authentication) {
+        log.debug("Getting characters with includeGlobal={}, pageable={}, authenticated={}", 
+            includeGlobal, pageable, authentication != null && authentication.isAuthenticated());
+
+        Page<Character> characters;
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            // User is authenticated
+            AppUser currentUser = currentUserService.getCurrentAppUser(authentication);
+            log.debug("Fetching characters for authenticated user {}", currentUser.getId());
+
+            characters = characterRepository.findAllByUserAndGlobal(
+                currentUser,
+                includeGlobal,
+                pageable
+            );
+
+            log.info("Retrieved {} characters (page {} of {}) for user {}", 
+                characters.getNumberOfElements(), 
+                pageable.getPageNumber() + 1,
+                characters.getTotalPages(),
+                currentUser.getId());
+
+        } else {
+            // User is not authenticated or anonymous
+            log.debug("Fetching only global characters for unauthenticated user.");
+
+            // Fetch only global characters, sorted by name (adjust pageable to ignore user-specific sorting)
+            characters = characterRepository.findAllGlobal(pageable); 
             
-        log.info("Retrieved {} characters (page {} of {}) for user {}", 
-            characters.getNumberOfElements(), 
-            pageable.getPageNumber() + 1,
-            characters.getTotalPages(),
-            currentUser.getId());
-        
+            log.info("Retrieved {} global characters (page {} of {}) for unauthenticated user", 
+                characters.getNumberOfElements(), 
+                pageable.getPageNumber() + 1,
+                characters.getTotalPages());
+        }
+
+        log.debug("Found {} characters (total {} in all pages)", 
+                    characters.getNumberOfElements(), characters.getTotalElements());
+                    
         return characterListMapper.toDTO(characters, pageable);
     }
 
@@ -100,15 +120,17 @@ public class CharacterService {
             
         log.debug("Found character: name={}, isGlobal={}", character.getName(), character.getIsGlobal());
             
-        AppUser currentUser = currentUserService.getUser();
+        AppUser currentUser = currentUserService.getCurrentAppUserOrNull();
+        String currentUserId = (currentUser != null) ? currentUser.getId().toString() : "anonymous";
         if (!isOwnedOrGlobal(character, currentUser)) {
-            log.warn("User {} attempted to access character {} owned by user {}", 
-                currentUser.getId(), id, character.getUser().getId());
+            
+            log.warn("User {} attempted to access character {} which is not owned or global (Owner: {})", 
+                currentUserId, id, character.getUser().getId());
             throw new AccessDeniedException("User does not have access to this character");
         }
         
         log.info("Retrieved character: id={}, name={}, isGlobal={} for user {}", 
-            character.getId(), character.getName(), character.getIsGlobal(), currentUser.getId());
+            character.getId(), character.getName(), character.getIsGlobal(), currentUserId);
             
         return characterMapper.toDTO(character);
     }
@@ -127,7 +149,7 @@ public class CharacterService {
     public CharacterDTO createCharacter(CreateCharacterCommand command) {
         log.debug("Creating character with name={}", command.name());
         
-        AppUser currentUser = currentUserService.getUser();
+        AppUser currentUser = currentUserService.getCurrentAppUser();
         log.debug("Creating character for user {}", currentUser.getId());
 
         // Check if user has reached the character limit
@@ -197,7 +219,9 @@ public class CharacterService {
             
         log.debug("Found character: name={}", character.getName());
             
-        AppUser currentUser = currentUserService.getUser();
+        AppUser currentUser = currentUserService.getCurrentAppUser();
+        
+        // Validate ownership
         if (!isOwned(character, currentUser)) {
             log.warn("User {} attempted to update character {} owned by user {}", 
                 currentUser.getId(), id, character.getUser().getId());
@@ -254,7 +278,9 @@ public class CharacterService {
         log.debug("Found character: name={}", character.getName());
             
         // Validate ownership
-        AppUser currentUser = currentUserService.getUser();
+        AppUser currentUser = currentUserService.getCurrentAppUser();
+        
+        // Validate ownership
         if (!isOwned(character, currentUser)) {
             log.warn("User {} attempted to delete character {} owned by user {}", 
                 currentUser.getId(), id, character.getUser().getId());
@@ -295,6 +321,10 @@ public class CharacterService {
      * Checks if a character is owned by a user
      */
     private boolean isOwned(Character character, AppUser currentUser) {
+        // If there's no current user (unauthenticated), they cannot own the character
+        if (currentUser == null) {
+            return false;
+        }
         return currentUser.getId().equals(character.getUser().getId());
     }
 
@@ -329,7 +359,9 @@ public class CharacterService {
                 return new ResourceNotFoundException("character", "Character not found with id: " + id);
             });
             
-        AppUser currentUser = currentUserService.getUser();
+        AppUser currentUser = currentUserService.getCurrentAppUser();
+        
+        // Validate ownership
         if (!isOwned(character, currentUser)) {
             log.warn("User {} attempted to upload avatar for character {} owned by user {}", 
                 currentUser.getId(), id, character.getUser().getId());

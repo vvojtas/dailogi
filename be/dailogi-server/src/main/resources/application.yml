@@ -5,6 +5,8 @@ spring:
     active: local
   jpa:
     open-in-view: false
+    hibernate:
+      ddl-auto: validate
   flyway:
     enabled: true
     locations: classpath:db/migration
@@ -33,4 +35,10 @@ dailogi:
   user:
     limits:
       # Maximum number of characters a user can create (default: 50)
-      max-characters-per-user: 50 
+      max-characters-per-user: 50
+
+
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration-ms: 3600000  # 1 hour in milliseconds 

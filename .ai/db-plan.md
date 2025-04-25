@@ -8,7 +8,6 @@ Poniżej znajduje się kompleksowy plan struktury bazy danych wraz z tabelami, r
 
 ### a. Tabela `User`
 - **id**: BIGINT, PRIMARY KEY  
-- **email**: VARCHAR(255)  
 - **name**: VARCHAR(50) NOT NULL, UNIQUE  
 - **password_hash**: TEXT NOT NULL  
 - **is_special_user**: BOOLEAN NOT NULL DEFAULT FALSE  

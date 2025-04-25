@@ -59,4 +59,16 @@ public interface CharacterRepository extends JpaRepository<Character, Long> {
      * @return true if a character with the name exists for the user (excluding the specified one), false otherwise
      */
     boolean existsByNameAndUserAndIdNot(String name, AppUser user, Long id);
+    
+    /**
+     * Finds all global characters, sorted by name.
+     * @param pageable Pagination information
+     * @return A page of global characters
+     */
+    @Query("""
+        SELECT c FROM Character c 
+        WHERE c.isGlobal = true
+        ORDER BY c.name ASC
+        """)
+    Page<Character> findAllGlobal(Pageable pageable);
 } 

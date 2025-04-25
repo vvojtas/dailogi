@@ -10,8 +10,12 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import com.github.vvojtas.dailogi_server.exception.ResourceNotFoundException;
+import com.github.vvojtas.dailogi_server.exception.DuplicateResourceException;
 import com.github.vvojtas.dailogi_server.model.common.response.ErrorResponseDTO;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
@@ -96,7 +100,72 @@ public class GlobalExceptionHandler {
             .body(new ErrorResponseDTO(
                 "Access denied",
                 "ACCESS_DENIED",
-                Map.of("error", e.getMessage()),
+                Map.of(),
+                OffsetDateTime.now()
+            ));
+    }
+
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<ErrorResponseDTO> handleDuplicateResourceException(DuplicateResourceException e) {
+        log.warn("Duplicate resource error", e);
+        
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new ErrorResponseDTO(
+                e.getMessage(),
+                "RESOURCE_DUPLICATE",
+                Map.of("resource", e.getResourceName()),
+                OffsetDateTime.now()
+            ));
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponseDTO> handleBadCredentialsException(BadCredentialsException e) {
+        log.warn("Authentication failed due to bad credentials", e);
+        
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new ErrorResponseDTO(
+                "Invalid username or password",
+                "INVALID_CREDENTIALS",
+                Map.of(),
+                OffsetDateTime.now()
+            ));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponseDTO> handleAuthenticationException(AuthenticationException e) {
+        log.warn("Authentication failed", e);
+        
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new ErrorResponseDTO(
+                "Authentication failed",
+                "AUTHENTICATION_FAILED",
+                Map.of(),
+                OffsetDateTime.now()
+            ));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponseDTO> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        log.warn("Method argument validation failed", e);
+        
+        Map<String, Object> details = new HashMap<>();
+        e.getBindingResult().getFieldErrors().forEach(error -> 
+            details.put(error.getField(), error.getDefaultMessage())
+        );
+        
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new ErrorResponseDTO(
+                "Validation failed",
+                "VALIDATION_ERROR",
+                details,
                 OffsetDateTime.now()
             ));
     }

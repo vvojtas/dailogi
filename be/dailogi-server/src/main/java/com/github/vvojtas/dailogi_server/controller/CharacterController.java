@@ -26,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,7 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Characters", description = "Endpoints for managing characters in the system")
-@SecurityRequirement(name = "bearer-jwt")
+@SecurityRequirement(name = "bearerAuth")
 public class CharacterController {
 
     private static final int MAX_PAGE_SIZE = 50;
@@ -86,7 +87,6 @@ public class CharacterController {
         )
     })
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<CharacterListDTO> getCharacters(
         @Parameter(
             description = "Flag indicating whether to include global characters in the results",
@@ -107,9 +107,11 @@ public class CharacterController {
         @RequestParam(defaultValue = "20") 
         @Min(value = 1, message = "Page size must be greater than 0")
         @Max(value = MAX_PAGE_SIZE, message = "Page size must not exceed " + MAX_PAGE_SIZE) 
-        int size
+        int size,
+        
+        Authentication authentication
     ) {
-        CharacterListDTO result = characterService.getCharacters(includeGlobal, PageRequest.of(page, size));
+        CharacterListDTO result = characterService.getCharacters(includeGlobal, PageRequest.of(page, size), authentication);
         
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Total-Count", String.valueOf(result.totalElements()));
@@ -175,7 +177,6 @@ public class CharacterController {
         )
     })
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<CharacterDTO> getCharacter(
         @Parameter(
             description = "ID of the character to retrieve",

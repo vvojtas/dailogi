@@ -1,6 +1,6 @@
 -- Insert admin user
-INSERT INTO app_user (email, name, password_hash, is_special_user, created_at, updated_at)
-VALUES ('admin@dailogi.com', 'Admin', '$2a$10$0Cgv3xMBGaHIINcgzBvQtOMSyjwwxRGCfve0N6NUxGqv7H1fJcK0G', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO app_user (name, password_hash, is_special_user, created_at, updated_at)
+VALUES ('Admin', '$2a$10$0Cgv3xMBGaHIINcgzBvQtOMSyjwwxRGCfve0N6NUxGqv7H1fJcK0G', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- Insert LLM entries
 INSERT INTO llm (name, openrouter_identifier)
