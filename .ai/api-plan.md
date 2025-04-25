@@ -14,6 +14,72 @@
 
 ### Authentication
 
+#### Register User
+- **Method**: POST
+- **Path**: `/api/auth/register`
+- **Description**: Register a new user.
+- **Request Body**:
+  ```json
+  {
+    "username": "string",
+    "password": "string",
+    "passwordConfirmation": "string"
+  }
+  ```
+- **Response Body**:
+  ```json
+  {
+    "id": "long",
+    "username": "string",
+    "createdAt": "timestamp"
+  }
+  ```
+- **Success Codes**: 201 Created
+- **Error Codes**: 400 Bad Request (validation error), 409 Conflict (username already exists)
+
+#### Login User
+- **Method**: POST
+- **Path**: `/api/auth/login`
+- **Description**: Authenticate user and receive JWT token.
+- **Request Body**:
+  ```json
+  {
+    "username": "string",
+    "password": "string"
+  }
+  ```
+- **Response Body**:
+  ```json
+  {
+    "accessToken": "string",
+    "tokenType": "string", // e.g., "Bearer"
+    "expiresIn": "long",
+    "user": {
+      "id": "long",
+      "username": "string",
+      "createdAt": "timestamp"
+    }
+  }
+  ```
+- **Success Codes**: 200 OK
+- **Error Codes**: 400 Bad Request (invalid credentials)
+
+#### Get Current User
+- **Method**: GET
+- **Path**: `/api/auth/me`
+- **Description**: Get information about the currently authenticated user.
+- **Request Body**: (None)
+- **Response Body**:
+  ```json
+  {
+    "id": "long",
+    "username": "string",
+    "createdAt": "timestamp"
+  }
+  ```
+- **Success Codes**: 200 OK
+- **Error Codes**: 401 Unauthorized
+
 ### API Keys
 
 #### Save OpenRouter API Key
@@ -186,17 +252,30 @@
 - **Success Codes**: 200 OK
 - **Error Codes**: 400 Bad Request (invalid image), 401 Unauthorized, 403 Forbidden (not owner), 404 Not Found
 
+#### Get Character Avatar
+- **Method**: GET
+- **Path**: `/api/characters/{id}/avatar`
+- **Description**: Get character's avatar image file.
+- **Request Body**: (None)
+- **Response Body**: Image file (`image/png`, `image/jpeg`, etc.)
+- **Success Codes**: 200 OK
+- **Error Codes**: 401 Unauthorized, 403 Forbidden (if user cannot access character), 404 Not Found (character or avatar)
+
+#### Delete Character Avatar
+- **Method**: DELETE
+- **Path**: `/api/characters/{id}/avatar`
+- **Description**: Delete character's avatar.
+- **Request Body**: (None)
+- **Response Body**: (No body)
+- **Success Codes**: 204 No Content
+- **Error Codes**: 401 Unauthorized, 403 Forbidden (not owner), 404 Not Found
+
 #### Delete Character
 - **Method**: DELETE
 - **Path**: `/api/characters/{id}`
 - **Description**: Delete a character
-- **Response Body**:
-  ```json
-  {
-    "message": "string"
-  }
-  ```
-- **Success Codes**: 200 OK
+- **Response Body**: (No body)
+- **Success Codes**: 204 No Content
 - **Error Codes**: 401 Unauthorized, 403 Forbidden (not owner or global character), 404 Not Found, 409 Conflict (character used in dialogues)
 
 ### LLMs
