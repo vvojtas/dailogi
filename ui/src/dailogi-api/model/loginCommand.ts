@@ -7,6 +7,17 @@
  */
 
 /**
- * Additional error details, specific to the error type (optional)
+ * Command for user login
  */
-export type ErrorResponseDTODetails = { [key: string]: { [key: string]: unknown } };
+export interface LoginCommand {
+  /**
+   * Username
+   * @minLength 1
+   */
+  name: string;
+  /**
+   * Password
+   * @minLength 1
+   */
+  password: string;
+}

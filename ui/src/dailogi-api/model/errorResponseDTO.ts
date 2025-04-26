@@ -12,10 +12,10 @@ import type { ErrorResponseDTODetails } from "./errorResponseDTODetails";
  */
 export interface ErrorResponseDTO {
   /** Human-readable error message */
-  message?: string;
+  message: string;
   /** Error code for programmatic handling */
-  code?: string;
-  /** Additional error details, specific to the error type */
+  code: string;
+  /** Additional error details, specific to the error type (optional) */
   details?: ErrorResponseDTODetails;
   /** Timestamp when the error occurred */
   timestamp?: string;

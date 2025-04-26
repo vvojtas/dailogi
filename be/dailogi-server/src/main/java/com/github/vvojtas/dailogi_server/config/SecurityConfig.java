@@ -33,7 +33,7 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/favicon.ico").permitAll()
                 .requestMatchers("/api/llms/**").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/characters/**").permitAll()
                 .anyRequest().authenticated()

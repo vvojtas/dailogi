@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "gen:types": "curl -k -o ./api.json https://localhost/v3/api-docs/api && orval --config ./orval.config.ts && del api.json"
+    "gen:types": "orval --config ./orval.config.ts"
   },
   "dependencies": {
     "@astrojs/node": "^9.1.3",

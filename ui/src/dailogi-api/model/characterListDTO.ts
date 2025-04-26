@@ -7,10 +7,18 @@
  */
 import type { CharacterDTO } from "./characterDTO";
 
+/**
+ * Paginated list of characters
+ */
 export interface CharacterListDTO {
-  content?: CharacterDTO[];
-  page?: number;
-  size?: number;
-  total_elements?: number;
-  total_pages?: number;
+  /** List of characters on the current page */
+  content: CharacterDTO[];
+  /** Current page number (0-indexed) */
+  page: number;
+  /** Number of characters per page */
+  size: number;
+  /** Total number of characters across all pages */
+  total_elements: number;
+  /** Total number of pages */
+  total_pages: number;
 }

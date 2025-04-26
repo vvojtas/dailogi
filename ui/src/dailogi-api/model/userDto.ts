@@ -7,13 +7,13 @@
  */
 
 /**
- * Data Transfer Object for a Language Learning Model (LLM)
+ * Data Transfer Object for User information
  */
-export interface Llmdto {
-  /** Unique identifier for the LLM */
+export interface UserDto {
+  /** Unique identifier for the user */
   id: number;
-  /** Name of the LLM */
+  /** Username */
   name: string;
-  /** Identifier used by OpenRouter for this LLM */
-  openrouter_identifier: string;
+  /** Timestamp when the user was created */
+  created_at?: string;
 }

@@ -6,8 +6,14 @@
  * OpenAPI spec version: v1.0.0
  */
 
+/**
+ * Response confirming character avatar status
+ */
 export interface CharacterAvatarResponseDTO {
-  id?: number;
-  has_avatar?: boolean;
+  /** Unique identifier for the character */
+  id: number;
+  /** Indicates if the character now has an avatar */
+  has_avatar: boolean;
+  /** New URL of the character's avatar image (null if avatar was removed or upload failed) */
   avatar_url?: string;
 }

@@ -6,15 +6,28 @@
  * OpenAPI spec version: v1.0.0
  */
 
+/**
+ * Data Transfer Object for a Character
+ */
 export interface CharacterDTO {
-  id?: number;
-  name?: string;
-  short_description?: string;
-  description?: string;
-  has_avatar?: boolean;
+  /** Unique identifier for the character */
+  id: number;
+  /** Name of the character */
+  name: string;
+  /** Brief character description */
+  short_description: string;
+  /** Detailed character description */
+  description: string;
+  /** Indicates if the character has an avatar */
+  has_avatar: boolean;
+  /** URL of the character's avatar image (null if no avatar) */
   avatar_url?: string;
-  is_global?: boolean;
+  /** Indicates if the character is globally available */
+  is_global: boolean;
+  /** Default language model ID for this character (null if not set) */
   default_llm_id?: number;
+  /** Timestamp when the character was created */
   created_at?: string;
+  /** Timestamp when the character was last updated (null if never updated) */
   updated_at?: string;
 }

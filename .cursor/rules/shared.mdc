@@ -41,7 +41,6 @@ When introducing changes to the project, always follow the directory structure b
 - `./be/dailogi-server/src/main/java/com/github/vvojtas/dailogi_server/db/repository` - database repositories
 - `./be/dailogi-server/src/main/java/com/github/vvojtas/dailogi_server/config` - backend spring configuration classes
 - `./be/dailogi-server/src/main/java/com/github/vvojtas/dailogi_server/properties` - localisation for ConfigurationProperties
-- `./public` - public assets
 
 When modifying the directory structure, always update this section.
 

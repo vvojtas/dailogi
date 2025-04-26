@@ -16,7 +16,7 @@ export default defineConfig({
       },
     },
     input: {
-      target: "api.json",
+      target: "../docs/be-api.json",
     },
   },
 });
