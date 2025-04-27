@@ -101,7 +101,7 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
 
 *   ID: US-003
 *   Tytuł: Wprowadzenie klucza API OpenRouter
-*   Opis: Jako zarejestrowany użytkownik, chcę móc wprowadzić i zapisać mój własny klucz API OpenRouter w ustawieniach profilu, aby móc korzystać z modeli LLM w ramach własnych limitów i rozliczeń OpenRouter.
+*   Opis: Jako zalogowany użytkownik, chcę móc wprowadzić i zapisać mój własny klucz API OpenRouter w ustawieniach profilu, aby móc korzystać z modeli LLM w ramach własnych limitów i rozliczeń OpenRouter.
 *   Kryteria akceptacji:
     *   W profilu użytkownika znajduje się pole do wprowadzenia klucza API OpenRouter.
     *   Po zapisaniu klucz jest przechowywany w bazie danych w sposób zaszyfrowany.
@@ -110,7 +110,7 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
 
 *   ID: US-004
 *   Tytuł: Korzystanie z globalnego klucza API (Specjalny Użytkownik)
-*   Opis: Jako specjalny użytkownik (z odpowiednią flagą w bazie), chcę móc korzystać z aplikacji bez podawania własnego klucza API, wykorzystując limitowany klucz globalny aplikacji.
+*   Opis: Jako zalogowany użytkownik specjalny (z odpowiednią flagą w bazie), chcę móc korzystać z aplikacji bez podawania własnego klucza API, wykorzystując limitowany klucz globalny aplikacji.
 *   Kryteria akceptacji:
     *   Jeśli użytkownik ma flagę "specjalny" i nie wprowadził własnego klucza, aplikacja używa klucza globalnego do zapytań do OpenRouter.
     *   Jeśli użytkownik specjalny wprowadzi własny klucz, będzie on używany zamiast globalnego.
@@ -169,23 +169,23 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
 
 *   ID: US-010
 *   Tytuł: Rozpoczęcie tworzenia nowej sceny
-*   Opis: Jako użytkownik, chcę móc rozpocząć proces tworzenia nowej sceny dialogowej z poziomu strony startowej lub dedykowanego przycisku, abym mógł wybrać postacie i zdefiniować temat rozmowy.
+*   Opis: Jako zalogowany użytkownik, chcę móc rozpocząć proces tworzenia nowej sceny dialogowej z poziomu strony startowej lub dedykowanego przycisku, abym mógł wybrać postacie i zdefiniować temat rozmowy.
 *   Kryteria akceptacji:
     *   Istnieje przycisk/link "Utwórz nową scenę" (lub podobny) dostępny dla zalogowanego użytkownika.
     *   Kliknięcie przenosi do interfejsu konfiguracji sceny.
 
 *   ID: US-011
 *   Tytuł: Wybór postaci do sceny
-*   Opis: Jako użytkownik, podczas konfiguracji sceny, chcę móc wybrać od 2 do 3 postaci spośród moich własnych postaci oraz postaci z biblioteki predefiniowanej, aby określić uczestników dialogu.
+*   Opis: Jako zalogowany użytkownik, podczas konfiguracji sceny, chcę móc wybrać od 2 do 3 postaci spośród moich własnych postaci oraz postaci z biblioteki predefiniowanej, aby określić uczestników dialogu.
 *   Kryteria akceptacji:
-    *   Interfejs pozwala na przeglądanie dostępnych postaci (własnych i z biblioteki; dla niezalogowanego użytkownika - tylko z bilbioteki).
+    *   Interfejs pozwala na przeglądanie dostępnych postaci (własnych i z biblioteki).
     *   Mogę wybrać minimum 2 i maksimum 3 postacie.
     *   Wybrane postacie są wyraźnie oznaczone.
     *   Interfejs uniemożliwia wybór mniej niż 2 lub więcej niż 3 postaci.
 
 *   ID: US-012
 *   Tytuł: Definiowanie tematu/opisu sceny
-*   Opis: Jako użytkownik, podczas konfiguracji sceny, chcę móc wprowadzić krótki opis tematu rozmowy lub scenerii, w której ma się ona odbywać, aby nadać kontekst dialogowi generowanemu przez AI.
+*   Opis: Jako zalogowany użytkownik, podczas konfiguracji sceny, chcę móc wprowadzić krótki opis tematu rozmowy lub scenerii, w której ma się ona odbywać, aby nadać kontekst dialogowi generowanemu przez AI.
 *   Kryteria akceptacji:
     *   Istnieje pole tekstowe (textarea) do wprowadzenia opisu sceny.
     *   Wprowadzony opis zostanie przekazany do modeli LLM jako część promptu systemowego.
@@ -193,7 +193,7 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
 
 *   ID: US-013
 *   Tytuł: Wybór modelu LLM dla postaci w scenie
-*   Opis: Jako użytkownik, podczas konfiguracji sceny, dla każdej wybranej postaci chcę móc wybrać model językowy (LLM) z dostępnej listy (np. Gemini Flash, Claude Sonnet), który będzie odpowiedzialny za generowanie wypowiedzi tej postaci.
+*   Opis: Jako zalogowany użytkownik, podczas konfiguracji sceny, dla każdej wybranej postaci chcę móc wybrać model językowy (LLM) z dostępnej listy (np. Gemini Flash, Claude Sonnet), który będzie odpowiedzialny za generowanie wypowiedzi tej postaci.
 *   Kryteria akceptacji:
     *   Przy każdej wybranej postaci w interfejsie konfiguracji sceny znajduje się lista rozwijana (lub inny element wyboru).
     *   Lista zawiera predefiniowane modele LLM dostępne przez OpenRouter (Gemini Flash, Claude Sonnet, DeepSeek V3, Llama 70B, o3 Min).
@@ -255,13 +255,39 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
     *   Wyświetlane są również informacje o scenie (uczestnicy, opis, użyte LLM).
 
 *   ID: US-020
-*   Tytuł: Usuwanie postaci AI
-*   Opis: Jako użytkownik, chcę móc usunąć stworzony przeze mnie dialog, abym mógł pozbyć się niepotrzebnych lub wadliwych wpisów z mojej kolekcji.
+*   Tytuł: Usuwanie dialogu
+*   Opis: Jako zalogowany użytkownik, chcę móc usunąć zapisany przeze mnie dialog, abym mógł pozbyć się niepotrzebnych lub wadliwych wpisów z mojej kolekcji.
 *   Kryteria akceptacji:
-    *   Z poziomu listy dialogów mogę zainicjować proces usuwania wybranej dialogu.
+    *   Z poziomu listy dialogów mogę zainicjować proces usuwania wybranego dialogu.
     *   Wyświetlane jest potwierdzenie z pytaniem, czy na pewno chcę usunąć dialog.
     *   Po potwierdzeniu dialog jest trwale usuwany z bazy danych.
     *   Dialog znika z listy moich dialogów.
+
+### Niezalogowany Użytkownik (Gość)
+
+*   ID: US-021
+*   Tytuł: Próba akcji wymagającej zalogowania
+*   Opis: Jako niezalogowany użytkownik (gość), próbując wykonać akcję dostępną tylko dla zalogowanych (np. stworzenie postaci, rozpoczęcie dialogu, zapisanie klucza API), chcę zostać poinformowany o konieczności zalogowania lub rejestracji i przekierowany do odpowiedniego formularza.
+*   Kryteria akceptacji:
+    *   Przyciski/linki do akcji wymagających autentykacji (np. "Utwórz postać", "Utwórz scenę", "Mój profil") są nieaktywne lub po kliknięciu prowadzą do strony logowania/rejestracji.
+    *   Wyświetlany jest komunikat wyjaśniający, że dana funkcja wymaga konta.
+
+*   ID: US-022
+*   Tytuł: Przeglądanie biblioteki postaci predefiniowanych
+*   Opis: Jako niezalogowany użytkownik (gość), chcę móc przejrzeć listę dostępnych postaci predefiniowanych (np. z domeny publicznej), widząc ich nazwy i awatary, abym mógł zobaczyć, jakie postacie są dostępne w aplikacji przed założeniem konta.
+*   Kryteria akceptacji:
+    *   Nawet bez logowania, istnieje możliwość dostępu do sekcji/widoku z biblioteką postaci predefiniowanych.
+    *   Lista wyświetla nazwy i awatary (lub placeholdery) postaci globalnych.
+    *   Nie widzę opcji edycji ani usuwania tych postaci.
+    *   Nie widzę postaci stworzonych przez innych użytkowników.
+
+*   ID: US-023
+*   Tytuł: Przeglądanie szczegółów postaci predefiniowanej
+*   Opis: Jako niezalogowany użytkownik (gość), po znalezieniu interesującej postaci w bibliotece predefiniowanej, chcę móc zobaczyć jej szczegóły (pełny opis, skrócony opis, awatar), aby dowiedzieć się o niej więcej.
+*   Kryteria akceptacji:
+    *   Z poziomu listy postaci predefiniowanych mogę przejść do widoku szczegółów wybranej postaci.
+    *   Widok szczegółów wyświetla nazwę, pełny opis, skrócony opis i awatar (lub placeholder) postaci.
+    *   Nie widzę opcji edycji ani usuwania dla tej postaci.
 
 ## 6. Metryki sukcesu
 Sukces wersji MVP będzie mierzony za pomocą następujących kryteriów:
