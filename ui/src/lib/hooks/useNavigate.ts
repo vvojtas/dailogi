@@ -1,5 +1,3 @@
-export function useNavigate() {
-  return (path: string) => {
-    window.location.href = path;
-  };
+export function navigate(path: string) {
+  window.location.href = path;
 }
