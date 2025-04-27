@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { Toaster } from "sonner";
 
 interface Props {
   title?: string;
@@ -19,6 +20,11 @@ const { title = "d-ai-logi" } = Astro.props;
   </head>
   <body>
     <slot />
+    <Toaster richColors closeButton position="top-right" />
+    <script>
+      // Initialize theme const theme = localStorage.getItem("theme") || "system";
+      document.documentElement.setAttribute("data-theme", theme);
+    </script>
   </body>
 </html>
 

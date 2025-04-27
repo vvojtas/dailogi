@@ -44,7 +44,7 @@ Przykładowe wykorzsytanie komponnetów:
 
 Wiele innych komponentów jest dostępnych, ale nie są one obecnie zainstalowane. Pełną listę można znaleźć na stronie https://ui.shadcn.com/r
 
-Aby zainstalować nowy komponent, wykorzystaj shadcn CLI
+Aby zainstalować nowy komponent, wykorzystaj shadcn CLI (z poziomu katalogu ui)
 
 
 ```bash
