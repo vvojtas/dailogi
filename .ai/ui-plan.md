@@ -8,7 +8,7 @@ Struktura UI dzieli się na dwie główne części:
 1.  **Strefa Publiczna:** Dostępna bez logowania, obejmująca stronę główną (`/`), strony logowania (`/login`) i rejestracji (`/register`), a także publiczny widok listy postaci globalnych (`/characters`).
 2.  **Strefa Uwierzytelniona:** Dostępna po zalogowaniu, chroniona przez middleware Astro, obejmująca wszystkie główne funkcjonalności aplikacji (panel główny `/dashboard`, zarządzanie postaciami, scenami, profilem).
 
-Nawigacja w strefie uwierzytelnionej odbywa się za pomocą stałego paska bocznego lub nagłówka (`AppLayout`). Strefa publiczna posiada osobny, prostszy układ (`PublicLayout`). Do zarządzania stanem globalnym (dane użytkownika, stan uwierzytelnienia, lista LLM) wykorzystywana jest biblioteka Zustand, a token JWT przechowywany jest w `localStorage`. Komunikacja z backendem odbywa się poprzez zcentralizowane funkcje pomocnicze (hooks/helpers), które automatycznie dołączają token JWT i obsługują podstawowe błędy API (np. 401, 422, inne błędy ogólne). Architektura jest zaprojektowana z myślą o widoku desktopowym (desktop-first) zgodnie z wymaganiami MVP.
+Nawigacja w strefie uwierzytelnionej odbywa się za pomocą stałego paska bocznego lub nagłówka (`PublicLayout`). Do zarządzania stanem globalnym (dane użytkownika, stan uwierzytelnienia, lista LLM) wykorzystywana jest biblioteka Zustand. Uwierzytelnianie opiera się na sesjach zarządzanych po stronie serwera przez middleware Astro, z wykorzystaniem bezpiecznych ciasteczek HTTP-only do przechowywania identyfikatora sesji (lub samego JWT). Komunikacja z backendem (API endpoints w Astro) odbywa się automatycznie z wykorzystaniem ciasteczka sesyjnego, a funkcje pomocnicze po stronie klienta obsługują podstawowe błędy API (np. 401 - nieautoryzowany dostęp, 422, inne błędy ogólne). Architektura jest zaprojektowana z myślą o widoku desktopowym (desktop-first) zgodnie z wymaganiami MVP.
 
 ## 2. Lista widoków
 
@@ -153,22 +153,28 @@ Nawigacja w strefie uwierzytelnionej odbywa się za pomocą stałego paska boczn
 
 ## 4. Układ i struktura nawigacji
 
-*   **Layouty Astro:**
-    *   `BaseLayout.astro`: Podstawowy layout z nagłówkiem `<head>` i wspólnymi elementami.
-    *   `PublicLayout.astro` (rozszerza `BaseLayout`): Layout dla stron publicznych (`/`, `/login`, `/register`, `/characters` - widok niezalogowany). Może zawierać prosty nagłówek z linkami Logowanie/Rejestracja.
-    *   `AppLayout.astro` (rozszerza `BaseLayout`): Główny layout dla stron uwierzytelnionych (`/dashboard`, `/profile`, `/characters` - widok zalogowany, `/characters/*`, `/scenes`, `/scenes/*`). Zawiera stały element nawigacyjny (np. pasek boczny lub nagłówek).
-*   **Nawigacja Główna (w `AppLayout.astro`):**
+*   **Główny Layout Astro (`Layout.astro`):**
+    *   Odpowiada za podstawową strukturę HTML (`<head>`, `<body>`), wczytywanie globalnych stylów i skryptów.
+    *   Zawiera stały element nawigacyjny (np. nagłówek lub pasek boczny).
+    *   **Warunkowe renderowanie:** Na podstawie danych sesji użytkownika (dostępnych np. przez `Astro.locals.user` z middleware), layout dynamicznie pokazuje:
+        *   **Dla niezalogowanych:** Linki/przyciski "Zaloguj się" i "Zarejestruj się".
+        *   **Dla zalogowanych:** Główną nawigację aplikacji, nazwę użytkownika i przycisk "Wyloguj".
+*   **Nawigacja Główna (w `Layout.astro`, widoczna dla zalogowanych):**
     *   Logo / Nazwa Aplikacji (link do `/dashboard`)
     *   Postaci (link do `/characters`)
     *   Historia Scen (link do `/scenes`)
     *   Nowa Scena (link do `/scenes/new`)
     *   Profil (link do `/profile`)
-    *   Przycisk Wyloguj (usuwa JWT z `localStorage`, czyści stan globalny, przekierowuje do `/login`)
+    *   Nazwa użytkownika (wyświetlana)
+    *   Przycisk Wyloguj (wywołuje endpoint API do zakończenia sesji po stronie serwera, np. `POST /api/auth/logout`, czyści stan globalny, przekierowuje do `/`)
 *   **Middleware (`src/middleware/index.ts`):**
-    *   Sprawdza obecność JWT w `localStorage` dla ścieżek wymagających uwierzytelnienia (np. `/dashboard`, `/profile`, `/scenes/**`, `/characters/new`, `/characters/[id]/edit`, `/characters/[id]` - gdy nie jest globalny).
-    *   Jeśli brak JWT dla chronionej ścieżki, przekierowuje na `/login`.
-    *   Ścieżki publiczne (`/`, `/login`, `/register`, `/characters` - dostęp do globalnych, `/characters/[id]` - dostęp do globalnych) są wykluczone ze sprawdzania JWT.
-    *   (Uwaga: Middleware nie weryfikuje aktywnie ważności tokenu po stronie klienta, polega na obsłudze błędu 401 z API).
+    *   Przechwytuje żądania do chronionych ścieżek (np. `/dashboard`, `/profile`, `/scenes/**`, `/characters/new`, `/characters/[id]/edit`).
+    *   Weryfikuje obecność i ważność ciasteczka sesji.
+    *   Jeśli sesja jest nieprawidłowa lub jej brak, przekierowuje na `/login`.
+    *   Obsługuje proces logowania/rejestracji: po pomyślnej weryfikacji danych uwierzytelniających, tworzy sesję i ustawia bezpieczne ciasteczko HTTP-only.
+    *   Udostępnia dane sesji (np. ID użytkownika) kontekstowi żądania dla punktów końcowych API i stron Astro.
+    *   Ścieżki publiczne (`/`, `/login`, `/register`) są wykluczone ze sprawdzania sesji.
+*   **Komponenty Astro (`.astro` pages/layouts):** Mogą uzyskiwać dostęp do danych sesji (np. `Astro.locals.user`) udostępnionych przez middleware do personalizacji interfejsu (np. wyświetlanie nazwy użytkownika).
 
 ## 5. Kluczowe komponenty (Shadcn/ui & inne)
 
@@ -187,5 +193,5 @@ Nawigacja w strefie uwierzytelnionej odbywa się za pomocą stałego paska boczn
 *   **Komponent Uploadu Awatara:** Niestandardowy komponent React obsługujący wybór pliku, podgląd, walidację (typ, rozmiar, wymiary) i komunikację z API (`POST /api/characters/{id}/avatar`).
 *   **Wskaźnik Ładowania (`Spinner`/`Progress`):** Do sygnalizowania operacji w tle (np. generowanie sceny).
 *   **Layouty (`BaseLayout`, `PublicLayout`, `AppLayout`):** Komponenty Astro definiujące strukturę strony.
-*   **Hooki/Funkcje Pomocnicze API:** Zestaw funkcji do komunikacji z API, obsługujących dołączanie JWT i podstawową obsługę błędów.
-*   **Globalny Store (Zustand):** Do przechowywania stanu uwierzytelnienia, danych użytkownika, listy LLM. 
+*   **Hooki/Funkcje Pomocnicze API (frontend):** Zestaw funkcji do komunikacji z punktami końcowymi API Astro (`/api/*`), obsługujących podstawową obsługę błędów (np. wyświetlanie `Toast` dla błędów 4xx/5xx). Nie muszą już zarządzać tokenem JWT.
+*   **Globalny Store (Zustand):** Do przechowywania stanu uwierzytelnienia (`isLoggedIn`), danych użytkownika pobranych z API, listy LLM. Stan `isLoggedIn` jest synchronizowany na podstawie dostępności danych sesji lub odpowiedzi API. 
