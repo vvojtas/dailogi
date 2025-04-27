@@ -20,7 +20,7 @@ const { title = "d-ai-logi" } = Astro.props;
   </head>
   <body>
     <slot />
-    <Toaster richColors closeButton position="top-right" />
+    <Toaster richColors closeButton position="top-right" client:load />
   </body>
 </html>
 
