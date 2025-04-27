@@ -45,7 +45,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Characters", description = "Endpoints for managing characters in the system")
-@SecurityRequirement(name = "bearerAuth")
 public class CharacterController {
 
     private static final int MAX_PAGE_SIZE = 50;
@@ -54,10 +53,11 @@ public class CharacterController {
     @Operation(
         summary = "Get paginated list of characters",
         description = """
-            Retrieves a paginated list of characters available to the current user.
-            The list includes user's personal characters and optionally global characters.
-            Results are sorted with personal characters first, then global characters, both groups sorted by name.
-            Requires authentication.
+            Retrieves a paginated list of characters.
+            If the user is authenticated, the list includes the user's personal characters and optionally global characters.
+            If the user is not authenticated, only global characters are returned (if `includeGlobal` is true).
+            Results are sorted with personal characters first (if applicable), then global characters, both groups sorted by name.
+            Authentication is optional.
             """
     )
     @ApiResponses({
@@ -138,8 +138,9 @@ public class CharacterController {
         summary = "Get character by ID",
         description = """
             Retrieves a single character by its ID.
-            The character must either be owned by the current user or be a global character.
-            Requires authentication.
+            If the user is authenticated, the character must either be owned by the current user or be a global character.
+            If the user is not authenticated, only global characters can be retrieved.
+            Authentication is optional.
             """
     )
     @ApiResponses({
@@ -239,6 +240,7 @@ public class CharacterController {
     })
     @PostMapping
     @PreAuthorize("isAuthenticated()")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<CharacterDTO> createCharacter(
         @Valid @RequestBody CreateCharacterCommand command
     ) {
@@ -307,6 +309,7 @@ public class CharacterController {
     })
     @PutMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<CharacterDTO> updateCharacter(
         @Parameter(
             description = "ID of the character to update. Must be a character owned by the current user.",
@@ -371,6 +374,7 @@ public class CharacterController {
     })
     @DeleteMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<String> deleteCharacter(
         @Parameter(
             description = "ID of the character to delete. Must be a character owned by the current user.",
@@ -436,6 +440,7 @@ public class CharacterController {
     })
     @PostMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("isAuthenticated()")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<CharacterAvatarResponseDTO> uploadAvatar(
         @Parameter(
             description = "ID of the character to update avatar for. Must be a character owned by the current user.",
