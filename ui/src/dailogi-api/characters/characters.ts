@@ -20,8 +20,9 @@ import type {
 
 /**
  * Retrieves a single character by its ID.
-The character must either be owned by the current user or be a global character.
-Requires authentication.
+If the user is authenticated, the character must either be owned by the current user or be a global character.
+If the user is not authenticated, only global characters can be retrieved.
+Authentication is optional.
 
  * @summary Get character by ID
  */
@@ -60,10 +61,11 @@ export const deleteCharacter = <TData = AxiosResponse<string>>(
   return axios.delete(`/api/characters/${id}`, options);
 };
 /**
- * Retrieves a paginated list of characters available to the current user.
-The list includes user's personal characters and optionally global characters.
-Results are sorted with personal characters first, then global characters, both groups sorted by name.
-Requires authentication.
+ * Retrieves a paginated list of characters.
+If the user is authenticated, the list includes the user's personal characters and optionally global characters.
+If the user is not authenticated, only global characters are returned (if `includeGlobal` is true).
+Results are sorted with personal characters first (if applicable), then global characters, both groups sorted by name.
+Authentication is optional.
 
  * @summary Get paginated list of characters
  */
