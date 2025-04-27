@@ -21,10 +21,6 @@ const { title = "d-ai-logi" } = Astro.props;
   <body>
     <slot />
     <Toaster richColors closeButton position="top-right" />
-    <script>
-      // Initialize theme const theme = localStorage.getItem("theme") || "system";
-      document.documentElement.setAttribute("data-theme", theme);
-    </script>
   </body>
 </html>
 

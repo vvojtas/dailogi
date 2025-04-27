@@ -18,9 +18,10 @@ import { RefreshCw } from "lucide-react";
 
 interface CharacterListPageProps {
   isLoggedIn: boolean;
+  pageSize?: number;
 }
 
-export default function CharacterListPage({ isLoggedIn }: CharacterListPageProps) {
+export default function CharacterListPage({ isLoggedIn, pageSize = 12 }: CharacterListPageProps) {
   // Navigation
   const navigate = useNavigate();
 
@@ -31,7 +32,7 @@ export default function CharacterListPage({ isLoggedIn }: CharacterListPageProps
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [pageSize] = useState(12);
+
   const [deletingCharacterIds, setDeletingCharacterIds] = useState<number[]>([]);
 
   // Fetch characters

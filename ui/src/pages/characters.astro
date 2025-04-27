@@ -12,7 +12,7 @@ const isLoggedIn = Astro.locals.isLoggedIn ?? false;
   <main class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold mb-8">Characters</h1>
     <ErrorBoundary client:load>
-      <CharacterListPage client:load isLoggedIn={isLoggedIn} />
+      <CharacterListPage client:load isLoggedIn={isLoggedIn} pageSize={12} />
     </ErrorBoundary>
   </main>
 </Layout>
