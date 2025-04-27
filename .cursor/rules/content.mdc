@@ -1,0 +1,9 @@
+---
+description: 
+globs: *.tsx,*.astro
+alwaysApply: false
+---
+## Frontend - Treści
+
+- Produkuj treści w języku Polskim.
+- Postaraj się tworzyć komunikaty nietuzinkowe i dramatyczne (np. powiązane z teatrem). Przykład zamiast 'Usuń postać' można zastosować 'Zlikwiduj postać'

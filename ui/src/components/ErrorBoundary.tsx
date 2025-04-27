@@ -40,14 +40,14 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="text-center py-8">
           <div className="mb-4">
-            <h2 className="text-lg font-semibold mb-2">Something went wrong</h2>
+            <h2 className="text-lg font-semibold mb-2">Chaos wtargnął w harmonię systemu</h2>
             <p className="text-sm text-muted-foreground">
-              {this.state.error?.message || "An unexpected error occurred"}
+              {this.state.error?.message || "Wystąpił błąd, nikt go nie oczekiwał, a mimo to wciaż przybył"}
             </p>
           </div>
           <Button onClick={this.handleRetry} variant="outline">
             <RefreshCw className="mr-2 h-4 w-4" />
-            Try Again
+            Spróbuj ponownie
           </Button>
         </div>
       );

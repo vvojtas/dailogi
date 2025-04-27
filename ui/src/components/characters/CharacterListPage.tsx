@@ -46,10 +46,10 @@ export default function CharacterListPage({ isLoggedIn, pageSize = 12 }: Charact
         setCharacters(data.content);
         setTotalPages(data.total_pages);
         if (isRefresh) {
-          toast.success("Characters refreshed successfully");
+          toast.success("Uaktualniono profile");
         }
       } catch (err) {
-        const message = "Failed to load characters. Please try again later.";
+        const message = "Poszukiwania nie przyniosły rezultatu. Może szczęście uśmiechnie się do ciebie później.";
         setError(message);
         toast.error(message);
         console.error("Error fetching characters:", err);
@@ -70,7 +70,7 @@ export default function CharacterListPage({ isLoggedIn, pageSize = 12 }: Charact
       try {
         setDeletingCharacterIds((prev) => [...prev, character.id]);
         await deleteCharacter(character.id);
-        toast.success(`Character "${character.name}" has been deleted.`);
+        toast.success(`Pomyślnie zlikwidowano "${character.name}"`);
         // Optimistically remove the character from the list
         setCharacters((prev) => prev.filter((c) => c.id !== character.id));
         // If this was the last character on the page and not the first page,
@@ -82,7 +82,7 @@ export default function CharacterListPage({ isLoggedIn, pageSize = 12 }: Charact
           await fetchCharacters(true);
         }
       } catch (err) {
-        const message = "Failed to delete character. Please try again later.";
+        const message = "Niewiarygodne. Postać uniknęła likwidacji. Możesz ponowić próbę później.";
         toast.error(message);
         console.error("Error deleting character:", err);
       } finally {

@@ -51,16 +51,10 @@ export function CharacterCard({ character, isOwner, isDeleting, onEdit, onDelete
           <div className="absolute right-4 top-4 flex gap-2">
             {isOwner && (
               <>
-                <Button variant="ghost" size="icon" onClick={handleEdit} disabled={isDeleting} title="Edit character">
+                <Button variant="ghost" size="icon" onClick={handleEdit} disabled={isDeleting} title="Edytuj postać">
                   <Pencil className="h-4 w-4" />
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  title="Delete character"
-                >
+                <Button variant="ghost" size="icon" onClick={handleDelete} disabled={isDeleting} title="Usuń postać">
                   {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                 </Button>
               </>
@@ -78,12 +72,12 @@ export function CharacterCard({ character, isOwner, isDeleting, onEdit, onDelete
         </CardHeader>
         <CardContent>
           <p className="line-clamp-3 text-sm text-muted-foreground">
-            {character.description || "No description available."}
+            {character.description || "Brak dostępnego opisu."}
           </p>
         </CardContent>
         <CardFooter>
           <Button variant="secondary" className="w-full" onClick={handleViewDetails} disabled={isDeleting}>
-            View Details
+            Sprawdź profil
           </Button>
         </CardFooter>
       </Card>
@@ -91,14 +85,14 @@ export function CharacterCard({ character, isOwner, isDeleting, onEdit, onDelete
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Character</AlertDialogTitle>
+            <AlertDialogTitle>Zlikwiduj postać</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete &quot;{character.name}&quot;? This action cannot be undone.
+              Czy na pewno chcesz zlikwidować postać &quot;{character.name}&quot;? Tej akcji nie można cofnąć.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDelete}>Delete</AlertDialogAction>
+            <AlertDialogCancel>Oszczędź</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete}>Zlikwiduj</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

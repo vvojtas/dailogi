@@ -38,7 +38,7 @@ export function CharacterPagination({ currentPage, totalPages, onPageChange }: C
             aria-disabled={currentPage === 0}
             className={currentPage === 0 ? "pointer-events-none opacity-50 cursor-not-allowed" : "cursor-pointer"}
           >
-            Previous
+            Poprzednia
           </PaginationLink>
         </PaginationItem>
         {[...Array(totalPages)].map((_, index) => {
@@ -73,7 +73,7 @@ export function CharacterPagination({ currentPage, totalPages, onPageChange }: C
               currentPage === totalPages - 1 ? "pointer-events-none opacity-50 cursor-not-allowed" : "cursor-pointer"
             }
           >
-            Next
+            Następna
           </PaginationLink>
         </PaginationItem>
       </PaginationContent>

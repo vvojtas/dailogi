@@ -8,9 +8,9 @@ import { ErrorBoundary } from "../components/ErrorBoundary";
 const isLoggedIn = Astro.locals.isLoggedIn ?? false;
 ---
 
-<Layout title="Characters - d-AI-logi">
+<Layout title="Postacie - d-AI-logi">
   <main class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-8">Characters</h1>
+    <h1 class="text-3xl font-bold mb-8">Postacie</h1>
     <ErrorBoundary client:load>
       <CharacterListPage client:load isLoggedIn={isLoggedIn} pageSize={12} />
     </ErrorBoundary>

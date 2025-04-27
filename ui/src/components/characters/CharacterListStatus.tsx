@@ -32,7 +32,7 @@ export function CharacterListStatus({
         <ErrorMessage message={error} className="mb-4" />
         <Button onClick={onRetry} variant="outline">
           <RefreshCw className="mr-2 h-4 w-4" />
-          Try Again
+          Ponowne poszukiwania
         </Button>
       </div>
     );
@@ -43,14 +43,14 @@ export function CharacterListStatus({
     if (isLoggedIn) {
       return (
         <div className="text-center py-8">
-          <p className="text-lg mb-4">You don&apos;t have any characters yet. Create your first one!</p>
-          <Button onClick={onCreate}>Create New Character</Button>
+          <p className="text-lg mb-4">Bezkresna samotność - wszelkie postaci pozostają nieuchwytne.</p>
+          <Button onClick={onCreate}>Powołaj nową postać</Button>
         </div>
       );
     }
     return (
       <div className="text-center py-8">
-        <p className="text-lg">No global characters available.</p>
+        <p className="text-lg">Bezkresna samotność - wszelkie postaci pozostają nieuchwytne.</p>
       </div>
     );
   }
