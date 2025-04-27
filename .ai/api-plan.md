@@ -380,7 +380,7 @@
 
 #### Generate Dialogue
 - **Method**: POST
-- **Path**: `/api/dialogues/{id}/generate`
+- **Path**: `/api/dialogues/generate`
 - **Description**: Start dialogue generation process
 - **Request Body**:
   ```json
