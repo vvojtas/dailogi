@@ -23,16 +23,16 @@ Zmiany w UI koncentrują się na dodaniu nowych widoków publicznych dla logowan
 ### 1.2. Modyfikacje Layoutów i Stron Istniejących
 
 *   **`Layout.astro` (`src/layouts/Layout.astro`):**
-    *   **Zmiany:** Główny layout aplikacji musi dynamicznie renderować elementy nawigacyjne w zależności od stanu uwierzytelnienia użytkownika pobranego z `Astro.locals.user` (dostarczanego przez middleware).
+    *   **Zmiany:** Główny layout aplikacji musi dynamicznie renderować elementy nawigacyjne w zależności od stanu uwierzytelnienia użytkownika przechowywanego w klienckim store (np. Zustand). Stan ten jest zarządzany po stronie klienta (np. aktualizowany po udanym logowaniu/wylogowaniu przez komponenty React).
         *   **Dla niezalogowanych:** W nagłówku/panelu bocznym wyświetlane są linki/przyciski "Zaloguj się" (`/login`) i "Zarejestruj się" (`/register`). Brak dostępu do nawigacji chronionej.
-        *   **Dla zalogowanych:** Wyświetlana jest pełna nawigacja aplikacji (Postaci, Historia Scen, Nowa Scena, Profil), nazwa zalogowanego użytkownika (`Astro.locals.user.name`) oraz przycisk/link "Wyloguj".
+        *   **Dla zalogowanych:** Wyświetlana jest pełna nawigacja aplikacji (Postaci, Historia Scen, Nowa Scena, Profil), nazwa zalogowanego użytkownika (pobrana ze stanu Zustand, np. `store.user.name`) oraz przycisk/link "Wyloguj".
     *   **Komponent Wylogowania:** Przycisk "Wyloguj" powinien być komponentem (np. `LogoutButton.tsx`), który po kliknięciu wywołuje dedykowany endpoint API (`POST /api/auth/logout`) w celu unieważnienia sesji po stronie serwera, a następnie czyści stan globalny (Zustand) i przekierowuje użytkownika na stronę główną (`/`).
 
 *   **Strony Chronione (np. `/dashboard.astro`, `/characters/**`, `/scenes/**`, `/profile.astro`):**
-    *   Nie wymagają bezpośrednich zmian w logice renderowania związanej z auth (middleware zajmie się przekierowaniem), ale muszą poprawnie działać z danymi użytkownika pobieranymi z `Astro.locals.user` (jeśli go używają) lub poprzez wywołania API, które będą automatycznie uwierzytelniane przez ciasteczko sesji.
+    *   Nie wymagają bezpośrednich zmian w logice renderowania związanej z auth (middleware zajmie się przekierowaniem). Ewentualne dane użytkownika potrzebne na tych stronach (np. ID do pobrania zasobów) muszą być pobierane przez uwierzytelnione wywołania API (które użyją ciasteczka sesji) lub pochodzić ze stanu Zustand.
 
 *   **Strona Główna (`/index.astro`):**
-    *   Powinna również sprawdzać `Astro.locals.user`. Jeśli użytkownik jest zalogowany, może wyświetlać spersonalizowane powitanie lub od razu przekierować na `/dashboard`.
+    *   Logika tej strony powinna opierać się na stanie klienckim (Zustand) do ewentualnego personalizowania powitania lub przekierowania na `/dashboard`, a nie na `Astro.locals.user`.
 
 ### 1.3. Nowe Komponenty Interaktywne (React)
 
@@ -50,7 +50,10 @@ Zmiany w UI koncentrują się na dodaniu nowych widoków publicznych dla logowan
     *   **Logika:**
         *   Po submicji formularza i pomyślnej walidacji client-side, wysyła żądanie `POST /api/auth/login` z danymi (`name`, `password`).
         *   Obsługuje odpowiedź API:
-            *   **Sukces (200 OK):** Przekierowuje użytkownika na `/dashboard` (np. używając `window.location.href` lub `navigate` z `astro:transitions` jeśli używane). Stan globalny (Zustand) zostanie zaktualizowany pośrednio przez odświeżenie strony lub dedykowany mechanizm po stronie layoutu.
+            *   **Sukces (200 OK):**
+                *   Opcjonalnie odbiera `UserDto` z odpowiedzi API.
+                *   Aktualizuje stan globalny Zustand danymi użytkownika (`store.setUser(userDto)`).
+                *   Przekierowuje użytkownika na `/dashboard` (np. używając `window.location.href` lub `navigate` z `astro:transitions` jeśli używane).
             *   **Błąd (400 Bad Request - np. nieprawidłowe dane logowania):** Wyświetla komunikat błędu globalny dla formularza lub używa `Toast` (np. "Nieprawidłowa nazwa użytkownika lub hasło.").
             *   **Inne błędy (5xx):** Wyświetla ogólny komunikat błędu (`Toast`).
         *   Wyświetla stan ładowania na przycisku podczas wysyłania żądania.
@@ -79,12 +82,12 @@ Zmiany w UI koncentrują się na dodaniu nowych widoków publicznych dla logowan
 
 ### 1.4. Stan Globalny (Zustand)
 
-*   Choć główny mechanizm opiera się na sesji serwerowej, store Zustand (`src/lib/store.ts` lub podobny) może być używany do przechowywania informacji o zalogowanym użytkowniku (`user: UserDto | null`, `isLoggedIn: boolean`) po stronie klienta w celu szybkiego dostępu i unikania ciągłego odpytywania `Astro.locals`.
-*   Stan ten powinien być inicjalizowany/aktualizowany przy ładowaniu layoutu na podstawie `Astro.locals.user` i czyszczony po wylogowaniu.
+*   Store Zustand (`src/lib/store.ts` lub podobny) jest kluczowy do przechowywania informacji o zalogowanym użytkowniku (`user: UserDto | null`, `isLoggedIn: boolean`) po stronie klienta. Służy do szybkiego dostępu przez komponenty UI i dynamicznego renderowania interfejsu.
+*   Stan ten powinien być aktualizowany przez komponenty React po udanych operacjach logowania (ustawienie danych użytkownika) i wylogowania (wyczyszczenie danych). Nie jest inicjalizowany na podstawie `Astro.locals.user` przez layout, ponieważ middleware (Opcja 2) nie dostarcza tych danych.
 
 ### 1.5. Obsługa Scenariuszy
 
-*   **Logowanie:** Użytkownik wchodzi na `/login`, wypełnia formularz, klika "Zaloguj się". Formularz wysyła dane do `/api/auth/login`. API (Astro) woła backend Spring. Po sukcesie, API (Astro) ustawia ciasteczko sesji (HTTP-only), formularz przekierowuje na `/dashboard`. Middleware przy następnym żądaniu odczyta ciasteczko i ustawi `Astro.locals.user`.
+*   **Logowanie:** Użytkownik wchodzi na `/login`, wypełnia formularz, klika "Zaloguj się". Formularz (`LoginForm.tsx`) wysyła dane do `/api/auth/login`. API (Astro) woła backend Spring. Po sukcesie, API (Astro) ustawia ciasteczko sesji (HTTP-only) i zwraca `200 OK` (opcjonalnie z `UserDto`). `LoginForm.tsx` odbiera sukces, aktualizuje store Zustand danymi użytkownika i przekierowuje na `/dashboard`. Middleware przy następnym żądaniu do *strony* chronionej tylko sprawdzi obecność ciasteczka, ale nie ustawi `Astro.locals.user`.
 *   **Rejestracja:** Użytkownik wchodzi na `/register`, wypełnia formularz, klika "Zarejestruj się". Formularz wysyła dane do `/api/auth/register`. API (Astro) woła backend Spring. Po sukcesie, formularz wyświetla komunikat i przekierowuje na `/login`.
 *   **Dostęp do strony chronionej (niezalogowany):** Użytkownik próbuje wejść np. na `/dashboard`. Middleware Astro przechwytuje żądanie, stwierdza brak ważnej sesji (ciasteczka), przekierowuje użytkownika na `/login`.
 *   **Wylogowanie:** Użytkownik klika "Wyloguj". Komponent wysyła `POST /api/auth/logout`. API (Astro) woła backend (opcjonalne, jeśli jest blacklistowanie) i usuwa ciasteczko sesji. Komponent czyści stan Zustand i przekierowuje na `/`.
@@ -134,7 +137,6 @@ Warstwa Astro pełni rolę API Gateway i zarządzania sesją użytkownika w kont
             *   **Sukces (Spring zwraca 200/201 z `UserDto` lub `ApiResponse`):** Zwraca odpowiedź `200 OK` lub `201 Created` do frontendu z odpowiednim ciałem.
             *   **Błąd (Spring zwraca 400, 409, itp.):** Przekazuje status błędu i komunikat/ciało błędu z backendu do frontendu.
             *   **Błąd połączenia z backendem:** Zwraca `500` lub `503`.
-
 
 *   **`POST /api/auth/logout.ts` (`src/pages/api/auth/logout.ts`):**
     *   **Cel:** Wylogowanie użytkownika.
