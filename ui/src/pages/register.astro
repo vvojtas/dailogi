@@ -1,0 +1,19 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { RegisterForm } from "@/components/auth/RegisterForm";
+---
+
+<Layout>
+  <div class="container mx-auto px-4 py-8">
+    <div class="mx-auto max-w-md">
+      <h1 class="mb-8 text-center text-3xl font-bold">Inicjacja konta</h1>
+      <div class="rounded-lg border bg-card p-6 shadow-sm">
+        <RegisterForm client:load />
+        <div class="mt-4 text-center text-sm text-muted-foreground">
+          Twoje dane błąkają się już w naszym systemie?{" "}
+          <a href="/login" class="font-medium text-primary hover:underline"> Zaloguj się </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

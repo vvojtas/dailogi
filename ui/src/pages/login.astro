@@ -1,0 +1,19 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { LoginForm } from "@/components/auth/LoginForm";
+---
+
+<Layout>
+  <div class="container mx-auto px-4 py-8">
+    <div class="mx-auto max-w-md">
+      <h1 class="mb-8 text-center text-3xl font-bold">Logowanie</h1>
+      <div class="rounded-lg border bg-card p-6 shadow-sm">
+        <LoginForm client:load />
+        <div class="mt-4 text-center text-sm text-muted-foreground">
+          Nie masz jeszcze konta?{" "}
+          <a href="/register" class="font-medium text-primary hover:underline"> Wejdź w d-ai-logi z nami</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

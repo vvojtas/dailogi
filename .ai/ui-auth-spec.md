@@ -10,13 +10,13 @@ Zmiany w UI koncentrują się na dodaniu nowych widoków publicznych dla logowan
 
 *   **`/login.astro` (`src/pages/login.astro`):**
     *   **Cel:** Strona logowania użytkownika.
-    *   **Layout:** Wykorzystuje `PublicLayout.astro` (lub podobny layout dla stron publicznych, bez nawigacji aplikacji).
+    *   **Layout:** Wykorzystuje `Layout.astro` (lub podobny layout dla stron publicznych, bez nawigacji aplikacji).
     *   **Zawartość:** Nagłówek ("Logowanie"), osadzony komponent React `LoginForm.tsx`, link do strony rejestracji (`/register`).
     *   **Logika:** Strona jest statyczna, główna logika znajduje się w komponencie React. W przypadku, gdy użytkownik jest już zalogowany (sprawdzenie w `Astro.locals`), strona powinna automatycznie przekierować do `/dashboard`.
 
 *   **`/register.astro` (`src/pages/register.astro`):**
     *   **Cel:** Strona rejestracji nowego użytkownika.
-    *   **Layout:** Wykorzystuje `PublicLayout.astro`.
+    *   **Layout:** Wykorzystuje `Layout.astro`.
     *   **Zawartość:** Nagłówek ("Rejestracja"), osadzony komponent React `RegisterForm.tsx`, link do strony logowania (`/login`).
     *   **Logika:** Strona statyczna. Podobnie jak `/login`, jeśli użytkownik jest już zalogowany, następuje przekierowanie do `/dashboard`.
 

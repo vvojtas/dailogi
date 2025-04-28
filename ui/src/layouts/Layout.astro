@@ -1,12 +1,14 @@
 ---
 import "../styles/global.css";
 import { Toaster } from "sonner";
+import { LogoutButton } from "@/components/auth/LogoutButton";
 
 interface Props {
   title?: string;
 }
 
 const { title = "d-ai-logi" } = Astro.props;
+const isLoggedIn = Astro.locals.isLoggedIn;
 ---
 
 <!doctype html>
@@ -18,8 +20,34 @@ const { title = "d-ai-logi" } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
-  <body>
-    <slot />
+  <body class="min-h-screen bg-background">
+    <header class="border-b">
+      <div class="container mx-auto flex h-16 items-center justify-between px-4">
+        <a href="/" class="text-xl font-bold">d-ai-logi</a>
+        <nav class="flex items-center gap-4">
+          {
+            isLoggedIn ? (
+              <LogoutButton client:load />
+            ) : (
+              <div class="flex items-center gap-4">
+                <a href="/login" class="text-sm font-medium hover:text-primary">
+                  Ujawnij się
+                </a>
+                <a
+                  href="/register"
+                  class="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                >
+                  Dołącz
+                </a>
+              </div>
+            )
+          }
+        </nav>
+      </div>
+    </header>
+    <main>
+      <slot />
+    </main>
     <Toaster richColors closeButton position="top-right" client:load />
   </body>
 </html>
