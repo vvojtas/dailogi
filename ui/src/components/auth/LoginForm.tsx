@@ -13,6 +13,7 @@ import { useAuthStore } from "@/lib/stores/auth.store";
 import type { AuthState } from "@/lib/stores/auth.store";
 import { ROUTES } from "@/lib/config/routes";
 import axios from "axios";
+import { navigate } from "@/lib/hooks/useNavigate";
 
 const loginSchema = z.object({
   name: z.string().min(1, "Zdradź swoją tożsamość"),
@@ -47,7 +48,7 @@ export function LoginForm() {
 
       toast.success("Zalogowano pomyślnie");
       console.log(`[LoginForm] Redirecting to ${ROUTES.HOME}...`);
-      window.location.href = ROUTES.HOME;
+      navigate(ROUTES.HOME);
       // Note: Code execution might stop here due to redirect
     } catch (error) {
       let errorMessage = "Nie tak brzmiał sekret powierzony nam wcześniej";

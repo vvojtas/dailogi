@@ -1,6 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { RegisterForm } from "@/components/auth/RegisterForm";
+import { ROUTES } from "@/lib/config/routes";
 ---
 
 <Layout>
@@ -11,7 +12,7 @@ import { RegisterForm } from "@/components/auth/RegisterForm";
         <RegisterForm client:load />
         <div class="mt-4 text-center text-sm text-muted-foreground">
           Twoje dane błąkają się już w naszym systemie?{" "}
-          <a href="/login" class="font-medium text-primary hover:underline"> Zaloguj się </a>
+          <a href={ROUTES.LOGIN} class="font-medium text-primary hover:underline"> Zaloguj się </a>
         </div>
       </div>
     </div>

@@ -7,6 +7,9 @@ export const ROUTES = {
   // Protected routes
   DASHBOARD: "/dashboard",
   CHARACTERS: "/characters",
+  CHARACTER_CREATE: "/characters/create",
+  CHARACTER_DETAIL_PATTERN: "/characters/:id",
+  CHARACTER_EDIT_PATTERN: "/characters/:id/edit",
   SCENES: "/scenes",
   PROFILE: "/profile",
 
@@ -38,3 +41,23 @@ export const isProtectedRoute = (path: string): boolean => {
   // All other routes are protected
   return true;
 };
+
+// --- Route Helper Functions ---
+
+/**
+ * Generates the URL for the character detail page.
+ * @param id - The ID of the character.
+ * @returns The URL string.
+ */
+export function getCharacterDetailUrl(id: number | string): string {
+  return ROUTES.CHARACTER_DETAIL_PATTERN.replace(":id", String(id));
+}
+
+/**
+ * Generates the URL for the character edit page.
+ * @param id - The ID of the character.
+ * @returns The URL string.
+ */
+export function getCharacterEditUrl(id: number | string): string {
+  return ROUTES.CHARACTER_EDIT_PATTERN.replace(":id", String(id));
+}

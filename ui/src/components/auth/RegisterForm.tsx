@@ -10,6 +10,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { register } from "@/dailogi-api/authentication/authentication";
 import type { RegisterCommand } from "@/dailogi-api/model";
 import axios from "axios";
+import { navigate } from "@/lib/hooks/useNavigate";
+import { ROUTES } from "@/lib/config/routes";
 
 const registerSchema = z
   .object({
@@ -50,7 +52,7 @@ export function RegisterForm() {
       await register(data);
 
       toast.success("Inicjalizacja konta pomyślna. Zapraszamy.");
-      window.location.href = "/login";
+      navigate(ROUTES.LOGIN);
     } catch (error: unknown) {
       let errorMessage = "Wystąpił błąd podczas inicjalizacji konta";
       if (axios.isAxiosError(error) && error.response) {

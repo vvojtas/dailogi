@@ -8,6 +8,7 @@ import { CharacterGrid } from "@/components/characters/CharacterGrid";
 import { CharacterPagination } from "@/components/characters/CharacterPagination";
 import { CharacterListStatus } from "@/components/characters/CharacterListStatus";
 import { useAuthStore } from "@/lib/stores/auth.store";
+import { ROUTES, getCharacterDetailUrl, getCharacterEditUrl } from "@/lib/config/routes";
 
 interface CharacterListPageProps {
   pageSize?: number;
@@ -142,13 +143,13 @@ export default function CharacterListPage({ pageSize = 12 }: CharacterListPagePr
 
 // Action handlers
 function handleNavigateToCreate() {
-  navigate("/characters/create");
+  navigate(ROUTES.CHARACTER_CREATE);
 }
 
 function handleNavigateToEdit(characterId: number) {
-  navigate(`/characters/${characterId}/edit`);
+  navigate(getCharacterEditUrl(characterId));
 }
 
 function handleViewDetails(characterId: number) {
-  navigate(`/characters/${characterId}`);
+  navigate(getCharacterDetailUrl(characterId));
 }
