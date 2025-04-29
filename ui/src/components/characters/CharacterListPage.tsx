@@ -1,3 +1,6 @@
+// Import konfiguracji axios na samej górze, przed innymi importami
+// import "@/lib/config/axios";
+
 import { useCallback, useEffect, useState } from "react";
 import type { CharacterDTO } from "@/dailogi-api/model";
 import { deleteCharacter, getCharacters } from "@/dailogi-api/characters/characters";

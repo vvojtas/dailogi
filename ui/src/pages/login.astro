@@ -1,6 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { LoginForm } from "@/components/auth/LoginForm";
+import { ROUTES } from "@/lib/config/routes";
 ---
 
 <Layout>
@@ -11,7 +12,7 @@ import { LoginForm } from "@/components/auth/LoginForm";
         <LoginForm client:load />
         <div class="mt-4 text-center text-sm text-muted-foreground">
           Nie masz jeszcze konta?{" "}
-          <a href="/register" class="font-medium text-primary hover:underline"> Wejdź w d-ai-logi z nami</a>
+          <a href={ROUTES.REGISTER} class="font-medium text-primary hover:underline"> Wejdź w d-ai-logi z nami</a>
         </div>
       </div>
     </div>

@@ -36,7 +36,9 @@ export function CharacterPagination({ currentPage, totalPages, onPageChange }: C
           <PaginationLink
             onClick={handlePrevious}
             aria-disabled={currentPage === 0}
-            className={currentPage === 0 ? "pointer-events-none opacity-50 cursor-not-allowed" : "cursor-pointer"}
+            className={`px-4 w-auto min-w-[110px] text-center ${
+              currentPage === 0 ? "pointer-events-none opacity-50 cursor-not-allowed" : "cursor-pointer"
+            }`}
           >
             Poprzednia
           </PaginationLink>
@@ -50,7 +52,7 @@ export function CharacterPagination({ currentPage, totalPages, onPageChange }: C
           }
 
           return (
-            <PaginationItem key={index}>
+            <PaginationItem key={index} className="mx-1">
               {isEllipsisBoundary ? (
                 <PaginationEllipsis />
               ) : (
@@ -65,13 +67,13 @@ export function CharacterPagination({ currentPage, totalPages, onPageChange }: C
             </PaginationItem>
           );
         })}
-        <PaginationItem>
+        <PaginationItem className="ml-2">
           <PaginationLink
             onClick={handleNext}
             aria-disabled={currentPage === totalPages - 1}
-            className={
+            className={`px-4 w-auto min-w-[110px] text-center ${
               currentPage === totalPages - 1 ? "pointer-events-none opacity-50 cursor-not-allowed" : "cursor-pointer"
-            }
+            }`}
           >
             Następna
           </PaginationLink>

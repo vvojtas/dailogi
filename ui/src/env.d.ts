@@ -19,7 +19,7 @@ declare namespace App {
 
 // Extend ImportMetaEnv to add custom environment variables
 interface ImportMetaEnv {
-  readonly PUBLIC_BACKEND_BASE_URL: string;
+  readonly SPRING_BACKEND_BASE_URL: string;
   // more env variables...
 }
 

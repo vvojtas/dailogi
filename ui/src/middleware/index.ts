@@ -1,30 +1,27 @@
-import type { MiddlewareHandler } from "astro";
 import { defineMiddleware } from "astro:middleware";
+import { isProtectedRoute } from "@/lib/config/routes";
 
-export const onRequest: MiddlewareHandler = defineMiddleware(async (context, next) => {
-  // Initialize locals with default values
-  context.locals.isLoggedIn = false;
-  context.locals.token = undefined; // Initialize token as undefined
+export const onRequest = defineMiddleware(async ({ request, redirect }, next) => {
+  const url = new URL(request.url);
+  const path = url.pathname;
 
-  // Get the session token from cookies
-  const token = context.cookies.get("session")?.value;
+  // Skip middleware for API routes and public pages
+  if (path.startsWith("/api/")) {
+    return next();
+  }
 
-  if (token) {
-    try {
-      // Here you would typically validate the token
-      // For now, we'll just assume the presence of a token means the user is logged in
-      context.locals.isLoggedIn = true;
-      context.locals.token = token;
+  // Check if the route requires protection
+  if (isProtectedRoute(path)) {
+    // Get session cookie
+    const cookies = request.headers.get("cookie");
+    const hasSessionToken = cookies?.includes("session_token=");
 
-      // You could also decode the token to get the user ID
-      // const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      // context.locals.userId = decoded.sub;
-    } catch (error) {
-      // If token validation fails, we'll keep isLoggedIn as false
-      console.error("Error validating token:", error);
+    // If no session token present, redirect to login
+    if (!hasSessionToken) {
+      return redirect("/login");
     }
   }
 
-  // Continue to the next middleware or route handler
+  // Continue to next middleware or page
   return next();
 });

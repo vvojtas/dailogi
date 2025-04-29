@@ -22,6 +22,7 @@ d-AI-logi is an interactive web application that lets users create and observe d
 When introducing changes to the project, always follow the directory structure below:
 
 - `./ui/src` - ui source code
+- `./ui/src/dialogi-api` - endpoints and types that can be used both in browser to astro and anstro to spring communication
 - `./ui/src/layouts` - Astro layouts
 - `./ui/src/pages` - Astro pages
 - `./ui/src/pages/api` - API endpoints
