@@ -35,7 +35,7 @@ export const ALL: APIRoute = async ({ request, cookies, params }) => {
 
   // Remove headers that shouldn't be forwarded directly (e.g., host)
   backendHeaders.delete("host");
-  // Astro/Vite adds connection: keep-alive, which might cause issues with some backends/proxies
+  // Astro adds connection: keep-alive, which might cause issues with some backends/proxies
   backendHeaders.delete("connection");
 
   // Add Authorization header if token exists
@@ -50,9 +50,11 @@ export const ALL: APIRoute = async ({ request, cookies, params }) => {
       headers: backendHeaders,
       // Forward body only for relevant methods
       body: request.method !== "GET" && request.method !== "HEAD" ? request.body : undefined,
+      // Add duplex option when sending a body (required in newer Node.js versions)
+      duplex: request.method !== "GET" && request.method !== "HEAD" ? "half" : undefined,
       // Pass through redirect handling
       redirect: "manual", // Let the client handle redirects based on backend response
-    });
+    } as RequestInit & { duplex?: "half" });
 
     // Create a new response based on the backend response
     // Important: Create a new Headers object to avoid modifying the original

@@ -1,4 +1,4 @@
-import "@/lib/config/axios";
+import "@/lib/config/axios/server";
 import { login } from "@/dailogi-api/authentication/authentication";
 import type { APIRoute } from "astro";
 
@@ -30,7 +30,8 @@ export const POST: APIRoute = async ({ request }) => {
       `Max-Age=${data.expires_in}`,
       "Path=/",
     ];
-
+    // Do not send the token to the client
+    data.access_token = "";
     return new Response(JSON.stringify(data), {
       status: 200,
       headers: {

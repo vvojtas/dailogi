@@ -3,16 +3,13 @@ import "../styles/global.css";
 import Layout from "../layouts/Layout.astro";
 import CharacterListPage from "../components/characters/CharacterListPage";
 import { ErrorBoundary } from "../components/ErrorBoundary";
-
-// Get authentication status from Astro.locals (to be implemented with middleware)
-const isLoggedIn = Astro.locals.isLoggedIn ?? false;
 ---
 
 <Layout title="Postacie - d-AI-logi">
   <main class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold mb-8">Postacie</h1>
     <ErrorBoundary client:load>
-      <CharacterListPage client:load isLoggedIn={isLoggedIn} pageSize={12} />
+      <CharacterListPage client:load pageSize={12} />
     </ErrorBoundary>
   </main>
 </Layout>

@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "@/lib/stores/auth.store";
 import type { AuthState } from "@/lib/stores/auth.store";
-
+import { ROUTES } from "@/lib/config/routes";
 export function LogoutButton() {
   const [isLoading, setIsLoading] = useState(false);
   const logoutStore = useAuthStore((state: AuthState) => state.logout);
@@ -31,7 +31,7 @@ export function LogoutButton() {
       console.log("[LogoutButton] About to redirect to home");
       // The slight timeout ensures storage operations complete before redirection
       setTimeout(() => {
-        window.location.href = "/";
+        window.location.href = ROUTES.HOME;
       }, 100);
     } catch (error) {
       toast.error(

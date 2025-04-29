@@ -87,7 +87,7 @@ export function CharacterCard({ character, isOwner, isDeleting, onEdit, onDelete
           <AlertDialogHeader>
             <AlertDialogTitle>Zlikwiduj postać</AlertDialogTitle>
             <AlertDialogDescription>
-              Czy na pewno chcesz zlikwidować postać &quot;{character.name}&quot;? Tej akcji nie można cofnąć.
+              Czy na pewno chcesz zlikwidować postać &quot;{character.name}&quot;? Nie da się jej później uratować.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -1,24 +1,22 @@
-import { useEffect } from "react";
 import { useAuthStore } from "@/lib/stores/auth.store";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { ROUTES } from "@/lib/config/routes";
 import type { AuthState } from "@/lib/stores/auth.store";
 
 export function HeaderNav() {
-  // Subscribe only to the primitive value needed
+  // Subscribe only to what's needed
   const isLoggedIn = useAuthStore((state: AuthState) => state.isLoggedIn);
-
-  console.log(`[HeaderNav] Component rendered. isLoggedIn: ${isLoggedIn}`);
-
-  useEffect(() => {
-    // Log when the isLoggedIn value changes from React's perspective
-    console.log(`[HeaderNav] useEffect triggered. isLoggedIn changed to: ${isLoggedIn}`);
-  }, [isLoggedIn]); // Dependency array ensures this runs when isLoggedIn changes
+  const userName = useAuthStore((state: AuthState) => state.user?.name);
 
   return (
     <nav className="flex items-center gap-4">
       {isLoggedIn ? (
-        <LogoutButton />
+        <div className="flex items-center gap-4">
+          <span className="text-sm font-medium">
+            Scenarzysta: <span className="italic">{userName}</span>
+          </span>
+          <LogoutButton />
+        </div>
       ) : (
         // Render Login and Register links when logged out
         <div className="flex items-center gap-4">

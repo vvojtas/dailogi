@@ -1,25 +1,12 @@
 import axios, { type AxiosInstance, type AxiosError } from "axios";
-import { ROUTES } from "./routes";
+import { ROUTES } from "../routes";
 import { toast } from "sonner";
 
 // Browser-to-Astro instance (for client-side usage)
 export const browserApi: AxiosInstance = axios.create({});
 
-// Astro-to-Spring instance (for server-side usage)
-export const serverApi: AxiosInstance = axios.create({
-  // Spring backend URL - przywracamy port i usuwamy /api
-  baseURL: "https://localhost:443",
-  // Disable SSL certificate verification for development (remove in production)
-  // httpsAgent: new (require("https").Agent)({ rejectUnauthorized: false }),
-});
-
 // Add request interceptors
 browserApi.interceptors.request.use(
-  (config) => config,
-  (error) => Promise.reject(error)
-);
-
-serverApi.interceptors.request.use(
   (config) => config,
   (error) => Promise.reject(error)
 );
@@ -66,19 +53,9 @@ browserApi.interceptors.response.use(
   }
 );
 
-// Add response interceptors for server API
-serverApi.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    // Server-side error handling doesn't show UI notifications
-    return Promise.reject(error);
-  }
-);
-
-// Patch the global axios instance based on environment
+// Patch the global axios instance for browser environment
 if (typeof window !== "undefined") {
-  // Browser environment
-  console.log("Applying browser-side Axios patch (original logic)...");
+  console.log("Applying browser-side Axios patch...");
   Object.keys(browserApi.defaults).forEach((key) => {
     if (key !== "headers") {
       (axios.defaults as Record<string, unknown>)[key] = (browserApi.defaults as Record<string, unknown>)[key];
@@ -86,16 +63,7 @@ if (typeof window !== "undefined") {
   });
   axios.interceptors.request = browserApi.interceptors.request;
   axios.interceptors.response = browserApi.interceptors.response;
-  console.log("Browser-side Axios patch applied (original logic).");
-} else {
-  // Server environment
-  console.log("Applying server-side Axios patch (original logic)...");
-  Object.keys(serverApi.defaults).forEach((key) => {
-    if (key !== "headers") {
-      (axios.defaults as Record<string, unknown>)[key] = (serverApi.defaults as Record<string, unknown>)[key];
-    }
-  });
-  axios.interceptors.request = serverApi.interceptors.request;
-  axios.interceptors.response = serverApi.interceptors.response;
-  console.log("Server-side Axios patch applied (original logic).");
+  console.log("Browser-side Axios patch applied.");
 }
+
+export default browserApi;

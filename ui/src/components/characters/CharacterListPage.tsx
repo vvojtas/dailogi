@@ -1,6 +1,3 @@
-// Import konfiguracji axios na samej górze, przed innymi importami
-// import "@/lib/config/axios";
-
 import { useCallback, useEffect, useState } from "react";
 import type { CharacterDTO } from "@/dailogi-api/model";
 import { deleteCharacter, getCharacters } from "@/dailogi-api/characters/characters";
@@ -10,13 +7,16 @@ import { CharacterListHeader } from "@/components/characters/CharacterListHeader
 import { CharacterGrid } from "@/components/characters/CharacterGrid";
 import { CharacterPagination } from "@/components/characters/CharacterPagination";
 import { CharacterListStatus } from "@/components/characters/CharacterListStatus";
+import { useAuthStore } from "@/lib/stores/auth.store";
 
 interface CharacterListPageProps {
-  isLoggedIn: boolean;
   pageSize?: number;
 }
 
-export default function CharacterListPage({ isLoggedIn, pageSize = 12 }: CharacterListPageProps) {
+export default function CharacterListPage({ pageSize = 12 }: CharacterListPageProps) {
+  // Auth state
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+
   // Navigation
   // const navigate = useNavigate();
 
