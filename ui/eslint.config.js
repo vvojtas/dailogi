@@ -57,6 +57,9 @@ const reactConfig = tseslint.config({
 });
 
 export default tseslint.config(
+  {
+    ignores: ["src/dailogi-api/**"],
+  },
   includeIgnoreFile(gitignorePath),
   baseConfig,
   jsxA11yConfig,

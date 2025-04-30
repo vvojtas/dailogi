@@ -10,7 +10,7 @@
   --gradient-from: hsl(231 100% 98%);
   --gradient-to: hsl(223 100% 93%);
   --card: hsl(0 0% 100%);
-  --card-foreground: hsl(222 84% 5%);
+  --card-foreground: hsl(46, 84%, 5%);
   --popover: hsl(0 0% 100%);
   --popover-foreground: hsl(222 84% 5%);
   --primary: hsl(210 100% 45%);
@@ -126,4 +126,27 @@
     background-image: linear-gradient(to bottom right, var(--gradient-from), var(--gradient-to));
     min-height: 100vh;
   }
+}
+
+/* Custom scrollbar styles */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: var(--secondary-foreground);
+  opacity: 0.5;
+  border-radius: 20px;
+}
+
+.scrollbar-thumb-secondary::-webkit-scrollbar-thumb {
+  background-color: var(--secondary-foreground);
+}
+
+.scrollbar-track-transparent::-webkit-scrollbar-track {
+  background: transparent;
 }

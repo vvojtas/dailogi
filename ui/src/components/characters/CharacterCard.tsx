@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import type { CharacterDTO } from "@/dailogi-api/model";
 import { CharacterAvatar } from "@/components/characters/CharacterAvatar";
-import { Loader2, Pencil, Trash2 } from "lucide-react";
+import { BookOpen, Loader2, Pencil, Trash2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,7 +46,9 @@ export function CharacterCard({ character, isOwner, isDeleting, onEdit, onDelete
 
   return (
     <>
-      <Card className="overflow-hidden">
+      <Card
+        className={`overflow-hidden ${character.is_global ? "bg-secondary/50 border-secondary" : ""} ${!isOwner ? "bg-muted/25 border-muted-foreground/20" : ""}`}
+      >
         <CardHeader className="relative">
           <div className="absolute right-4 top-4 flex gap-2">
             {isOwner && (
@@ -73,12 +75,20 @@ export function CharacterCard({ character, isOwner, isDeleting, onEdit, onDelete
               characterName={character.name}
               className="h-16 w-16"
             />
-            <CardTitle>{character.name}</CardTitle>
+            <div className="flex flex-col gap-1">
+              <CardTitle>{character.name}</CardTitle>
+              {character.is_global && (
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <BookOpen className="h-3 w-3" />
+                  <span>Katalog główny</span>
+                </div>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent>
-          <p className="line-clamp-3 text-sm text-muted-foreground">
-            {character.description || "Brak dostępnego opisu."}
+          <p className="h-24 overflow-y-auto text-sm text-muted-foreground scrollbar-thin scrollbar-thumb-secondary scrollbar-track-transparent">
+            {character.description || "Ta postać owiana jest tajemnicą."}
           </p>
         </CardContent>
         <CardFooter>

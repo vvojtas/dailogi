@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import { Toaster } from "sonner";
 import { HeaderNav } from "@/components/layout/HeaderNav";
+import { ThemeInit } from "@/components/ThemeInit";
 
 interface Props {
   title?: string;
@@ -22,25 +23,33 @@ const { title = "d-ai-logi" } = Astro.props;
       import "@/lib/config/axios/browser";
     </script>
   </head>
-  <body class="min-h-screen bg-background">
-    <header class="border-b">
-      <div class="container mx-auto flex h-16 items-center justify-between px-4">
-        <a href="/" class="text-xl font-bold">d-ai-logi</a>
-        <HeaderNav client:only="react" />
-      </div>
-    </header>
-    <main>
-      <slot />
-    </main>
-    <Toaster richColors closeButton position="top-right" client:load />
+  <body class="min-h-screen bg-gradient-to-br from-[var(--gradient-from)] to-[var(--gradient-to)]">
+    <ThemeInit client:load />
+    <div class="flex min-h-screen flex-col antialiased">
+      <header
+        class="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+      >
+        <div class="container mx-auto flex h-16 items-center justify-between px-4">
+          <div class="flex items-center mr-8">
+            <a href="/" class="flex items-center hover:opacity-90 transition-opacity">
+              <img src="/d-ai-logi-logo.svg" alt="d-ai-logi logo" width="120" height="120" />
+            </a>
+          </div>
+          <HeaderNav client:only="react" />
+        </div>
+      </header>
+      <main class="flex-1">
+        <slot />
+      </main>
+      <Toaster richColors closeButton position="top-right" client:load />
+    </div>
   </body>
 </html>
 
 <style>
-  html,
   body {
+    background-image: linear-gradient(to bottom right, var(--gradient-from), var(--gradient-to));
+    min-height: 100vh;
     margin: 0;
-    width: 100%;
-    height: 100%;
   }
 </style>

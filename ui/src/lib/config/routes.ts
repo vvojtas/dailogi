@@ -11,6 +11,7 @@ export const ROUTES = {
   CHARACTER_DETAIL_PATTERN: "/characters/:id",
   CHARACTER_EDIT_PATTERN: "/characters/:id/edit",
   SCENES: "/scenes",
+  SCENE_NEW: "/scenes/new",
   PROFILE: "/profile",
 
   // API routes are defined in the generated API client
