@@ -45,7 +45,7 @@ export function LogoutButton() {
 
   return (
     <Button
-      variant="ghost"
+      variant="outline"
       onClick={handleLogout}
       disabled={isLoading}
       className="text-destructive hover:text-destructive/90"
