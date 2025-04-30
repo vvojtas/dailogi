@@ -1,0 +1,78 @@
+<svg viewBox="0 0 225 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur">
+        <animate attributeName="stdDeviation" values="2;4;2" dur="2s" repeatCount="2" begin="0s;aianim.end+13s" id="aianim"/>
+      </feGaussianBlur>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <pattern id="dots" width="10" height="10" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="0.5" fill="#b0c4ff" opacity="0.2"/>
+    </pattern>
+  </defs>
+  <rect x="0" y="0" width="300" height="150" rx="10" ry="10" fill="url(#dots)"/>
+  <g transform="translate(9, 77)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-weight="bold" font-size="52" fill="#444444">d</text>
+    <text x="30" y="0" font-family="Arial, sans-serif" font-weight="bold" font-size="52" fill="#444444">-</text>
+    <text x="48" y="0" font-family="Arial, sans-serif" font-weight="bold" font-size="52" fill="#0078e7" filter="url(#glow)">AI</text>
+    <text x="96" y="0" font-family="Arial, sans-serif" font-weight="bold" font-size="52" fill="#444444">-</text>
+    <text x="114" y="0" font-family="Arial, sans-serif" font-weight="bold" font-size="52" fill="#444444">logi</text>
+    <g transform="translate(10 -45)">
+      <path d="M0,0 
+               q-6,-3 -6,-8 
+               v-5 
+               q0,-5 6,-5
+               h12
+               q6,0 6,5
+               v5
+               q0,5 -6,8
+               l-3,1.5 l-3,-1.5" fill="#7cb9e8" opacity="0.3">
+        <animate attributeName="fill-opacity" values="0.3;0.9;0.3" fill="freeze" dur="0.75s" begin="0s;anim4.end+10s" id="anim1"/>
+        <animateTransform attributeName="transform" type="scale" values="1;1.15;1" dur="0.75s" begin="anim1.begin" additive="sum"/>
+      </path>
+    </g>
+    <g transform="translate(36 -30)">
+      <path d="M0,-0 
+               q-10,-5 -10,-12 
+               v-8 
+               q0,-8 10,-8
+               h20
+               q10,0 10,8
+               v8
+               q0,7 -10,12
+               l-5,3 l-5,-3" fill="#7cb9e8" opacity="0.4">
+        <animate attributeName="fill-opacity" values="0.4;0.9;0.4" dur="0.75s" fill="freeze" begin="anim1.end" id="anim2"/>
+        <animateTransform attributeName="transform" type="scale" values="1;1.15;1" dur="0.75s" begin="anim2.begin" additive="sum"/>
+      </path>
+    </g>
+    <g transform="translate(95 -45)">
+      <path d="M0,-0 
+               q-8,-4 -8,-10 
+               v-6 
+               q0,-6 8,-6
+               h16
+               q8,0 8,6
+               v6
+               q0,6 -8,10
+               l-4,2 l-4,-2" fill="#7cb9e8" opacity="0.6">
+        <animate attributeName="fill-opacity" values="0.6;0.9;0.6" dur="0.75s" fill="freeze" begin="anim2.end" id="anim3"/>
+        <animateTransform attributeName="transform" type="scale" values="1;1.15;1" dur="0.75s" begin="anim3.begin" additive="sum"/>
+      </path>
+    </g>
+    <g transform="translate(155 -25)">
+      <path d="M0, 0 
+               q-9,-5 -9,-11 
+               v-7 
+               q0,-7 9,-7
+               h18
+               q9,0 9,7
+               v7
+               q0,6 -9,11
+               l-4.5,2.5 l-4.5,-2.5" fill="#7cb9e8" opacity="0.8">
+        <animate attributeName="fill-opacity" values="0.8;1;0.8" dur="0.75s" fill="freeze" begin="anim3.end" id="anim4"/>
+        <animateTransform attributeName="transform" type="scale" values="1;1.15;1" dur="0.75s" begin="anim4.begin" additive="sum"/>
+      </path>
+    </g>
+    <path d="M15,-50 Q105,-80 190,-50" stroke="#1e90ff" stroke-width="1.5" fill="none" stroke-dasharray="3,2"/>
+  </g>
+</svg>

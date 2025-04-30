@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { register } from "@/dailogi-api/authentication/authentication";
 import type { RegisterCommand } from "@/dailogi-api/model";
 import axios from "axios";
-import { navigate } from "@/lib/hooks/useNavigate";
+import { navigate } from "@/lib/client/navigate";
 import { ROUTES } from "@/lib/config/routes";
 
 const registerSchema = z

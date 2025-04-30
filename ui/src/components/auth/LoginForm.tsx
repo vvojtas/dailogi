@@ -13,7 +13,7 @@ import { useAuthStore } from "@/lib/stores/auth.store";
 import type { AuthState } from "@/lib/stores/auth.store";
 import { ROUTES } from "@/lib/config/routes";
 import axios from "axios";
-import { navigate } from "@/lib/hooks/useNavigate";
+import { navigate } from "@/lib/client/navigate";
 
 const loginSchema = z.object({
   name: z.string().min(1, "Zdradź swoją tożsamość"),

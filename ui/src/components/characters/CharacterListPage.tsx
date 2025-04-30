@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { CharacterDTO } from "@/dailogi-api/model";
 import { deleteCharacter, getCharacters } from "@/dailogi-api/characters/characters";
 import { toast } from "sonner";
-import { navigate } from "@/lib/hooks/useNavigate";
+import { navigate } from "@/lib/client/navigate";
 import { CharacterListHeader } from "@/components/characters/CharacterListHeader";
 import { CharacterGrid } from "@/components/characters/CharacterGrid";
 import { CharacterPagination } from "@/components/characters/CharacterPagination";
@@ -17,9 +17,6 @@ interface CharacterListPageProps {
 export default function CharacterListPage({ pageSize = 12 }: CharacterListPageProps) {
   // Auth state
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-
-  // Navigation
-  // const navigate = useNavigate();
 
   // State
   const [characters, setCharacters] = useState<CharacterDTO[]>([]);
