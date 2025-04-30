@@ -14,6 +14,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { useLlms } from "@/lib/hooks/useLlms";
 
 interface CharacterCardProps {
   character: CharacterDTO;
@@ -26,6 +28,7 @@ interface CharacterCardProps {
 
 export function CharacterCard({ character, isOwner, isDeleting, onEdit, onDelete, onViewDetails }: CharacterCardProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { getLlmName, isLoading: isLoadingLlms } = useLlms();
 
   const handleEdit = () => {
     onEdit(character.id);
@@ -50,22 +53,29 @@ export function CharacterCard({ character, isOwner, isDeleting, onEdit, onDelete
         className={`overflow-hidden ${character.is_global ? "bg-secondary/50 border-secondary" : ""} ${!isOwner ? "bg-muted/25 border-muted-foreground/20" : ""}`}
       >
         <CardHeader className="relative">
-          <div className="absolute right-4 top-4 flex gap-2">
-            {isOwner && (
-              <>
-                <Button variant="ghost" size="icon" onClick={handleEdit} disabled={isDeleting} title="Odmień postać">
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  title="Zlikwiduj postać"
-                >
-                  {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-                </Button>
-              </>
+          <div className="absolute right-4 top-0 flex gap-2">
+            {character.is_global ? (
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <BookOpen className="h-3 w-3" />
+                <span>Katalog główny</span>
+              </div>
+            ) : (
+              isOwner && (
+                <>
+                  <Button variant="ghost" size="icon" onClick={handleEdit} disabled={isDeleting} title="Odmień postać">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    title="Zlikwiduj postać"
+                  >
+                    {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                  </Button>
+                </>
+              )
             )}
           </div>
           <div className="flex flex-row items-center gap-4">
@@ -77,12 +87,19 @@ export function CharacterCard({ character, isOwner, isDeleting, onEdit, onDelete
             />
             <div className="flex flex-col gap-1">
               <CardTitle>{character.name}</CardTitle>
-              {character.is_global && (
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <BookOpen className="h-3 w-3" />
-                  <span>Katalog główny</span>
-                </div>
-              )}
+              <div className="flex flex-wrap items-center gap-1">
+                {character.default_llm_id && (
+                  <>
+                    {isLoadingLlms ? (
+                      <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+                    ) : (
+                      <Badge variant="secondary" className="text-xs">
+                        {getLlmName(character.default_llm_id)}
+                      </Badge>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </CardHeader>
