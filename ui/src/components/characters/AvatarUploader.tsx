@@ -1,0 +1,149 @@
+import { useState, useRef } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { uploadAvatar } from "@/dailogi-api/characters/characters";
+import type { AxiosError } from "axios";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+
+interface AvatarUploaderProps {
+  initialAvatarUrl?: string;
+  characterId?: number;
+  onAvatarChange: (file: File | null) => void;
+}
+
+interface ValidationError {
+  type: "size" | "dimensions" | "format";
+  message: string;
+}
+
+export function AvatarUploader({ initialAvatarUrl, characterId, onAvatarChange }: AvatarUploaderProps) {
+  const [previewUrl, setPreviewUrl] = useState<string | null>(initialAvatarUrl || null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const validateFile = (file: File): Promise<ValidationError | null> => {
+    return new Promise((resolve) => {
+      // Sprawdź format
+      if (!["image/png", "image/jpeg"].includes(file.type)) {
+        resolve({
+          type: "format",
+          message: "Portret musi być w formacie PNG lub JPEG",
+        });
+        return;
+      }
+
+      // Sprawdź rozmiar (max 1MB)
+      if (file.size > 1024 * 1024) {
+        resolve({
+          type: "size",
+          message: "Portret jest zbyt duży (maksymalnie 1MB)",
+        });
+        return;
+      }
+
+      // Sprawdź wymiary
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(img.src);
+        if (img.width !== 256 || img.height !== 256) {
+          resolve({
+            type: "dimensions",
+            message: "Portret musi mieć wymiary dokładnie 256x256 pikseli",
+          });
+        } else {
+          resolve(null);
+        }
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(img.src);
+        resolve({
+          type: "format",
+          message: "Nie udało się wczytać portretu",
+        });
+      };
+    });
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const validationError = await validateFile(file);
+    if (validationError) {
+      toast.error(validationError.message);
+      onAvatarChange(null);
+      return;
+    }
+
+    setPreviewUrl(URL.createObjectURL(file));
+    onAvatarChange(file);
+
+    if (characterId) {
+      setIsUploading(true);
+      try {
+        const response = await uploadAvatar(characterId, { file });
+        setPreviewUrl(response.data.avatar_url || null);
+        toast.success("Portret został pomyślnie uwieczniony");
+      } catch (err) {
+        const axiosError = err as AxiosError;
+        console.error("Błąd wgrywania portretu:", axiosError);
+        const errorMsg = "Nie udało się uwiecznić portretu";
+        toast.error(errorMsg);
+      } finally {
+        setIsUploading(false);
+      }
+    }
+  };
+
+  const handleClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleRemove = () => {
+    setPreviewUrl(null);
+    onAvatarChange(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    toast.info("Portret został usunięty");
+  };
+
+  return (
+    <div className="flex flex-col items-center space-y-4">
+      <Avatar className="w-32 h-32">
+        <AvatarImage src={previewUrl || undefined} alt="Portret postaci" />
+        <AvatarFallback>{previewUrl ? "..." : "Brak"}</AvatarFallback>
+      </Avatar>
+
+      <div className="flex space-x-2">
+        <Button type="button" variant="outline" onClick={handleClick} disabled={isUploading}>
+          {isUploading ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Trwa wgrywanie...
+            </>
+          ) : previewUrl ? (
+            "Zmień portret"
+          ) : (
+            "Wybierz portret"
+          )}
+        </Button>
+        {previewUrl && (
+          <Button type="button" variant="destructive" onClick={handleRemove} disabled={isUploading}>
+            {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Zdejmij portret"}
+          </Button>
+        )}
+      </div>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/png,image/jpeg"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+    </div>
+  );
+}

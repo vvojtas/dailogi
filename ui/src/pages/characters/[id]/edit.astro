@@ -1,0 +1,18 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { CharacterFormWrapper } from "@/components/characters/CharacterFormWrapper";
+
+const { id } = Astro.params;
+const characterId = parseInt(id as string, 10);
+
+if (isNaN(characterId)) {
+  return Astro.redirect("/404");
+}
+---
+
+<Layout title="Odmień postać - D-AI-logi">
+  <main class="container mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold mb-8">Odmień postać</h1>
+    <CharacterFormWrapper client:load characterId={characterId} />
+  </main>
+</Layout>

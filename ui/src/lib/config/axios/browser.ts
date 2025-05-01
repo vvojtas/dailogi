@@ -1,6 +1,8 @@
 import axios, { type AxiosInstance, type AxiosError } from "axios";
 import { ROUTES } from "../routes";
 import { toast } from "sonner";
+import { navigate } from "@/lib/client/navigate";
+import { useAuthStore } from "@/lib/stores/auth.store";
 
 // Browser-to-Astro instance (for client-side usage)
 export const browserApi: AxiosInstance = axios.create({});
@@ -24,8 +26,10 @@ browserApi.interceptors.response.use(
         // Handle specific error cases
         switch (error.response.status) {
           case 401:
-            // Unauthorized - redirect to login
-            window.location.href = ROUTES.LOGIN;
+            // Unauthorized - logout user and redirect to login
+            toast.error("Nie wiadomo kim jesteś - ujawnij się");
+            useAuthStore.getState().logout();
+            navigate(ROUTES.LOGIN);
             break;
           case 403:
             toast.error("Nie dla twoich oczu");
@@ -41,7 +45,7 @@ browserApi.interceptors.response.use(
             message =
               error.response.data && typeof error.response.data === "object" && "message" in error.response.data
                 ? (error.response.data.message as string)
-                : "Wystąpił nieoczekiwany błąd";
+                : "Wystąpił błąd, nikt go nieoczekiwał, ale i tak wystąpił";
             toast.error(message);
         }
       } else if (error.request) {

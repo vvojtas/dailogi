@@ -41,15 +41,10 @@ export function LoginForm() {
       const response = await login(data);
 
       console.log("[LoginForm] Login API success. User data:", response.data.user);
-      // Update global store with user data
-      console.log("[LoginForm] Calling setUser...");
-      setUser(response.data.user);
-      console.log("[LoginForm] setUser called.");
+      setUser(response.data.user, response.data.expires_in);
 
       toast.success("Zalogowano pomyślnie");
-      console.log(`[LoginForm] Redirecting to ${ROUTES.HOME}...`);
       navigate(ROUTES.HOME);
-      // Note: Code execution might stop here due to redirect
     } catch (error) {
       let errorMessage = "Nie tak brzmiał sekret powierzony nam wcześniej";
       if (axios.isAxiosError(error) && error.response) {
@@ -60,8 +55,6 @@ export function LoginForm() {
       console.error("[LoginForm] Login failed:", errorMessage, error);
       toast.error(errorMessage);
     } finally {
-      // This might not run if redirect happens in try block
-      console.log("[LoginForm] Setting isLoading to false (finally block).");
       setIsLoading(false);
     }
   }

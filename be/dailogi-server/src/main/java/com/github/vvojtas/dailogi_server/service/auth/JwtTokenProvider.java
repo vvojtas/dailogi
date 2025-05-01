@@ -53,14 +53,14 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
     
-    public Long getExpirationFromToken(String token) {
+    public Long getExpirationSecondsFromToken(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
         
-        return claims.getExpiration().getTime() - new Date().getTime();
+        return (claims.getExpiration().getTime() - new Date().getTime()) / 1000;
     }
     
     public boolean validateToken(String token) {

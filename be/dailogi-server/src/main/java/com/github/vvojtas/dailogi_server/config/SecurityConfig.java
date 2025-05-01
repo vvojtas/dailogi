@@ -1,5 +1,6 @@
 package com.github.vvojtas.dailogi_server.config;
 
+import com.github.vvojtas.dailogi_server.security.AuthenticationExceptionHandler;
 import com.github.vvojtas.dailogi_server.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -26,6 +27,7 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final AuthenticationExceptionHandler authenticationExceptionHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -37,6 +39,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/llms/**").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/characters/**").permitAll()
                 .anyRequest().authenticated()
+            )
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint(authenticationExceptionHandler)
             )
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

@@ -1,6 +1,7 @@
 import "@/lib/config/axios/server";
 import { login } from "@/dailogi-api/authentication/authentication";
 import type { APIRoute } from "astro";
+import { createTokenCookieOptions } from "@/lib/config/cookies";
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -21,22 +22,15 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Set the JWT token in an HTTP-only cookie
-    const cookieOptions = [
-      `session_token=${data.access_token}`,
-      "HttpOnly",
-      "Secure",
-      "SameSite=Strict",
-      // Set expiration based on token expiry
-      `Max-Age=${data.expires_in}`,
-      "Path=/",
-    ];
+    const cookieValue = createTokenCookieOptions(data.access_token, data.expires_in);
+
     // Do not send the token to the client
     data.access_token = "";
     return new Response(JSON.stringify(data), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
-        "Set-Cookie": cookieOptions.join("; "),
+        "Set-Cookie": cookieValue,
       },
     });
   } catch (error) {

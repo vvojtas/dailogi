@@ -7,7 +7,7 @@ export const ROUTES = {
   // Protected routes
   DASHBOARD: "/dashboard",
   CHARACTERS: "/characters",
-  CHARACTER_CREATE: "/characters/create",
+  CHARACTER_CREATE: "/characters/new",
   CHARACTER_DETAIL_PATTERN: "/characters/:id",
   CHARACTER_EDIT_PATTERN: "/characters/:id/edit",
   SCENES: "/scenes",
@@ -23,6 +23,11 @@ export const ROUTES = {
 // Helper to check if route is protected
 export const isProtectedRoute = (path: string): boolean => {
   const publicPaths: readonly string[] = [ROUTES.HOME, ROUTES.LOGIN, ROUTES.REGISTER, ROUTES.CHARACTERS];
+
+  // Character detail pages are public (but API will handle authorization)
+  if (path.match(/^\/characters\/\d+$/)) {
+    return false;
+  }
 
   // If path starts with /api, it's handled by API routes
   if (path.startsWith("/api")) {

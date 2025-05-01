@@ -59,7 +59,7 @@ public class AuthService {
         return new JwtResponseDTO(
                 jwt,
                 "Bearer",
-                jwtTokenProvider.getExpirationFromToken(jwt),
+                jwtTokenProvider.getExpirationSecondsFromToken(jwt),
                 userMapper.toDto(user)
         );
     }

@@ -1,0 +1,17 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { CharacterDetailsWrapper } from "@/components/characters/CharacterDetailsWrapper";
+
+const { id } = Astro.params;
+const characterId = parseInt(id as string, 10);
+
+if (isNaN(characterId)) {
+  return Astro.redirect("/404");
+}
+---
+
+<Layout title={`Profil postaci - D-AI-logi`}>
+  <main class="container mx-auto px-4 py-8">
+    <CharacterDetailsWrapper client:load characterId={characterId} />
+  </main>
+</Layout>

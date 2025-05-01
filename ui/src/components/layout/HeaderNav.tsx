@@ -6,8 +6,8 @@ import { ThemeToggle } from "@/components/theme-toggle";
 
 export function HeaderNav() {
   // Subscribe only to what's needed
-  const isLoggedIn = useAuthStore((state: AuthState) => state.isLoggedIn);
-  const userName = useAuthStore((state: AuthState) => state.user?.name);
+  const isLoggedIn = useAuthStore((state: AuthState) => state.getIsLoggedIn());
+  const userName = useAuthStore((state: AuthState) => state.getUser()?.name);
 
   return (
     <div className="flex items-center justify-between w-full">

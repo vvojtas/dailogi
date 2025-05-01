@@ -12,8 +12,10 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
+import com.github.vvojtas.dailogi_server.exception.AuthenticationErrorException;
 import com.github.vvojtas.dailogi_server.exception.ResourceNotFoundException;
 import com.github.vvojtas.dailogi_server.exception.DuplicateResourceException;
+import com.github.vvojtas.dailogi_server.exception.InvalidJwtException;
 import com.github.vvojtas.dailogi_server.model.common.response.ErrorResponseDTO;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
@@ -130,6 +132,36 @@ public class GlobalExceptionHandler {
             .body(new ErrorResponseDTO(
                 "Invalid username or password",
                 "INVALID_CREDENTIALS",
+                Map.of(),
+                OffsetDateTime.now()
+            ));
+    }
+
+    @ExceptionHandler(InvalidJwtException.class)
+    public ResponseEntity<ErrorResponseDTO> handleInvalidJwtException(InvalidJwtException e) {
+        log.warn("Invalid JWT token", e);
+        
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new ErrorResponseDTO(
+                "Invalid JWT token",
+                "INVALID_TOKEN",
+                Map.of(),
+                OffsetDateTime.now()
+            ));
+    }
+
+    @ExceptionHandler(AuthenticationErrorException.class)
+    public ResponseEntity<ErrorResponseDTO> handleAuthenticationErrorException(AuthenticationErrorException e) {
+        log.error("Authentication error occurred", e);
+        
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new ErrorResponseDTO(
+                "An error occurred during authentication",
+                "AUTH_ERROR",
                 Map.of(),
                 OffsetDateTime.now()
             ));

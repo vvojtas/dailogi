@@ -1,0 +1,7 @@
+Sprawdzić logout po expiration
+Tworzenie postaci z avatarem
+handlowanie limitów code 422
+
+Vallidacja tworzenia postaci
+Tytuł
+https

@@ -1,10 +1,10 @@
 import type { APIRoute } from "astro";
+import { SESSION_COOKIE_NAME, createExpiredCookieOptions } from "@/lib/config/cookies";
 
 const backendBaseUrl = import.meta.env.SPRING_BACKEND_BASE_URL;
-const sessionCookieName = "session_token";
 
 export const ALL: APIRoute = async ({ request, cookies, params }) => {
-  const token = cookies.get(sessionCookieName)?.value;
+  const token = cookies.get(SESSION_COOKIE_NAME)?.value;
   const slug = params.slug;
 
   if (!backendBaseUrl) {
@@ -59,6 +59,11 @@ export const ALL: APIRoute = async ({ request, cookies, params }) => {
     // Create a new response based on the backend response
     // Important: Create a new Headers object to avoid modifying the original
     const responseHeaders = new Headers(backendResponse.headers);
+
+    // If response status is 401 (Unauthorized), clear the session cookie
+    if (backendResponse.status === 401) {
+      responseHeaders.set("Set-Cookie", createExpiredCookieOptions());
+    }
 
     // TODO: Ensure CORS headers are handled correctly if needed (Astro might handle this)
 

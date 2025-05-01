@@ -16,7 +16,7 @@ interface CharacterListPageProps {
 
 export default function CharacterListPage({ pageSize = 12 }: CharacterListPageProps) {
   // Auth state
-  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const isLoggedIn = useAuthStore((state) => state.getIsLoggedIn());
 
   // State
   const [characters, setCharacters] = useState<CharacterDTO[]>([]);
