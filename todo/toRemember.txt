@@ -1,4 +1,3 @@
-przeniesienie avatara do tabeli
 
 Tworzenie postaci z avatarem
 

@@ -7,7 +7,7 @@
  */
 
 /**
- * PNG image file to use as avatar. Must be exactly 256x256 pixels and not exceed 1MB.
+ * Avatar image file. Supports PNG and JPEG formats up to 1MB and max 256x256 pixels.
  */
 export interface UploadAvatarCommand {
   /** PNG image file to use as avatar. Must be exactly 256x256 pixels and not exceed 1MB. */

@@ -1,4 +1,4 @@
-package com.github.vvojtas.dailogi_server.model.character.response;
+package com.github.vvojtas.dailogi_server.model.avatar.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;

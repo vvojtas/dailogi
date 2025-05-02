@@ -40,9 +40,12 @@ public class Character {
     @Column(name = "short_description", nullable = false, columnDefinition = "TEXT")
     private String shortDescription;
 
-    @Lob
-    @Column
-    private byte[] avatar;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "avatar_id", foreignKey = @ForeignKey(name = "fk_character_avatar"))
+    private Avatar avatar;
+
+    @Column(name = "avatar_id", insertable = false, updatable = false)
+    private Long avatarId;
 
     @Column(name = "is_global", nullable = false)
     @Builder.Default

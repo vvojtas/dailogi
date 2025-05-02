@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { uploadAvatar } from "@/dailogi-api/characters/characters";
+import { uploadAvatar } from "@/dailogi-api/avatars/avatars";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { DailogiError } from "@/lib/errors/DailogiError";

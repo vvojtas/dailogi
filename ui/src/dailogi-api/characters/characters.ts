@@ -9,13 +9,11 @@ import axios from "axios";
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
 
 import type {
-  CharacterAvatarResponseDTO,
   CharacterDTO,
   CharacterListDTO,
   CreateCharacterCommand,
   GetCharactersParams,
   UpdateCharacterCommand,
-  UploadAvatarCommand,
 } from ".././model";
 
 /**
@@ -91,28 +89,8 @@ export const createCharacter = <TData = AxiosResponse<CharacterDTO>>(
 ): Promise<TData> => {
   return axios.post(`/api/characters`, createCharacterCommand, options);
 };
-/**
- * Uploads or replaces the avatar for a character.
-The character must be owned by the current user.
-Only PNG files up to 1MB and exactly 256x256 pixels are accepted.
-The avatar will be returned as a base64-encoded data URL.
-Requires authentication.
-
- * @summary Upload character avatar
- */
-export const uploadAvatar = <TData = AxiosResponse<CharacterAvatarResponseDTO>>(
-  id: number,
-  uploadAvatarCommand: UploadAvatarCommand,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  const formData = new FormData();
-  formData.append("file", uploadAvatarCommand.file);
-
-  return axios.post(`/api/characters/${id}/avatar`, formData, options);
-};
 export type GetCharacterResult = AxiosResponse<CharacterDTO>;
 export type UpdateCharacterResult = AxiosResponse<CharacterDTO>;
 export type DeleteCharacterResult = AxiosResponse<string>;
 export type GetCharactersResult = AxiosResponse<CharacterListDTO>;
 export type CreateCharacterResult = AxiosResponse<CharacterDTO>;
-export type UploadAvatarResult = AxiosResponse<CharacterAvatarResponseDTO>;

@@ -5,7 +5,7 @@
  * API for d-AI-logi - an interactive web application for creating AI dialogues
  * OpenAPI spec version: v1.0.0
  */
-import type { CharacterDTO } from "./characterDTO";
+import type { CharacterDTO } from './characterDTO';
 
 /**
  * Paginated list of characters

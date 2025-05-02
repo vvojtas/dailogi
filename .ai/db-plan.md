@@ -23,7 +23,16 @@ Poniżej znajduje się kompleksowy plan struktury bazy danych wraz z tabelami, r
 
 ---
 
-### c. Tabela `Character`
+### c. Tabela `Avatar`
+- **id**: BIGINT, PRIMARY KEY  
+- **data**: BLOB (BYTEA w PostgreSQL) NOT NULL  
+- **format_type**: VARCHAR(20) NOT NULL  
+- **created_at**: TIMESTAMP WITH TIME ZONE NOT NULL  
+- **updated_at**: TIMESTAMP WITH TIME ZONE NOT NULL  
+
+---
+
+### d. Tabela `Character`
 - **id**: BIGINT, PRIMARY KEY  
 - **user_id**: BIGINT NOT NULL  
   - FOREIGN KEY REFERENCES `User`(id) ON DELETE CASCADE  
@@ -31,9 +40,10 @@ Poniżej znajduje się kompleksowy plan struktury bazy danych wraz z tabelami, r
   - Unikalność w obrębie użytkownika: UNIQUE(user_id, name)  
 - **description**: TEXT NOT NULL  
 - **short_description**: TEXT NOT NULL  
-- **avatar**: BYTEA  
-  - Przechowywane jako BLOB; kolumna nie jest indeksowana  
-- **is_global**: BOOLEAN NOT NULL DEFAULT FALSE  
+- **avatar_id**: BIGINT  
+  - FOREIGN KEY REFERENCES `Avatar`(id) ON DELETE SET NULL (reprezentuje powiązanie z awatarem)  
+- **is_global**: BOOLEAN NOT NULL  
+  - (domyślnie ustawiane na FALSE na poziomie aplikacji)  
 - **default_llm_id**: BIGINT  
   - FOREIGN KEY REFERENCES `LLM`(id) ON DELETE SET NULL  
 - **created_at**: TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP  
@@ -41,7 +51,7 @@ Poniżej znajduje się kompleksowy plan struktury bazy danych wraz z tabelami, r
 
 ---
 
-### d. Tabela `Dialogue`
+### e. Tabela `Dialogue`
 - **id**: BIGINT, PRIMARY KEY  
 - **user_id**: BIGINT NOT NULL  
   - FOREIGN KEY REFERENCES `User`(id) ON DELETE CASCADE  
@@ -54,7 +64,7 @@ Poniżej znajduje się kompleksowy plan struktury bazy danych wraz z tabelami, r
 
 ---
 
-### e. Tabela `DialogueMessage`
+### f. Tabela `DialogueMessage`
 - **id**: BIGINT, PRIMARY KEY  
 - **dialogue_id**: BIGINT NOT NULL  
   - FOREIGN KEY REFERENCES `Dialogue`(id) ON DELETE CASCADE  
@@ -67,7 +77,7 @@ Poniżej znajduje się kompleksowy plan struktury bazy danych wraz z tabelami, r
 
 ---
 
-### f. Tabela `DialogueCharacterConfig`
+### g. Tabela `DialogueCharacterConfig`
 - **dialogue_id**: BIGINT NOT NULL  
   - FOREIGN KEY REFERENCES `Dialogue`(id) ON DELETE CASCADE  
 - **character_id**: BIGINT NOT NULL  
@@ -104,6 +114,9 @@ Poniżej znajduje się kompleksowy plan struktury bazy danych wraz z tabelami, r
 - `LLM` 1 : N `Character` przez kolumnę `default_llm_id`  
   (W przypadku usunięcia wpisu w tabeli `LLM`, wartość `default_llm_id` w rekordach `Character` zostanie ustawiona na NULL – ON DELETE SET NULL)
 
+- `Avatar` 1 : 1 `Character`  
+  (Relacja jeden-do-jednego; kolumna `avatar_id` w tabeli `Character` wskazuje na rekord w tabeli `Avatar`. W przypadku usunięcia awatara, `avatar_id` zostaje ustawione na NULL)
+
 ---
 
 ## 3. Indeksy i ograniczenia
@@ -115,7 +128,7 @@ Poniżej znajduje się kompleksowy plan struktury bazy danych wraz z tabelami, r
   - Unikalność ograniczona na kombinację (`user_id`, `name`).
   - Klucz obcy `user_id` z ON DELETE CASCADE.
   - Klucz obcy `default_llm_id` z ON DELETE SET NULL.
-  - Kolumna `avatar` nie jest indeksowana.
+  - Klucz obcy `avatar_id` z ON DELETE SET NULL.
 
 - **Tabela `Dialogue`:**
   - Klucz obcy `user_id` z ON DELETE CASCADE.
