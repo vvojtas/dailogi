@@ -1,7 +1,6 @@
 przeniesienie avatara do tabeli
 
 Tworzenie postaci z avatarem
-handlowanie limitów code 422
 
 Tytuł
 https
