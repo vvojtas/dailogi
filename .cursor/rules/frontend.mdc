@@ -40,3 +40,7 @@ alwaysApply: false
 #### Routes
 
 - '\ui\src\lib\config\routes.ts' contains all routes constans - please use them
+- use navigate from "@/lib/client/navigate for navigation
+
+#### Errors
+- use DailogiError when handling errors to make sure only single toast is produced

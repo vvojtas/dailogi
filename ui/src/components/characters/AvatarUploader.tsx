@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { uploadAvatar } from "@/dailogi-api/avatars/avatars";
+import { uploadAvatar, deleteAvatar } from "@/dailogi-api/avatars/avatars";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { DailogiError } from "@/lib/errors/DailogiError";
@@ -105,13 +105,37 @@ export function AvatarUploader({ initialAvatarUrl, characterId, onAvatarChange }
     fileInputRef.current?.click();
   };
 
-  const handleRemove = () => {
-    setPreviewUrl(null);
-    onAvatarChange(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+  const handleRemove = async () => {
+    // Jeśli characterId nie istnieje, wykonaj lokalne usunięcie
+    if (!characterId) {
+      setPreviewUrl(null);
+      onAvatarChange(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      toast.info("Portret został zdematerializowany");
+      return;
     }
-    toast.info("Portret został usunięty");
+
+    setIsUploading(true);
+    try {
+      await deleteAvatar(characterId);
+      setPreviewUrl(null);
+      onAvatarChange(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      toast.success("Portret został zdematerializowany");
+    } catch (err) {
+      if (err instanceof DailogiError && err.displayed) {
+        console.error("Błąd przy likwidacji portretu:", err);
+      } else {
+        toast.error("Portret oparł się próbom dematerializacji. Spróbuj ponownie później.");
+        console.error("Błąd przy likwidacji portretu:", err);
+      }
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (

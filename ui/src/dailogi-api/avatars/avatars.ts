@@ -34,5 +34,16 @@ export const uploadAvatar = <TData = AxiosResponse<CharacterAvatarResponseDTO>>(
 
   return axios.post(`/api/characters/${characterId}/avatar`, formData, options);
 };
+/**
+ * Deletes the avatar for a character. The character must be owned by the current user. Requires authentication.
+ * @summary Delete character avatar
+ */
+export const deleteAvatar = <TData = AxiosResponse<string>>(
+  characterId: number,
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.delete(`/api/characters/${characterId}/avatar`, options);
+};
 export type GetAvatarResult = AxiosResponse<unknown>;
 export type UploadAvatarResult = AxiosResponse<CharacterAvatarResponseDTO>;
+export type DeleteAvatarResult = AxiosResponse<string>;

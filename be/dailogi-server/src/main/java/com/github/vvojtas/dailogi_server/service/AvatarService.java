@@ -190,4 +190,39 @@ public class AvatarService {
 
         return contentType; // Return the validated content type
     }
+
+    @Transactional
+    public void deleteAvatar(Long characterId, Authentication authentication) {
+        log.debug("Attempting to delete avatar for character id={}", characterId);
+        
+        var character = characterRepository.findById(characterId)
+            .orElseThrow(() -> {
+                log.warn("Character not found with id={}", characterId);
+                return new ResourceNotFoundException("character", "Character not found with id: " + characterId);
+            });
+        
+        var currentUser = currentUserService.getCurrentAppUser(authentication);
+        if (!CharacterService.isOwned(character, currentUser)) {
+            log.warn("User {} attempted to delete avatar for character {} without proper ownership", currentUser.getId(), characterId);
+            throw new AccessDeniedException("User does not have permission to delete avatar for this character");
+        }
+        
+        if (character.getAvatarId() == null) {
+            log.warn("Character id={} has no avatar to delete", characterId);
+            throw new ResourceNotFoundException("avatar", "Character with id " + characterId + " has no avatar");
+        }
+        
+        Long avatarId = character.getAvatarId();
+        var avatar = avatarRepository.findById(avatarId)
+            .orElseThrow(() -> {
+                log.error("Data inconsistency: Character {} has avatarId {} but Avatar entity not found", characterId, avatarId);
+                return new ResourceNotFoundException("avatar", "Avatar not found with id: " + avatarId);
+            });
+        
+        avatarRepository.delete(avatar);
+        character.setAvatar(null);
+        characterRepository.save(character);
+        
+        log.info("Successfully deleted avatar id={} for character id={}", avatarId, characterId);
+    }
 } 
