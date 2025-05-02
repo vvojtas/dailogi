@@ -11,7 +11,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AvatarUploader } from "@/components/characters/AvatarUploader";
 import { useState } from "react";
-import type { AxiosError } from "axios";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, CircleSlash } from "lucide-react";
 import { toast } from "sonner";

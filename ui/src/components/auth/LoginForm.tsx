@@ -25,7 +25,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 /**
  * Function to handle API error responses and return appropriate Polish error messages
  */
-function handleApiError(error: unknown, form: ReturnType<typeof useForm<LoginFormValues>>): string | null {
+function handleApiError(error: unknown): string | null {
   // If it's already a DailogiError and was displayed, don't show another toast
   if (error instanceof DailogiError && error.displayed) {
     return null;
@@ -92,7 +92,7 @@ export function LoginForm() {
     } catch (error) {
       console.error("[LoginForm] Login failed:", error);
 
-      const errorMsg = handleApiError(error, form);
+      const errorMsg = handleApiError(error);
       if (errorMsg) {
         toast.error(errorMsg);
       }
