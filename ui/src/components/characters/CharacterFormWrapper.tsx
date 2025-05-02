@@ -7,6 +7,7 @@ import { getCharacter } from "@/dailogi-api/characters/characters";
 import type { CharacterDTO } from "@/dailogi-api/model/characterDTO";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { toast } from "sonner";
+import { DailogiError } from "@/lib/errors/DailogiError";
 
 interface CharacterFormWrapperProps {
   characterId?: number;
@@ -27,7 +28,18 @@ export function CharacterFormWrapper({ characterId }: CharacterFormWrapperProps)
           setError(null);
         })
         .catch((err) => {
-          const errorMsg = err?.response?.data?.message || "Namierzanie postaci zakończone niepowodzeniem";
+          // Skip if error was already displayed by global handler
+          if (err instanceof DailogiError && err.displayed) {
+            console.error("Error fetching character:", err);
+            setError("Namierzanie postaci zakończone niepowodzeniem");
+            return;
+          }
+
+          const errorMsg =
+            err instanceof DailogiError
+              ? err.errorData?.message || "Namierzanie postaci zakończone niepowodzeniem"
+              : "Namierzanie postaci zakończone niepowodzeniem";
+
           setError(errorMsg);
           toast.error(errorMsg);
         })

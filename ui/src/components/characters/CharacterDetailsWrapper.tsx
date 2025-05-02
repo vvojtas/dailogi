@@ -5,9 +5,9 @@ import { ROUTES, getCharacterEditUrl } from "@/lib/config/routes";
 import { getCharacter, deleteCharacter } from "@/dailogi-api/characters/characters";
 import type { CharacterDTO } from "@/dailogi-api/model/characterDTO";
 import { CharacterDetails } from "@/components/characters/CharacterDetails";
-import type { AxiosError } from "axios";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { toast } from "sonner";
+import { DailogiError } from "@/lib/errors/DailogiError";
 
 interface CharacterDetailsWrapperProps {
   characterId: number;
@@ -28,8 +28,18 @@ export function CharacterDetailsWrapper({ characterId }: CharacterDetailsWrapper
         setError(null);
       })
       .catch((err) => {
-        const axiosError = err as AxiosError<{ message: string }>;
-        const errorMsg = axiosError.response?.data?.message || "Nie udało się zlokalizować postaci";
+        // Skip if error was already displayed by global handler
+        if (err instanceof DailogiError && err.displayed) {
+          console.error("Error fetching character:", err);
+          setError("Nie udało się zlokalizować postaci");
+          return;
+        }
+
+        const errorMsg =
+          err instanceof DailogiError
+            ? err.errorData?.message || "Nie udało się zlokalizować postaci"
+            : "Nie udało się zlokalizować postaci";
+
         setError(errorMsg);
         toast.error(errorMsg);
       })
@@ -49,8 +59,18 @@ export function CharacterDetailsWrapper({ characterId }: CharacterDetailsWrapper
       toast.success(`Pomyślnie zlikwidowano "${character.name}"`);
       navigate(ROUTES.CHARACTERS);
     } catch (err) {
-      const axiosError = err as AxiosError<{ message: string }>;
-      const errorMsg = axiosError.response?.data?.message || "Nie udało się zlikwidować postaci";
+      // Skip if error was already displayed by global handler
+      if (err instanceof DailogiError && err.displayed) {
+        console.error("Error deleting character:", err);
+        setIsDeleting(false);
+        return;
+      }
+
+      const errorMsg =
+        err instanceof DailogiError
+          ? err.errorData?.message || "Nie udało się zlikwidować postaci"
+          : "Nie udało się zlikwidować postaci";
+
       setError(errorMsg);
       toast.error(errorMsg);
       setIsDeleting(false);

@@ -1,6 +1,5 @@
 przeniesienie avatara do tabeli
 
-Sprawdzić logout po expiration
 Tworzenie postaci z avatarem
 handlowanie limitów code 422
 

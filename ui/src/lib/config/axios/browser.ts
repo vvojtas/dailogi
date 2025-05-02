@@ -3,6 +3,8 @@ import { ROUTES } from "../routes";
 import { toast } from "sonner";
 import { navigate } from "@/lib/client/navigate";
 import { useAuthStore } from "@/lib/stores/auth.store";
+import { DailogiError } from "@/lib/errors/DailogiError";
+import { extractErrorResponseDTO } from "@/lib/errors/errorUtils";
 
 // Browser-to-Astro instance (for client-side usage)
 export const browserApi: AxiosInstance = axios.create({});
@@ -22,35 +24,51 @@ browserApi.interceptors.response.use(
   (error: AxiosError) => {
     if (typeof window !== "undefined") {
       if (error.response) {
-        let message: string;
-        // Handle specific error cases
-        switch (error.response.status) {
-          case 401:
-            // Unauthorized - logout user and redirect to login
+        // Extract error data in a standardized format
+        const errorData = extractErrorResponseDTO(error);
+        const status = error.response.status;
+        let toastShown = false;
+
+        // Handle specific status codes with if-else
+        if (status === 401) {
+          // Special case: Don't redirect or show toast for invalid credentials
+          // Let the login form handle this error
+          if (errorData?.code === "INVALID_CREDENTIALS") {
+            console.log("Invalid credentials, letting login form handle it");
+          } else {
+            // Other 401 errors - logout user and redirect to login
             toast.error("Nie wiadomo kim jesteś - ujawnij się");
             useAuthStore.getState().logout();
             navigate(ROUTES.LOGIN);
-            break;
-          case 403:
-            toast.error("Nie dla twoich oczu");
-            break;
-          case 404:
-            toast.error("To czego szukasz nie istnieje");
-            break;
-          case 500:
-            toast.error("Niefortunny zbieg okoliczności doprowadził do wystąpienia błędu");
-            break;
-          default:
-            // Handle other error cases
-            message =
-              error.response.data && typeof error.response.data === "object" && "message" in error.response.data
-                ? (error.response.data.message as string)
-                : "Wystąpił błąd, nikt go nieoczekiwał, ale i tak wystąpił";
-            toast.error(message);
+            toastShown = true;
+          }
+        } else if (status === 403) {
+          toast.error("Nie dla twoich oczu");
+          toastShown = true;
+        } else if (status === 404) {
+          toast.error("To czego szukasz nie istnieje");
+          toastShown = true;
+        } else if (status >= 400 && status < 500) {
+          // Other client errors (4xx)
+          const message = errorData?.message || "";
+          console.log("Error with backend call", status, message);
+        } else if (status >= 500) {
+          // Server errors (5xx)
+          toast.error("Niefortunny zbieg okoliczności doprowadził do wystąpienia błędu");
+          toastShown = true;
+        } else {
+          // Handle other error cases
+          const message = errorData?.message || "";
+          console.log("Error with backend call", status, message);
+          toast.error("Wystąpił błąd, nikt go nieoczekiwał, ale i tak wystąpił");
+          toastShown = true;
         }
+
+        return Promise.reject(new DailogiError(error, toastShown, errorData));
       } else if (error.request) {
         // Network error
         toast.error("Nie udało się nawiązać kontaktu z serwerem");
+        return Promise.reject(new DailogiError(error, true));
       }
     }
     return Promise.reject(error);

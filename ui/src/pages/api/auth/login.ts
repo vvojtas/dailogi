@@ -2,6 +2,8 @@ import "@/lib/config/axios/server";
 import { login } from "@/dailogi-api/authentication/authentication";
 import type { APIRoute } from "astro";
 import { createTokenCookieOptions } from "@/lib/config/cookies";
+import type { AxiosError } from "axios";
+import type { ErrorResponseDTO } from "@/dailogi-api/model/errorResponseDTO";
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -35,11 +37,44 @@ export const POST: APIRoute = async ({ request }) => {
     });
   } catch (error) {
     console.error("Login error:", error);
-    return new Response(JSON.stringify({ message: "Wystąpił błąd podczas logowania" }), {
-      status: 500,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+
+    // Check if this is an Axios error with response data
+    if (error && typeof error === "object" && "isAxiosError" in error) {
+      const axiosError = error as AxiosError<ErrorResponseDTO>;
+
+      if (axiosError.response) {
+        // Return the original error response data and status
+        return new Response(
+          JSON.stringify(
+            axiosError.response.data || {
+              message: "Wystąpił błąd podczas logowania",
+              code: "AUTHENTICATION_ERROR",
+              timestamp: new Date().toISOString(),
+            }
+          ),
+          {
+            status: axiosError.response.status || 500,
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      }
+    }
+
+    // Fallback for non-axios errors or network errors
+    return new Response(
+      JSON.stringify({
+        message: "Nie udało się nawiązać kontaktu z serwerem",
+        code: "NETWORK_ERROR",
+        timestamp: new Date().toISOString(),
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
   }
 };

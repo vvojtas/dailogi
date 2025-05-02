@@ -2,9 +2,9 @@ import { useState, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { uploadAvatar } from "@/dailogi-api/characters/characters";
-import type { AxiosError } from "axios";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { DailogiError } from "@/lib/errors/DailogiError";
 
 interface AvatarUploaderProps {
   initialAvatarUrl?: string;
@@ -87,10 +87,14 @@ export function AvatarUploader({ initialAvatarUrl, characterId, onAvatarChange }
         setPreviewUrl(response.data.avatar_url || null);
         toast.success("Portret został pomyślnie uwieczniony");
       } catch (err) {
-        const axiosError = err as AxiosError;
-        console.error("Błąd wgrywania portretu:", axiosError);
-        const errorMsg = "Nie udało się uwiecznić portretu";
-        toast.error(errorMsg);
+        // Check if error was already handled by the global error handler
+        if (err instanceof DailogiError && err.displayed) {
+          // Error was already displayed to the user, do nothing
+          console.error("Error uploading avatar:", err);
+        } else {
+          // Show a generic error message
+          toast.error("Nie udało się uwiecznić portretu");
+        }
       } finally {
         setIsUploading(false);
       }

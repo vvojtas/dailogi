@@ -9,9 +9,9 @@ import { Loader2 } from "lucide-react";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { register } from "@/dailogi-api/authentication/authentication";
 import type { RegisterCommand } from "@/dailogi-api/model";
-import axios from "axios";
 import { navigate } from "@/lib/client/navigate";
 import { ROUTES } from "@/lib/config/routes";
+import { DailogiError } from "@/lib/errors/DailogiError";
 
 const registerSchema = z
   .object({
@@ -32,6 +32,50 @@ const registerSchema = z
   });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
+
+/**
+ * Function to handle API error responses and return appropriate Polish error messages
+ */
+function handleApiError(error: unknown, form: ReturnType<typeof useForm<RegisterFormValues>>): string | null {
+  // If it's already a DailogiError and was displayed, don't show another toast
+  if (error instanceof DailogiError && error.displayed) {
+    return null;
+  }
+
+  // Get error code and message from response
+  let errorCode: string | undefined;
+
+  if (error instanceof DailogiError) {
+    errorCode = error.errorData?.code;
+  }
+
+  // Default error message
+  let errorMsg = "Wystąpił błąd podczas inicjalizacji konta";
+
+  if (errorCode) {
+    switch (errorCode) {
+      case "RESOURCE_DUPLICATE":
+        // Handle duplicate username - set form error instead of toast
+        form.setError("name", {
+          type: "manual",
+          message: "Osobę taką już znamy - wybierz nowe imię",
+        });
+        return null; // Don't show toast
+      case "VALIDATION_ERROR":
+        errorMsg = "Formularz zawiera błędy weryfikacji";
+        break;
+      default:
+        // Use message from errorData if available
+        if (error instanceof DailogiError && error.errorData?.message) {
+          errorMsg = error.errorData.message;
+        }
+    }
+  } else if (error instanceof Error) {
+    errorMsg = error.message;
+  }
+
+  return errorMsg;
+}
 
 export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -54,21 +98,12 @@ export function RegisterForm() {
       toast.success("Inicjalizacja konta pomyślna. Zapraszamy.");
       navigate(ROUTES.LOGIN);
     } catch (error: unknown) {
-      let errorMessage = "Wystąpił błąd podczas inicjalizacji konta";
-      if (axios.isAxiosError(error) && error.response) {
-        if (error.response.status === 409) {
-          form.setError("name", {
-            type: "manual",
-            message: "Osobę taką już znamy - wybierz nowe imię",
-          });
-          // Don't show a generic toast if it's a specific field error
-          return;
-        }
-        errorMessage = error.response.data?.message || errorMessage;
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
+      console.error("Registration error:", error);
+
+      const errorMsg = handleApiError(error, form);
+      if (errorMsg) {
+        toast.error(errorMsg);
       }
-      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

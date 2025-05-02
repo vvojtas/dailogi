@@ -9,6 +9,7 @@ import { CharacterPagination } from "@/components/characters/CharacterPagination
 import { CharacterListStatus } from "@/components/characters/CharacterListStatus";
 import { useAuthStore } from "@/lib/stores/auth.store";
 import { ROUTES, getCharacterDetailUrl, getCharacterEditUrl } from "@/lib/config/routes";
+import { DailogiError } from "@/lib/errors/DailogiError";
 
 interface CharacterListPageProps {
   pageSize?: number;
@@ -50,6 +51,12 @@ export default function CharacterListPage({ pageSize = 12 }: CharacterListPagePr
           toast.success("Uaktualniono profile");
         }
       } catch (err) {
+        // Skip showing error message if it was already displayed
+        if (err instanceof DailogiError && err.displayed) {
+          console.error("Error fetching characters:", err);
+          return;
+        }
+
         const message = "Poszukiwania nie przyniosły rezultatu. Może szczęście uśmiechnie się do ciebie później.";
         setError(message);
         toast.error(message);
@@ -83,6 +90,12 @@ export default function CharacterListPage({ pageSize = 12 }: CharacterListPagePr
           await fetchCharacters(true);
         }
       } catch (err) {
+        // Skip showing error message if it was already displayed
+        if (err instanceof DailogiError && err.displayed) {
+          console.error("Error deleting character:", err);
+          return;
+        }
+
         const message = "Niewiarygodne. Postać uniknęła likwidacji. Możesz ponowić próbę później.";
         toast.error(message);
         console.error("Error deleting character:", err);

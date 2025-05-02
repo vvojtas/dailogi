@@ -15,14 +15,21 @@ import type { AxiosError } from "axios";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, CircleSlash } from "lucide-react";
 import { toast } from "sonner";
+import { DailogiError } from "@/lib/errors/DailogiError";
 
 const characterFormSchema = z.object({
   name: z
     .string()
     .min(1, "Imię postaci musi zostać zapisane w rejestrze")
     .max(100, "Imię postaci jest zbyt długie dla rejestru (max 100 znaków)"),
-  short_description: z.string().max(500, "Krótki opis nie jest krótki (max 500 znaków)"),
-  description: z.string().max(5000, "Biografia postaci jest zbyt obszerna (max 5000 znaków)"),
+  short_description: z
+    .string()
+    .min(1, "Krótki opis nie jest opisem (min 1 znak)")
+    .max(500, "Krótki opis nie jest krótki (max 500 znaków)"),
+  description: z
+    .string()
+    .min(1, "Biografia postaci nie jest obszerna (min 1 znak)")
+    .max(5000, "Biografia postaci jest zbyt obszerna (max 5000 znaków)"),
   default_llm_id: z.string().optional(),
   avatar: z.custom<File | undefined>().optional(),
 });
@@ -34,6 +41,54 @@ interface CharacterFormProps {
   initialData?: CharacterDTO | null;
   onSubmitSuccess: (character: CharacterDTO) => void;
   onCancel: () => void;
+}
+
+/**
+ * Function to handle API error responses and return appropriate Polish error messages
+ */
+function handleApiError(error: unknown): string | null {
+  // If it's already a DailogiError and was displayed, don't show another toast
+  if (error instanceof DailogiError && error.displayed) {
+    return null;
+  }
+
+  // Get error code and message from response
+  let errorCode: string | undefined;
+  let errorDetails: Record<string, unknown> | undefined;
+
+  if (error instanceof DailogiError) {
+    errorCode = error.errorData?.code;
+    errorDetails = error.errorData?.details as Record<string, unknown> | undefined;
+  }
+
+  // Default error message
+  let errorMsg = "Nie udało się zapisać postaci w rejestrze... Spróbuj ponownie";
+
+  if (errorCode) {
+    switch (errorCode) {
+      case "VALIDATION_ERROR":
+        errorMsg = "Formularz zawiera błędy weryfikacji";
+        // If we have field-specific errors, show the first one
+        if (errorDetails) {
+          const firstError = Object.values(errorDetails)[0];
+          if (firstError && typeof firstError === "string") {
+            errorMsg = `Błąd weryfikacji: ${firstError}`;
+          }
+        }
+        break;
+      case "RESOURCE_DUPLICATE":
+        errorMsg = "Ta postać już widnieje w rejestrze";
+        break;
+      case "RESOURCE_NOT_FOUND":
+        errorMsg = "Nie odnaleziono postaci w rejestrze";
+        break;
+      case "TYPE_MISMATCH":
+        errorMsg = "Podano nieprawidłowy format danych";
+        break;
+    }
+  }
+
+  return errorMsg;
 }
 
 export function CharacterForm({ llms, initialData, onSubmitSuccess, onCancel }: CharacterFormProps) {
@@ -67,10 +122,10 @@ export function CharacterForm({ llms, initialData, onSubmitSuccess, onCancel }: 
       toast.success(initialData ? "Postać została odmieniona!" : "Postać została powołana do życia!");
       onSubmitSuccess(response.data);
     } catch (err) {
-      const axiosError = err as AxiosError<{ message: string }>;
-      const errorMsg =
-        axiosError.response?.data?.message || "Nie udało się zapisać postaci w rejestrze... Spróbuj ponownie";
-      toast.error(errorMsg);
+      const errorMsg = handleApiError(err);
+      if (errorMsg) {
+        toast.error(errorMsg);
+      }
     } finally {
       setIsSubmitting(false);
     }

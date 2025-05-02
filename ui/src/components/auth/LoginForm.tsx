@@ -12,8 +12,8 @@ import type { LoginCommand } from "@/dailogi-api/model";
 import { useAuthStore } from "@/lib/stores/auth.store";
 import type { AuthState } from "@/lib/stores/auth.store";
 import { ROUTES } from "@/lib/config/routes";
-import axios from "axios";
 import { navigate } from "@/lib/client/navigate";
+import { DailogiError } from "@/lib/errors/DailogiError";
 
 const loginSchema = z.object({
   name: z.string().min(1, "Zdradź swoją tożsamość"),
@@ -21,6 +21,50 @@ const loginSchema = z.object({
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
+
+/**
+ * Function to handle API error responses and return appropriate Polish error messages
+ */
+function handleApiError(error: unknown, form: ReturnType<typeof useForm<LoginFormValues>>): string | null {
+  // If it's already a DailogiError and was displayed, don't show another toast
+  if (error instanceof DailogiError && error.displayed) {
+    return null;
+  }
+
+  // Get error code and message from response
+  let errorCode: string | undefined;
+
+  if (error instanceof DailogiError) {
+    errorCode = error.errorData?.code;
+  }
+
+  // Default error message
+  let errorMsg = "Nieokreślony błąd podczas procesu weryfikacji";
+
+  if (errorCode) {
+    switch (errorCode) {
+      case "INVALID_CREDENTIALS":
+        errorMsg = "Nie tak brzmiał sekret powierzony nam wcześniej";
+        break;
+      case "AUTHENTICATION_FAILED":
+        errorMsg = "Weryfikacja tożsamości nie powiodła się";
+        break;
+      case "AUTH_ERROR":
+        errorMsg = "Nieoczekiwany błąd podczas procesu weryfikacji";
+        break;
+      case "VALIDATION_ERROR":
+        errorMsg = "Nie wszystkie pola są wypełnione poprawnie";
+        break;
+      default:
+        // Use message from errorData if available
+        if (error instanceof DailogiError && error.errorData?.message) {
+          errorMsg = error.errorData.message;
+        }
+    }
+  }
+
+  return errorMsg;
+}
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -46,14 +90,12 @@ export function LoginForm() {
       toast.success("Zalogowano pomyślnie");
       navigate(ROUTES.HOME);
     } catch (error) {
-      let errorMessage = "Nie tak brzmiał sekret powierzony nam wcześniej";
-      if (axios.isAxiosError(error) && error.response) {
-        errorMessage = error.response.data?.message || errorMessage;
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
+      console.error("[LoginForm] Login failed:", error);
+
+      const errorMsg = handleApiError(error, form);
+      if (errorMsg) {
+        toast.error(errorMsg);
       }
-      console.error("[LoginForm] Login failed:", errorMessage, error);
-      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

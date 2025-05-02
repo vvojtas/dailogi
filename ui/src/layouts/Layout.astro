@@ -38,7 +38,7 @@ const { title = "D-AI-Logi" } = Astro.props;
               <img src="/d-ai-logi-logo_textless.svg" alt="d-ai-logi logo" width="120" height="120" />
             </a>
           </div>
-          <HeaderNav client:only="react" />
+          <HeaderNav client:load />
         </div>
       </header>
       <main class="flex-1" transition:animate="initial">
