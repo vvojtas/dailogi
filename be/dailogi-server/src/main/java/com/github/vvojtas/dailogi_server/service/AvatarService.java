@@ -7,8 +7,10 @@ import com.github.vvojtas.dailogi_server.db.repository.AvatarRepository;
 import com.github.vvojtas.dailogi_server.db.repository.CharacterRepository;
 import com.github.vvojtas.dailogi_server.exception.ResourceNotFoundException;
 import com.github.vvojtas.dailogi_server.service.auth.CurrentUserService;
+import com.github.vvojtas.dailogi_server.service.util.AvatarUtil;
 import com.github.vvojtas.dailogi_server.model.avatar.AvatarData;
 import com.github.vvojtas.dailogi_server.model.avatar.request.UploadAvatarCommand;
+
 import org.springframework.security.access.AccessDeniedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -91,8 +93,8 @@ public class AvatarService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Avatar file is missing or empty.");
         }
 
-        // Validate file type, size, dimensions
-        String formatType = validateAvatarFile(file);
+        // Use AvatarUtil for validation
+        String formatType = AvatarUtil.validateAvatarFile(file);
         byte[] avatarData = file.getBytes();
 
         // Validate character exists and is owned by current user
@@ -148,47 +150,6 @@ public class AvatarService {
         } else {
             log.info("Successfully updated avatar data for id={} linked to character id={}", savedAvatar.getId(), characterId);
         }
-    }
-
-    /**
-     * Validates the uploaded avatar file based on type, size, and dimensions.
-     * Moved from CharacterService.
-     *
-     * @param file The uploaded MultipartFile.
-     * @return The validated content type (e.g., "image/png", "image/jpeg").
-     * @throws ResponseStatusException If validation fails.
-     * @throws IOException If the file cannot be read.
-     */
-    private String validateAvatarFile(MultipartFile file) throws IOException {
-        // Validate file type (Allow PNG and JPEG)
-        String contentType = file.getContentType();
-        if (contentType == null || (!contentType.equals("image/png") && !contentType.equals("image/jpeg"))) {
-            log.warn("Invalid file type '{}' for avatar upload. Allowed: image/png, image/jpeg", contentType);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid file type. Only PNG and JPEG files are allowed.");
-        }
-
-        // Validate file size (1MB = 1048576 bytes)
-        if (file.getSize() > 1048576) {
-            log.warn("File size {} bytes exceeds maximum allowed size of 1MB", file.getSize());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File size must not exceed 1MB.");
-        }
-
-        // Read and validate image dimensions (Max 256x256)
-        BufferedImage img = ImageIO.read(file.getInputStream());
-        if (img == null) {
-            log.warn("Failed to read image file, it might be corrupted or not a valid image.");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid image file. Could not read image data.");
-        }
-
-        if (img.getWidth() > 256 || img.getHeight() > 256) {
-            log.warn("Invalid image dimensions: {}x{}. Maximum allowed is 256x256.", img.getWidth(), img.getHeight());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Image dimensions must not exceed 256x256 pixels.");
-        }
-
-        log.debug("Avatar file validation successful: Type={}, Size={} bytes, Dimensions={}x{}",
-            contentType, file.getSize(), img.getWidth(), img.getHeight());
-
-        return contentType; // Return the validated content type
     }
 
     @Transactional

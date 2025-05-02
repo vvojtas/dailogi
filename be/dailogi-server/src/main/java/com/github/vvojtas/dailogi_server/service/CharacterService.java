@@ -5,6 +5,7 @@ import com.github.vvojtas.dailogi_server.db.repository.CharacterRepository;
 import com.github.vvojtas.dailogi_server.model.character.mapper.CharacterListMapper;
 import com.github.vvojtas.dailogi_server.model.character.response.CharacterListDTO;
 import com.github.vvojtas.dailogi_server.service.auth.CurrentUserService;
+import com.github.vvojtas.dailogi_server.service.util.AvatarUtil;
 import com.github.vvojtas.dailogi_server.properties.UserLimitProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,8 @@ import org.springframework.web.server.ResponseStatusException;
 import com.github.vvojtas.dailogi_server.model.character.request.UpdateCharacterCommand;
 import org.springframework.security.core.Authentication;
 import com.github.vvojtas.dailogi_server.exception.CharacterLimitExceededException;
+import com.github.vvojtas.dailogi_server.db.entity.Avatar;
+import com.github.vvojtas.dailogi_server.db.repository.AvatarRepository;
 
 @Slf4j
 @Service
@@ -38,6 +41,7 @@ public class CharacterService {
     private final LLMRepository llmRepository;
     private final CharacterListMapper characterListMapper;
     private final CharacterMapper characterMapper;
+    private final AvatarRepository avatarRepository;
     
     
 
@@ -133,6 +137,7 @@ public class CharacterService {
     /**
      * Creates a new character for the current user.
      * The character name must be unique for the user.
+     * Can optionally include avatar data during character creation.
      * 
      * @param command the command containing character creation data
      * @return the created character as DTO
@@ -180,8 +185,39 @@ public class CharacterService {
             character.setDefaultLlm(defaultLlm);
         }
         
+        // Handle avatar data if provided
+        if (command.avatar() != null) {
+            try {
+                log.debug("Processing avatar data for new character");
+                
+                // Validate and decode avatar data using AvatarUtil
+                byte[] avatarData = AvatarUtil.validateAndDecodeBase64Avatar(
+                    command.avatar().data(), 
+                    command.avatar().contentType()
+                );
+                
+                // Create and save avatar entity
+                Avatar avatar = Avatar.builder()
+                    .data(avatarData)
+                    .formatType(command.avatar().contentType())
+                    .build();
+                
+                avatar = avatarRepository.save(avatar);
+                character.setAvatar(avatar);
+                
+                log.debug("Avatar created and associated with new character");
+            } catch (Exception e) {
+                log.error("Failed to process avatar data: {}", e.getMessage(), e);
+                throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Failed to process avatar data: " + e.getMessage()
+                );
+            }
+        }
+        
         character = characterRepository.save(character);
-        log.info("Created new character: id={}, name={}", character.getId(), character.getName());
+        log.info("Created new character: id={}, name={}, with avatar={}", 
+            character.getId(), character.getName(), character.getAvatarId() != null);
         
         return characterMapper.toDTO(character);
     }

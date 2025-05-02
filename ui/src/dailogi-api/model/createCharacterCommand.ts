@@ -5,6 +5,7 @@
  * API for d-AI-logi - an interactive web application for creating AI dialogues
  * OpenAPI spec version: v1.0.0
  */
+import type { AvatarRequest } from "./avatarRequest";
 
 /**
  * Command for creating a new character
@@ -30,4 +31,6 @@ export interface CreateCharacterCommand {
   description: string;
   /** Default language model ID to use for this character */
   default_llm_id?: number;
+  /** Optional avatar data as base64 encoded string with content type */
+  avatar?: AvatarRequest;
 }

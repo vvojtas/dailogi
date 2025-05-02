@@ -3,6 +3,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import type { Llmdto } from "@/dailogi-api/model";
 import type { CharacterDTO } from "@/dailogi-api/model/characterDTO";
+import type { CreateCharacterCommand } from "@/dailogi-api/model/createCharacterCommand";
+import type { UpdateCharacterCommand } from "@/dailogi-api/model/updateCharacterCommand";
 import { createCharacter, updateCharacter } from "@/dailogi-api/characters/characters";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -93,6 +95,26 @@ function handleApiError(error: unknown): string | null {
   return errorMsg;
 }
 
+/**
+ * Converts a File to base64 encoding
+ */
+async function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        // Remove the data URL prefix (e.g., "data:image/png;base64,")
+        const base64 = reader.result.split(",")[1];
+        resolve(base64);
+      } else {
+        reject(new Error("Failed to convert file to base64"));
+      }
+    };
+    reader.onerror = (error) => reject(error);
+  });
+}
+
 export function CharacterForm({ llms, initialData, onSubmitSuccess, onCancel }: CharacterFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -110,19 +132,47 @@ export function CharacterForm({ llms, initialData, onSubmitSuccess, onCancel }: 
     setIsSubmitting(true);
 
     try {
-      const characterData = {
-        name: data.name,
-        short_description: data.short_description,
-        description: data.description,
-        default_llm_id: data.default_llm_id ? parseInt(data.default_llm_id, 10) : undefined,
-      };
+      if (initialData) {
+        // Update existing character
+        const updateData: UpdateCharacterCommand = {
+          name: data.name,
+          short_description: data.short_description,
+          description: data.description,
+          default_llm_id: data.default_llm_id ? parseInt(data.default_llm_id, 10) : undefined,
+        };
 
-      const response = initialData
-        ? await updateCharacter(initialData.id, characterData)
-        : await createCharacter(characterData);
+        const response = await updateCharacter(initialData.id, updateData);
+        toast.success("Postać została odmieniona!");
+        onSubmitSuccess(response.data);
+      } else {
+        // Create new character with avatar
+        const createData: CreateCharacterCommand = {
+          name: data.name,
+          short_description: data.short_description,
+          description: data.description,
+          default_llm_id: data.default_llm_id ? parseInt(data.default_llm_id, 10) : undefined,
+        };
 
-      toast.success(initialData ? "Postać została odmieniona!" : "Postać została powołana do życia!");
-      onSubmitSuccess(response.data);
+        // Handle avatar for new character
+        if (data.avatar) {
+          try {
+            const base64Data = await fileToBase64(data.avatar);
+            createData.avatar = {
+              data: base64Data,
+              content_type: data.avatar.type,
+            };
+          } catch (error) {
+            console.error("Error while encoding avatar:", error);
+            toast.error("Nie udało się przetworzyć awatara. Spróbuj ponownie.");
+            setIsSubmitting(false);
+            return;
+          }
+        }
+
+        const response = await createCharacter(createData);
+        toast.success("Postać została powołana do życia!");
+        onSubmitSuccess(response.data);
+      }
     } catch (err) {
       const errorMsg = handleApiError(err);
       if (errorMsg) {

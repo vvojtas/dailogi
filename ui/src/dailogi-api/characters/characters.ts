@@ -79,6 +79,8 @@ export const getCharacters = <TData = AxiosResponse<CharacterListDTO>>(
 /**
  * Creates a new character for the current user.
 The character name must be unique for the user.
+Optionally can include base64-encoded avatar data during character creation.
+Supports PNG and JPEG avatar formats up to 1MB and max 256x256 pixels.
 Requires authentication.
 
  * @summary Create a new character

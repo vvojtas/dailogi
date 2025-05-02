@@ -6,6 +6,7 @@
  * OpenAPI spec version: v1.0.0
  */
 
+export * from "./avatarRequest";
 export * from "./characterAvatarResponseDTO";
 export * from "./characterDTO";
 export * from "./characterListDTO";

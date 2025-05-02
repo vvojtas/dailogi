@@ -26,5 +26,8 @@ public record CreateCharacterCommand(
     @JsonProperty("description") String description,
 
     @Schema(description = "Default language model ID to use for this character", example = "1", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @JsonProperty("default_llm_id") Long defaultLlmId
+    @JsonProperty("default_llm_id") Long defaultLlmId,
+    
+    @Schema(description = "Optional avatar data as base64 encoded string with content type", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+    @JsonProperty("avatar") AvatarRequest avatar
 ) {} 

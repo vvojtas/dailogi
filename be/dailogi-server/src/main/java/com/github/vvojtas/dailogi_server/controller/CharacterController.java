@@ -189,6 +189,8 @@ public class CharacterController {
         description = """
             Creates a new character for the current user.
             The character name must be unique for the user.
+            Optionally can include base64-encoded avatar data during character creation.
+            Supports PNG and JPEG avatar formats up to 1MB and max 256x256 pixels.
             Requires authentication.
             """
     )
@@ -203,7 +205,7 @@ public class CharacterController {
         ),
         @ApiResponse(
             responseCode = "400",
-            description = "Invalid request parameters",
+            description = "Invalid request parameters or invalid avatar data",
             content = @Content(
                 mediaType = "application/json",
                 schema = @Schema(implementation = ErrorResponseDTO.class)
