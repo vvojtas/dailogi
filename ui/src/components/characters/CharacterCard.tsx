@@ -105,7 +105,7 @@ export function CharacterCard({ character, isOwner, isDeleting, onEdit, onDelete
         </CardHeader>
         <CardContent>
           <p className="h-24 overflow-y-auto text-sm text-muted-foreground scrollbar-thin scrollbar-thumb-secondary scrollbar-track-transparent">
-            {character.description || "Ta postać owiana jest tajemnicą."}
+            {character.short_description || "Ta postać owiana jest tajemnicą."}
           </p>
         </CardContent>
         <CardFooter>

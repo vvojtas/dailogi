@@ -13,7 +13,7 @@ import { AvatarUploader } from "@/components/characters/AvatarUploader";
 import { useState } from "react";
 import type { AxiosError } from "axios";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Loader2, CircleSlash } from "lucide-react";
 import { toast } from "sonner";
 
 const characterFormSchema = z.object({
@@ -148,11 +148,14 @@ export function CharacterForm({ llms, initialData, onSubmitSuccess, onCancel }: 
                     <FormLabel>Model językowy</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="min-w-[180px]!">
                           <SelectValue placeholder="Wybierz najstosowniejszy LLM" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
+                        <SelectItem value="undefined">
+                          <CircleSlash className="h-4 w-4 mr-2" /> Brak modelu
+                        </SelectItem>
                         {llms.map((llm) => (
                           <SelectItem key={llm.id} value={llm.id.toString()}>
                             {llm.name}
