@@ -31,6 +31,7 @@ import java.awt.image.BufferedImage;
 import com.github.vvojtas.dailogi_server.model.character.response.CharacterAvatarResponseDTO;
 import com.github.vvojtas.dailogi_server.model.character.request.UploadAvatarCommand;
 import org.springframework.security.core.Authentication;
+import com.github.vvojtas.dailogi_server.exception.CharacterLimitExceededException;
 
 @Slf4j
 @Service
@@ -157,11 +158,7 @@ public class CharacterService {
         if (userCharacterCount >= userLimitProperties.getMaxCharactersPerUser()) {
             log.warn("User {} attempted to exceed character limit of {}", 
                 currentUser.getId(), userLimitProperties.getMaxCharactersPerUser());
-            throw new ResponseStatusException(
-                HttpStatus.UNPROCESSABLE_ENTITY,
-                String.format("Cannot create more characters. Maximum limit of %d characters reached.", 
-                    userLimitProperties.getMaxCharactersPerUser())
-            );
+            throw new CharacterLimitExceededException(userLimitProperties.getMaxCharactersPerUser());
         }
         
         // Verify character name uniqueness for this user

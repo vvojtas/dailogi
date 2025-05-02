@@ -18,6 +18,7 @@ import com.github.vvojtas.dailogi_server.exception.DuplicateResourceException;
 import com.github.vvojtas.dailogi_server.exception.InvalidJwtException;
 import com.github.vvojtas.dailogi_server.model.common.response.ErrorResponseDTO;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import com.github.vvojtas.dailogi_server.exception.CharacterLimitExceededException;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
@@ -198,6 +199,21 @@ public class GlobalExceptionHandler {
                 "Validation failed",
                 "VALIDATION_ERROR",
                 details,
+                OffsetDateTime.now()
+            ));
+    }
+
+    @ExceptionHandler(CharacterLimitExceededException.class)
+    public ResponseEntity<ErrorResponseDTO> handleCharacterLimitExceededException(CharacterLimitExceededException e) {
+        log.warn("Character limit exceeded", e);
+        
+        return ResponseEntity
+            .status(HttpStatus.UNPROCESSABLE_ENTITY)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new ErrorResponseDTO(
+                e.getMessage(),
+                "CHARACTER_LIMIT_EXCEEDED",
+                Map.of("limit", e.getLimit()),
                 OffsetDateTime.now()
             ));
     }

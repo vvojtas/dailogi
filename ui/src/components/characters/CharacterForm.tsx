@@ -84,6 +84,9 @@ function handleApiError(error: unknown): string | null {
       case "TYPE_MISMATCH":
         errorMsg = "Podano nieprawidłowy format danych";
         break;
+      case "CHARACTER_LIMIT_EXCEEDED":
+        errorMsg = "Osiągnięto limit postaci w Twoim zespole! Więcej nie można stworzyć.";
+        break;
     }
   }
 
