@@ -54,6 +54,14 @@ Następujące elementy nie będą testowane w ramach MVP:
 ### 3.1. Strategia Testowania Frontendu (Astro + React)
 *   **Testy Jednostkowe (Unit Tests):**
     *   Narzędzia: Vitest, React Testing Library (RTL).
+    *   Struktura katalogów: 
+        * `ui/src/test/` - główny katalog testów
+        * `ui/src/test/components/` - testy komponentów, z podkatalogami odzwierciedlającymi strukturę aplikacji (np. `layout/`, `ui/`)
+        * `ui/src/test/hooks/` - testy hooków React
+        * `ui/src/test/utils/` - testy funkcji pomocniczych
+        * `ui/src/test/integration/` - testy integracyjne komponentów
+        * `ui/src/test/__mocks__/` - współdzielone mocki
+        * `ui/src/test/setup.ts` - konfiguracja środowiska testowego
     *   Zakres: Poszczególne komponenty React (izolowane), hooki, funkcje pomocnicze (np. walidacja po stronie klienta, formatowanie danych). Testowanie logiki renderowania, obsługi zdarzeń, zarządzania stanem komponentu.
 *   **Testy Integracyjne Komponentów (Component Integration Tests):**
     *   Narzędzia: React Testing Library (RTL).

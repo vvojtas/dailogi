@@ -21,3 +21,15 @@ alwaysApply: false
 - Structure tests for maintainability - Group related tests with descriptive `describe` blocks, use explicit assertion messages, and follow the Arrange-Act-Assert pattern to make tests self-documenting.
 - Leverage TypeScript type checking in tests - Enable strict typing in your tests to catch type errors early, use `expectTypeOf()` for type-level assertions, and ensure mocks preserve the original type signatures.
 
+#### Project Test Structure
+
+- Place all tests in the `ui/src/test` directory with specific subdirectories:
+  - `components/` - Tests for React/Astro components with subdirectories matching the application structure (e.g., `layout/`, `ui/`)
+  - `hooks/` - Tests for custom React hooks
+  - `utils/` - Tests for utility functions and helpers
+  - `integration/` - Component integration tests
+  - `__mocks__/` - Shared mock implementations
+- Update imports to use absolute paths (e.g., `import { Component } from "@/components/path/Component"`) instead of relative paths
+- Use Jest-style naming convention: `Component.test.tsx` or `utility.test.ts`
+- Set up shared test configurations in `ui/src/test/setup.ts`
+

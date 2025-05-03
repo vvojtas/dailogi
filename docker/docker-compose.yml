@@ -1,0 +1,15 @@
+services:
+  # SonarQube 
+  sonarqube:
+    image: sonarqube:latest
+    container_name: dailogi-sonarqube
+    ports:
+      - "9000:9000"
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+    volumes:
+      - ./sonarqube/data:/opt/sonarqube/data
+      - ./sonarqube/logs:/opt/sonarqube/logs
+      - ./sonarqube/extensions:/opt/sonarqube/extensions
+      - ./sonarqube/conf:/opt/sonarqube/conf
+    restart: unless-stopped 

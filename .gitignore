@@ -32,3 +32,6 @@ prompts/
 ### UI test reports ###
 ui/playwright-report/
 ui/test-results/
+
+### Docker volumes ###
+docker/sonarqube/

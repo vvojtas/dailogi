@@ -4,11 +4,6 @@ globs:
 alwaysApply: true
 ---
 Terminal Command Rules for Windows Environment
-Description
 
-These rules guide Cursor’s AI when generating terminal commands for a Windows-only environment. Due to execution problems with PowerShell, we need to ensure only CMD commands are used.
-Rules
-
-You are working on Windows with powershell terminal.
-
-Do not use && - it does not work. Run commands one by one instead.
+- You are working on Windows with powershell terminal.
+- Do not use && - it does not work. Run commands one by one instead.

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -27,13 +28,8 @@ class ExampleServiceTest {
     private SomeOtherService dependencyService;
 
     // Service under test
+    @InjectMocks
     private ExampleService exampleService;
-
-    @BeforeEach
-    void setUp() {
-        // Initialize the service with mocks
-        exampleService = new ExampleService(dependencyService);
-    }
 
     @Test
     @DisplayName("Should return expected result when valid input is provided")
