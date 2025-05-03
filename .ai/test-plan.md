@@ -1,109 +1,210 @@
-# Plan Testów dla Projektu d-AI-logi
+      
+# Plan Testów dla Aplikacji d-AI-logi
 
-## 1. Wprowadzenie i cel testów
-Celem testów jest zapewnienie wysokiej jakości aplikacji d-AI-logi poprzez kompleksowe pokrycie kluczowych funkcjonalności na poziomie frontendu oraz backendu. Testy mają na celu weryfikację poprawności implementacji, bezpieczeństwa, wydajności i użyteczności aplikacji, zgodnie z dokumentem wymagań produktowych.
+**Wersja:** 1.0
+**Data:** 2025-05-03
+**Autor:** Gemini 2.5 PRO, Specjalista QA
 
-## 2. Zakres testów
-- **Frontend:** 
-  - Walidacja formularzy (rejestracja, logowanie, tworzenie/edycja postaci).
-  - Interaktywność komponentów React oraz strony generowane przez Astro.
-  - Responsywność UI i poprawność wyświetlania komponentów Shadcn/ui.
-  - Przepływy użytkownika, m.in. tworzenie sceny dialogowej oraz obserwacja generowanego dialogu.
+## 1. Wprowadzenie i Cel Testów
 
-- **Backend:**
-  - Testy jednostkowe serwisów i kontrolerów Spring.
-  - Testy integracyjne REST API (m.in. rejestracja, logowanie, zarządzanie postaciami, generowanie dialogu).
-  - Testy bezpieczeństwa (autoryzacja, uwierzytelnianie oraz szyfrowanie kluczy API).
-  - Obsługa błędów i walidacja danych wejściowych.
+### 1.1. Wprowadzenie
+Niniejszy dokument opisuje plan testów dla aplikacji internetowej **d-AI-logi** w wersji MVP (Minimum Viable Product). Aplikacja umożliwia użytkownikom tworzenie i obserwowanie dialogów generowanych przez sztuczną inteligencję (AI) pomiędzy zdefiniowanymi postaciami. Wykorzystuje architekturę opartą o frontend (Astro + React) oraz backend (Java + Spring Boot), z integracją zewnętrznego API (OpenRouter) do obsługi modeli językowych (LLM).
 
-- **Integracja i End-to-End:**
-  - Testy przepływu użytkownika od rejestracji, poprzez konfigurację sceny, aż do generowania dialogu.
-  - Testowanie integracji z zewnętrznym API OpenRouter (symulacja poprawnych i niepoprawnych scenariuszy).
+### 1.2. Cel Testów
+Głównym celem testów jest zapewnienie wysokiej jakości aplikacji d-AI-logi w wersji MVP poprzez:
+*   Weryfikację zgodności implementacji z wymaganiami funkcjonalnymi (PRD).
+*   Identyfikację i raportowanie defektów oprogramowania.
+*   Ocenę stabilności, wydajności i bezpieczeństwa kluczowych komponentów aplikacji.
+*   Zapewnienie spójnego i użytecznego doświadczenia użytkownika (UX).
+*   Minimalizację ryzyka związanego z wdrożeniem aplikacji na środowisko produkcyjne.
 
-## 3. Strategie testowania
+## 2. Zakres Testów
 
-### Frontend
-- **Testy jednostkowe:** Użycie narzędzi takich jak Vitest, Jest oraz React Testing Library do testowania poszczególnych komponentów. Vitest jest preferowany ze względu na szybkość i lepszą integrację z Astro.
-- **Testy integracyjne:** Weryfikacja współdziałania komponentów na poziomie stron Astro.
-- **Testy E2E:** Automatyzacja scenariuszy użytkownika przy użyciu narzędzi takich jak Playwright lub Cypress, symulacja kluczowych przepływów (rejestracja, logowanie, tworzenie dialogu). Playwright jest rekomendowany jako nowocześniejsza alternatywa.
+### 2.1. Funkcjonalności Wchodzące w Zakres Testów (In Scope)
+Testy obejmą wszystkie funkcjonalności zdefiniowane w dokumencie wymagań (PRD) dla wersji MVP, w tym:
 
-### Backend
-- **Testy jednostkowe:** Wykorzystanie JUnit 5 i Mockito do testowania logiki biznesowej oraz kontrolerów Spring.
-- **Testy integracyjne:** Testowanie komunikacji między warstwami aplikacji przy użyciu Spring Boot Test (np. MockMvc, testy z bazą H2 lub symulacją PostgreSQL).
-- **Testy bezpieczeństwa:** Weryfikacja mechanizmów uwierzytelniania, autoryzacji oraz szyfrowania kluczy API.
+*   **Zarządzanie Kontem Użytkownika (FR-001):** Rejestracja, Logowanie.
+*   **Zarządzanie Postaciami AI (FR-002):** Tworzenie (z limitem, walidacją, opcjonalnym awatarem), Edycja, Usuwanie, Przeglądanie własnych postaci.
+*   **Biblioteka Postaci Predefiniowanych (FR-003):** Dostęp i przeglądanie dla zalogowanych i niezalogowanych użytkowników.
+*   **Tworzenie Sceny Dialogowej (FR-004):** Wybór 2-3 postaci (własne/predefiniowane), Definiowanie tematu/opisu sceny, Wybór LLM per postać (z listy przez OpenRouter).
+*   **Generowanie i Obserwacja Dialogu (FR-005):** Inicjacja, Generowanie tura po turze (round-robin), Limit 50 tur, Wizualizacja czatu.
+*   **Zarządzanie Historią Dialogów (FR-006, US-017 - US-020):** Zapisywanie (z limitem), Przeglądanie listy, Odczytywanie zapisanego dialogu, Usuwanie zapisanego dialogu.
+*   **Zarządzanie Kluczem API OpenRouter (FR-007):** Wprowadzanie, Zapisywanie (szyfrowane), Aktualizacja/Usuwanie.
+*   **Mechanizm Specjalnego Użytkownika (FR-008):** Użycie globalnego klucza API.
+*   **Obsługa Błędów API (FR-009):** Wyświetlanie komunikatów, Obsługa błędów podczas generowania dialogu.
+*   **Interfejs Użytkownika (FR-010):** Podstawowa nawigacja, Strona startowa.
+*   **Dostęp Gościa (US-021 - US-023):** Ograniczenia akcji, Przeglądanie postaci predefiniowanych.
+*   **Backend API:** Walidacja endpointów, autentykacja (JWT), autoryzacja.
+*   **Interakcja Frontend-Backend:** Poprawność przesyłania danych, obsługa odpowiedzi API.
+*   **Baza Danych:** Integralność danych, poprawność migracji (Flyway).
 
-### End-to-End (E2E) i Systemowe
-- Automatyzacja pełnych scenariuszy użytkownika, łączących interakcje frontendowe z backendowymi endpointami.
-- Symulacja scenariuszy awaryjnych, takich jak błędy API, nieprawidłowe dane wejściowe oraz przerwanie generowania dialogu.
+### 2.2. Funkcjonalności Poza Zakresem Testów (Out of Scope)
+Następujące elementy nie będą testowane w ramach MVP:
 
-## 4. Typy testów do przeprowadzenia
-- **Testy jednostkowe:** Sprawdzające izolowane funkcje komponentów frontendu oraz metod backendowych.
-- **Testy integracyjne:** Weryfikujące współdziałanie różnych modułów (np. kontroler-serwis, komunikacja z bazą danych).
-- **Testy end-to-end (E2E):** Symulacja pełnych przepływów użytkownika.
-- **Testy regresyjne:** Powtarzane testy całej aplikacji po każdej iteracji, w celu wykrycia nowych błędów.
-- **Testy bezpieczeństwa:** Sprawdzenie autoryzacji, uwierzytelniania, szyfrowania oraz odporności na ataki typu injection.
-- **Testy obciążeniowe (opcjonalnie):** Weryfikacja wydajności generowania dialogu oraz obsługi dużej liczby jednoczesnych użytkowników.
+*   Funkcjonalności wymienione w PRD jako "NIE wchodzące w zakres MVP".
+*   Zaawansowane testy wydajnościowe i obciążeniowe (poza podstawowymi sprawdzeniami).
+*   Formalny audyt dostępności (WCAG).
+*   Testy penetracyjne (poza podstawowymi testami bezpieczeństwa).
+*   Testowanie specyficznych, niestandardowych konfiguracji przeglądarek lub systemów operacyjnych.
+*   Dogłębna analiza jakości odpowiedzi generowanych przez modele LLM (skupienie na procesie generowania, a nie merytorycznej poprawności odpowiedzi AI).
+*   Testowanie kosztów generowania zapytań do OpenRouter (poza podstawową weryfikacją działania mechanizmu).
 
-## 5. Środowiska testowe
-- **Lokalne środowisko developerskie:** Do szybkich iteracji testów jednostkowych i integracyjnych.
-- **Środowisko testowe/Staging:** Symulujące warunki produkcyjne, z pełną konfiguracją bazy danych (np. klon PostgreSQL) oraz integracji z zewnętrznymi serwisami.
-- **Środowisko CI/CD:** Automatyczne testowanie przy każdej zmianie kodu (integracja z GitHub Actions). Testy powinny być uruchamiane nie tylko przy każdej zmianie, ale również w ramach pipeline'ów dla pull requestów przed umożliwieniem merge'u do głównej gałęzi.
+## 3. Strategie Testowania
 
-## 6. Harmonogram testów (ogólny zarys)
-1. **Faza planowania:**
-   - Zdefiniowanie zakresu testów i przygotowanie środowisk.
-2. **Testy jednostkowe:**
-   - Opracowanie i uruchomienie testów jednostkowych dla komponentów frontendu i metod backendowych.
-3. **Testy integracyjne:**
-   - Przeprowadzenie testów integracyjnych w celu weryfikacji komunikacji między modułami.
-4. **Testy E2E:**
-   - Implementacja automatycznych scenariuszy użytkownika, symulacja pełnych przepływów.
-5. **Testy regresyjne:**
-   - Powtarzanie testów po każdej iteracji wdrożenia zmian.
-6. **Testy bezpieczeństwa i wydajności:**
-   - Testy pod kątem bezpieczeństwa oraz obciążeniowe (jeśli wymagane).
+### 3.1. Strategia Testowania Frontendu (Astro + React)
+*   **Testy Jednostkowe (Unit Tests):**
+    *   Narzędzia: Vitest, React Testing Library (RTL).
+    *   Zakres: Poszczególne komponenty React (izolowane), hooki, funkcje pomocnicze (np. walidacja po stronie klienta, formatowanie danych). Testowanie logiki renderowania, obsługi zdarzeń, zarządzania stanem komponentu.
+*   **Testy Integracyjne Komponentów (Component Integration Tests):**
+    *   Narzędzia: React Testing Library (RTL).
+    *   Zakres: Interakcje pomiędzy powiązanymi komponentami React (np. formularz i jego pola, lista i jej elementy). Weryfikacja przepływu danych i zdarzeń między komponentami.
+*   **Testy End-to-End (E2E):**
+    *   Narzędzia: Playwright lub Cypress.
+    *   Zakres: Symulacja pełnych przepływów użytkownika w przeglądarce, obejmująca interakcję z UI, komunikację z backendem i weryfikację rezultatów. Kluczowe scenariusze: rejestracja, logowanie, CRUD postaci (z awatarem), tworzenie sceny, inicjacja i obserwacja dialogu, przeglądanie historii. Testowanie zarówno statycznych stron Astro, jak i interaktywnych wysp React.
+*   **Testy Manualne:**
+    *   Zakres: Testy eksploracyjne, testy użyteczności (UX), weryfikacja wizualna (zgodność z designem, responsywność - Tailwind), testy kompatybilności przeglądarek.
 
-## 7. Kryteria akceptacji testów
-- Wszystkie krytyczne funkcjonalności muszą przejść testy bez błędów.
-- Walidacja danych wejściowych oraz obsługa błędów zgodnie z wymaganiami produktowymi.
-- UI musi być responsywny i zgodny z projektem (Astro, React, Tailwind, Shadcn/ui).
-- End-to-end testy muszą potwierdzić poprawny przepływ użytkownika, łącznie z generowaniem dialogu do 50 tur oraz zapisywaniem historii.
-- Mechanizmy bezpieczeństwa (uwierzytelnianie, autoryzacja, szyfrowanie) muszą działać zgodnie z założeniami.
+### 3.2. Strategia Testowania Backendu (Java + Spring Boot)
+*   **Testy Jednostkowe (Unit Tests):**
+    *   Narzędzia: JUnit 5, Mockito.
+    *   Zakres: Poszczególne klasy serwisów (np. `CharacterService`, `AuthService`), kontrolerów (mockując zależności), repozytoriów (jeśli zawierają złożoną logikę zapytań), klas pomocniczych (np. `AvatarUtil`, `JwtTokenProvider`). Skupienie na logice biznesowej w izolacji.
+*   **Testy Integracyjne (Integration Tests):**
+    *   Narzędzia: Spring Boot Test (`@SpringBootTest`), H2 (dla szybkich testów) / Testcontainers (dla testów z PostgreSQL), MockMvc / RestAssured (dla testów API).
+    *   Zakres: Weryfikacja interakcji pomiędzy warstwami aplikacji (Kontroler -> Serwis -> Repozytorium -> Baza Danych). Testowanie endpointów API (walidacja żądań, odpowiedzi, kody statusu), konfiguracji bezpieczeństwa (Spring Security - reguły dostępu, filtry JWT), obsługi wyjątków (`GlobalExceptionHandler`), migracji bazy danych (Flyway). Zewnętrzne zależności (np. OpenRouter API) będą mockowane.
+*   **Testy API (API Contract Tests):**
+    *   Narzędzia: Postman, Newman lub RestAssured.
+    *   Zakres: Testowanie kontraktu REST API niezależnie od UI. Weryfikacja wszystkich endpointów, metod HTTP, struktur żądań i odpowiedzi, obsługi błędów, autentykacji i autoryzacji zgodnie ze specyfikacją OpenAPI (`docs/be-api.json`).
 
-## 8. Proces raportowania błędów
-- Błędy będą zgłaszane w systemie zarządzania zgłoszeniami (np. Jira).
-- Każde zgłoszenie powinno zawierać:
-  - Opis błędu oraz kroki do jego reprodukcji.
-  - Oczekiwany rezultat versus otrzymany rezultat.
-  - Zrzuty ekranu, logi systemowe oraz, w miarę możliwości, linki do commitów.
-- Priorytetyzacja zgłoszeń według wpływu na krytyczne funkcjonalności oraz bezpieczeństwo.
+### 3.3. Strategia Testowania Integracji AI (OpenRouter)
+*   **Mockowanie w Testach Jednostkowych/Integracyjnych:** Serwis OpenRouter będzie mockowany, aby symulować różne scenariusze odpowiedzi (sukces, błąd klucza, błąd serwera, przekroczenie limitu) bez rzeczywistego wywoływania API.
+*   **Dedykowane Testy Integracyjne API:** Przeprowadzenie ograniczonej liczby testów na środowisku Staging, wykorzystując dedykowany, *testowy* klucz API OpenRouter z niskimi limitami. Celem jest weryfikacja poprawności komunikacji (format zapytań, autoryzacja) i obsługi rzeczywistych odpowiedzi API. Należy monitorować koszty tych testów.
+*   **Testowanie Obsługi Błędów:** Skupienie na weryfikacji, czy aplikacja poprawnie interpretuje błędy zwracane przez OpenRouter i prezentuje je użytkownikowi (FR-009, US-016).
 
-## 9. Zasoby i narzędzia potrzebne do testowania
-- **Frontend:**
-  - Vitest jako główne narzędzie do testów (szybsze i lepiej zintegrowane z Astro)
-  - Jest, React Testing Library jako narzędzia pomocnicze
-  - Playwright (preferowany) lub Cypress do testów E2E
-  - ESLint, Prettier
+## 4. Typy Testów
 
-- **Backend:**
-  - JUnit 5, Mockito, Spring Boot Test
-  - Postman/Insomnia do testowania API
-  - JaCoCo (narzędzie do analizy pokrycia testów)
+W ramach projektu przeprowadzone zostaną następujące typy testów:
 
-- **Bezpieczeństwo i jakość kodu:**
-  - SonarQube do analizy statycznej kodu i monitorowania jakości w czasie rzeczywistym
+*   **Testy Funkcjonalne:** Weryfikacja, czy aplikacja działa zgodnie z wymaganiami PRD (obejmuje testy jednostkowe, integracyjne, API, E2E).
+*   **Testy Jednostkowe:** Izolowane testowanie najmniejszych części kodu (funkcje, metody, komponenty).
+*   **Testy Integracyjne:** Testowanie interakcji pomiędzy różnymi modułami/warstwami aplikacji (np. kontroler-serwis-repozytorium, komponenty FE).
+*   **Testy API:** Bezpośrednie testowanie endpointów backendu w celu weryfikacji kontraktu API.
+*   **Testy End-to-End (E2E):** Testowanie kompletnych przepływów użytkownika przez całą aplikację (UI -> Backend -> DB -> Zewnętrzne API).
+*   **Testy Bezpieczeństwa:** Podstawowa weryfikacja mechanizmów autentykacji i autoryzacji, przechowywania kluczy API, obsługa sesji (JWT), potencjalne podatności (np. XSS w polach tekstowych). Skanowanie zależności.
+*   **Testy Użyteczności (Manualne):** Ocena łatwości obsługi, intuicyjności interfejsu i ogólnego doświadczenia użytkownika.
+*   **Testy Kompatybilności (Manualne/Automatyczne):** Sprawdzenie działania aplikacji na różnych, popularnych przeglądarkach internetowych (Chrome, Firefox, Safari, Edge - najnowsze wersje).
+*   **Testy Regresji:** Ponowne wykonanie wybranych testów (automatycznych i manualnych) po wprowadzeniu zmian w kodzie lub naprawie błędów, aby upewnić się, że nowe zmiany nie zepsuły istniejących funkcjonalności.
 
-- **Inne:**
-  - System CI/CD (np. GitHub Actions) do automatyzacji testów z naciskiem na testowanie wszystkich PR-ów.
-  - Narzędzie do zarządzania błędami (Jira, Trello lub inny).
-  - Środowiska Docker do symulacji produkcyjnych konfiguracji (jeśli wymagane).
+## 5. Środowiska Testowe
 
-## 10. Monitorowanie jakości kodu
-- Implementacja SonarQube do ciągłej analizy jakości kodu
-- Monitorowanie metryk jakości kodu w czasie rzeczywistym:
-  - Pokrycie testami
-  - Dług techniczny
-  - Duplikacje kodu
-  - Złożoność cyklomatyczna
-  - Potencjalne problemy bezpieczeństwa
-- Definiowanie progów jakości, które muszą być spełnione przed zaakceptowaniem pull requestów
+*   **Środowisko Lokalne (Development):**
+    *   Cel: Testowanie jednostkowe i integracyjne przez deweloperów podczas kodowania.
+    *   Konfiguracja: Kod uruchamiany lokalnie, backend z bazą H2 lub lokalnym PostgreSQL, frontend łączący się z lokalnym backendem. Mockowane API OpenRouter.
+*   **Środowisko CI (Continuous Integration - GitHub Actions):**
+    *   Cel: Automatyczne uruchamianie testów jednostkowych, integracyjnych (z H2/Testcontainers) oraz E2E (opcjonalnie) po każdym pushu do repozytorium lub Pulla Request.
+    *   Konfiguracja: Środowisko budowane dynamicznie w ramach pipeline'u CI.
+*   **Środowisko Staging/Przedprodukcyjne:**
+    *   Cel: Testy E2E, testy manualne, testy UAT (User Acceptance Testing), testy integracyjne z zewnętrznymi serwisami (ograniczone testy OpenRouter).
+    *   Konfiguracja: Dedykowany serwer z konfiguracją zbliżoną do produkcyjnej. Własna instancja bazy danych PostgreSQL (z danymi testowymi). Połączenie z *testowym* kluczem API OpenRouter.
+*   **Środowisko Produkcyjne:**
+    *   Cel: Ograniczone testy dymne (smoke tests) po wdrożeniu nowej wersji. Bieżący monitoring działania aplikacji.
+    *   Konfiguracja: Środowisko dostępne dla użytkowników końcowych.
+
+## 6. Harmonogram Testów (Ogólny Zarys)
+
+Testowanie będzie procesem ciągłym, zintegrowanym z cyklem rozwoju oprogramowania:
+
+*   **Podczas Sprintu/Iteracji:**
+    *   Deweloperzy piszą i uruchamiają testy jednostkowe i integracyjne równolegle z implementacją funkcjonalności.
+    *   Testy automatyczne (jednostkowe, integracyjne) są uruchamiane w CI przy każdym pushu/PR.
+    *   QA przeprowadza testy funkcjonalne (manualne/API) nowo zaimplementowanych historyjek użytkownika na środowisku lokalnym lub wczesnym Staging.
+*   **Przed Zakończeniem Sprintu/Wydania MVP:**
+    *   Wykonanie pełnego cyklu testów regresji (automatycznych i kluczowych manualnych).
+    *   Przeprowadzenie testów E2E na środowisku Staging.
+    *   Testy kompatybilności i użyteczności.
+    *   UAT (jeśli dotyczy).
+*   **Po Wdrożeniu na Produkcji:**
+    *   Wykonanie testów dymnych (smoke tests) w celu weryfikacji kluczowych funkcjonalności.
+
+## 7. Kryteria Akceptacji Testów
+
+### 7.1. Kryteria Wejścia (Rozpoczęcia Testów Fazy/Cyklu)
+*   Kod źródłowy dla testowanych funkcjonalności jest w repozytorium.
+*   Build aplikacji jest możliwy i zakończony sukcesem.
+*   Testy jednostkowe i podstawowe integracyjne (pokrywające kod) przechodzą pomyślnie w CI.
+*   Środowisko testowe (Staging) jest dostępne i stabilne.
+*   Dokumentacja (PRD, specyfikacja API) jest dostępna i aktualna.
+
+### 7.2. Kryteria Wyjścia (Zakończenia Testów dla Wydania MVP)
+*   Wszystkie zaplanowane przypadki testowe (manualne i automatyczne) zostały wykonane.
+*   Wszystkie krytyczne (Critical) i wysokie (High) błędy zostały naprawione i zweryfikowane.
+*   Brak znanych błędów blokujących kluczowe ścieżki użytkownika.
+*   Odsetek błędów średnich (Medium) i niskich (Low) jest na akceptowalnym poziomie, zaakceptowanym przez Product Ownera.
+*   Kluczowe testy E2E przechodzą pomyślnie na środowisku Staging.
+*   Osiągnięto uzgodniony poziom pokrycia kodu testami automatycznymi (np. >70% dla testów jednostkowych i integracyjnych backnedu).
+*   Wyniki testów zostały udokumentowane i zaakceptowane.
+
+**Definicje Priorytetów Błędów:**
+*   **Krytyczny (Critical):** Błąd blokujący działanie kluczowej funkcjonalności, brak obejścia, powoduje utratę danych lub awarię systemu.
+*   **Wysoki (High):** Błąd znacznie utrudniający działanie kluczowej funkcjonalności, obejście jest trudne lub niewygodne.
+*   **Średni (Medium):** Błąd utrudniający działanie mniej istotnej funkcjonalności lub istotnej z łatwym obejściem, problem UI/UX.
+*   **Niski (Low):** Drobny błąd kosmetyczny, literówka, sugestia usprawnienia.
+
+## 8. Proces Raportowania Błędów
+
+*   **Narzędzie:** GitHub Issues w repozytorium projektu.
+*   **Wymagane Informacje w Zgłoszeniu:**
+    *   Tytuł: Krótki, zwięzły opis problemu.
+    *   Środowisko: Gdzie zaobserwowano błąd (Lokalne, Staging, Produkcja).
+    *   Wersja/Build: Jeśli dotyczy.
+    *   Kroki do Reprodukcji: Dokładna, numerowana lista kroków.
+    *   Wynik Oczekiwany: Co powinno się wydarzyć.
+    *   Wynik Rzeczywisty: Co się wydarzyło.
+    *   Priorytet/Waga (Severity): Krytyczny, Wysoki, Średni, Niski.
+    *   Zrzuty Ekranu/Nagrania Wideo: Jeśli pomagają zilustrować problem.
+    *   Logi: Fragmenty logów aplikacji (jeśli relevantne, szczególnie dla błędów backendu/API).
+    *   Etykiety: np. `bug`, `frontend`, `backend`, `api`, `security`, `ui/ux`.
+*   **Przepływ Pracy (Workflow) Błędu:**
+    1.  `New/Open`: Zgłoszenie nowego błędu.
+    2.  `Triage/Assigned`: Błąd jest analizowany, potwierdzany i przypisywany do dewelopera.
+    3.  `In Progress`: Deweloper pracuje nad naprawą.
+    4.  `Resolved/Ready for Verification`: Deweloper naprawił błąd i jest gotowy do weryfikacji przez QA.
+    5.  `Verified`: QA potwierdza, że błąd został naprawiony na odpowiednim środowisku.
+    6.  `Closed`: Błąd jest zamknięty.
+    7.  `Reopened`: Jeśli weryfikacja nie powiodła się, błąd wraca do `In Progress`.
+
+## 9. Zasoby i Narzędzia
+
+### 9.1. Zasoby Ludzkie
+*   Specjalista/Zespół QA
+*   Deweloperzy Frontend
+*   Deweloperzy Backend
+*   Product Owner (do akceptacji kryteriów i priorytetyzacji błędów)
+
+### 9.2. Narzędzia Testowe
+*   **Frontend:**
+    *   Vitest (Testy jednostkowe JS/TS)
+    *   React Testing Library (Testy komponentów React)
+    *   Playwright / Cypress (Testy E2E)
+*   **Backend:**
+    *   JUnit 5 (Framework testowy Java)
+    *   Mockito (Mockowanie zależności Java)
+    *   Spring Boot Test (Testy integracyjne Spring)
+    *   H2 Database / Testcontainers (Testowanie bazy danych)
+    *   MockMvc / RestAssured (Testowanie API z poziomu Javy)
+*   **API:**
+    *   Postman / Newman (Manualne i automatyczne testy API)
+*   **CI/CD:**
+    *   GitHub Actions
+*   **Konteneryzacja:**
+    *   Docker
+*   **Zarządzanie Błędami:**
+    *   GitHub Issues
+*   **Analiza Kodu:**
+    *   SonarQube (skonfigurowany w `pom.xml`)
+*   **Przeglądarki:**
+    *   Aktualne wersje Google Chrome, Mozilla Firefox, Safari, Microsoft Edge.
+*   **Inne (Opcjonalnie):**
+    *   Narzędzia do testów kompatybilności (np. BrowserStack, LambdaTest).
+    *   Narzędzia do testów wydajnościowych (np. k6, JMeter).
+
+    
