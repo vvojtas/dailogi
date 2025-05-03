@@ -31,6 +31,13 @@
 	<properties>
 		<java.version>21</java.version>
 		<jjwt.version>0.12.6</jjwt.version>
+		<sonar.projectKey>dailogi_server</sonar.projectKey>
+		<sonar.projectName>Dailogi Server</sonar.projectName>
+		<sonar.sources>src/main</sonar.sources>
+		<sonar.java.binaries>target/classes</sonar.java.binaries>
+		<sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
+		<sonar.host.url>http://localhost:9000</sonar.host.url>
+		<sonar.token>squ_26cfc933e88bd1d698995e7a6f8811b27d78c95e</sonar.token>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -127,6 +134,11 @@
 					<password>password</password>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>5.1.0.4751</version>
+			  </plugin>
 		</plugins>
 	</build>
 

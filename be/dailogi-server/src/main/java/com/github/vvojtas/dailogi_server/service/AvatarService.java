@@ -20,14 +20,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
-import javax.imageio.ImageIO;
 import java.io.IOException;
-import java.awt.image.BufferedImage;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AvatarService {
+
+    private static final String CHARACTER_RESOURCE_NAME = Character.class.getSimpleName().toLowerCase();
+    private static final String AVATAR_RESOURCE_NAME = Avatar.class.getSimpleName().toLowerCase();
 
     private final AvatarRepository avatarRepository;
     private final CharacterRepository characterRepository;
@@ -40,7 +41,7 @@ public class AvatarService {
         Character character = characterRepository.findById(characterId)
             .orElseThrow(() -> {
                  log.warn("Avatar request failed: Character not found with id={}", characterId);
-                 return new ResourceNotFoundException("character", "Character not found with id: " + characterId);
+                 return new ResourceNotFoundException(CHARACTER_RESOURCE_NAME, "Character not found with id: " + characterId);
             });
 
         // Check if the character is global or owned by the current user
@@ -56,7 +57,7 @@ public class AvatarService {
         var avatarId = character.getAvatarId();
         if (avatarId== null) {
             log.debug("Character id={} found, but has no avatar (avatarId is null).", characterId);
-            throw new ResourceNotFoundException("avatar", "Character wit id: " + characterId + "has no avatar");
+            throw new ResourceNotFoundException(AVATAR_RESOURCE_NAME, "Character wit id: " + characterId + "has no avatar");
         }
 
         // Fetch the avatar data using avatarId
@@ -66,7 +67,7 @@ public class AvatarService {
             .orElseThrow(() -> {
                  // This case indicates data inconsistency
                  log.error("Data inconsistency: Character {} has avatarId {} but Avatar entity not found.", characterId, avatarId);
-                 return new ResourceNotFoundException("avatar", "Avatar not found with id: " + avatarId);
+                 return new ResourceNotFoundException(AVATAR_RESOURCE_NAME, "Avatar not found with id: " + avatarId);
              });
              
         log.info("Successfully retrieved avatar id={} for character id={}",  avatarId, characterId);
@@ -101,7 +102,7 @@ public class AvatarService {
         Character character = characterRepository.findById(characterId)
             .orElseThrow(() -> {
                 log.warn("Attempt to set avatar for non-existent character with id={}", characterId);
-                return new ResourceNotFoundException("character", "Character not found with id: " + characterId);
+                return new ResourceNotFoundException(CHARACTER_RESOURCE_NAME, "Character not found with id: " + characterId);
             });
 
         // Use CurrentUserService to get the authenticated user for ownership check
@@ -159,7 +160,7 @@ public class AvatarService {
         var character = characterRepository.findById(characterId)
             .orElseThrow(() -> {
                 log.warn("Character not found with id={}", characterId);
-                return new ResourceNotFoundException("character", "Character not found with id: " + characterId);
+                return new ResourceNotFoundException(CHARACTER_RESOURCE_NAME, "Character not found with id: " + characterId);
             });
         
         var currentUser = currentUserService.getCurrentAppUser(authentication);
@@ -170,14 +171,14 @@ public class AvatarService {
         
         if (character.getAvatarId() == null) {
             log.warn("Character id={} has no avatar to delete", characterId);
-            throw new ResourceNotFoundException("avatar", "Character with id " + characterId + " has no avatar");
+            throw new ResourceNotFoundException(AVATAR_RESOURCE_NAME, "Character with id " + characterId + " has no avatar");
         }
         
         Long avatarId = character.getAvatarId();
         var avatar = avatarRepository.findById(avatarId)
             .orElseThrow(() -> {
                 log.error("Data inconsistency: Character {} has avatarId {} but Avatar entity not found", characterId, avatarId);
-                return new ResourceNotFoundException("avatar", "Avatar not found with id: " + avatarId);
+                return new ResourceNotFoundException(AVATAR_RESOURCE_NAME, "Avatar not found with id: " + avatarId);
             });
         
         avatarRepository.delete(avatar);

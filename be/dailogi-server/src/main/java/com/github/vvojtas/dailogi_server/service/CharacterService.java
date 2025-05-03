@@ -1,6 +1,7 @@
 package com.github.vvojtas.dailogi_server.service;
 
 import com.github.vvojtas.dailogi_server.db.entity.Character;
+import com.github.vvojtas.dailogi_server.db.entity.LLM;
 import com.github.vvojtas.dailogi_server.db.repository.CharacterRepository;
 import com.github.vvojtas.dailogi_server.model.character.mapper.CharacterListMapper;
 import com.github.vvojtas.dailogi_server.model.character.response.CharacterListDTO;
@@ -19,7 +20,6 @@ import com.github.vvojtas.dailogi_server.model.character.response.CharacterDTO;
 import com.github.vvojtas.dailogi_server.model.character.mapper.CharacterMapper;
 import com.github.vvojtas.dailogi_server.db.entity.AppUser;
 import com.github.vvojtas.dailogi_server.exception.DuplicateResourceException;
-import com.github.vvojtas.dailogi_server.db.entity.LLM;
 import com.github.vvojtas.dailogi_server.db.repository.LLMRepository;
 import com.github.vvojtas.dailogi_server.model.character.request.CreateCharacterCommand;
 import org.springframework.http.HttpStatus;
@@ -35,6 +35,9 @@ import com.github.vvojtas.dailogi_server.db.repository.AvatarRepository;
 @RequiredArgsConstructor
 public class CharacterService {
 
+    private static final String CHARACTER_RESOURCE_NAME = Character.class.getSimpleName().toLowerCase();
+    private static final String LLM_RESOURCE_NAME = LLM.class.getSimpleName().toLowerCase();
+    
     private final UserLimitProperties userLimitProperties;
     private final CurrentUserService currentUserService;
     private final CharacterRepository characterRepository;
@@ -114,7 +117,7 @@ public class CharacterService {
         Character character = characterRepository.findById(id)
             .orElseThrow(() -> {
                 log.warn("Attempt to access non-existent character with id={}", id);
-                return new ResourceNotFoundException("character", "Character not found with id: " + id);
+                return new ResourceNotFoundException(CHARACTER_RESOURCE_NAME, "Character not found with id: " + id);
             });
             
         log.debug("Found character: name={}, isGlobal={}", character.getName(), character.getIsGlobal());
@@ -164,7 +167,7 @@ public class CharacterService {
         if (characterRepository.existsByNameAndUser(command.name(), currentUser)) {
             log.warn("User {} attempted to create duplicate character with name '{}'", 
                 currentUser.getId(), command.name());
-            throw new DuplicateResourceException("character", 
+            throw new DuplicateResourceException(CHARACTER_RESOURCE_NAME, 
                 "Character with name '" + command.name() + "' already exists");
         }
         
@@ -180,7 +183,7 @@ public class CharacterService {
             LLM defaultLlm = llmRepository.findById(command.defaultLlmId())
                 .orElseThrow(() -> {
                     log.warn("Attempted to set non-existent LLM id={} as default", command.defaultLlmId());
-                    return new ResourceNotFoundException("llm", "LLM not found with id: " + command.defaultLlmId());
+                    return new ResourceNotFoundException(LLM_RESOURCE_NAME, "LLM not found with id: " + command.defaultLlmId());
                 });
             character.setDefaultLlm(defaultLlm);
         }
@@ -241,7 +244,7 @@ public class CharacterService {
         Character character = characterRepository.findById(id)
             .orElseThrow(() -> {
                 log.warn("Attempt to update non-existent character with id={}", id);
-                return new ResourceNotFoundException("character", "Character not found with id: " + id);
+                return new ResourceNotFoundException(CHARACTER_RESOURCE_NAME, "Character not found with id: " + id);
             });
             
         log.debug("Found character: name={}", character.getName());
@@ -255,11 +258,12 @@ public class CharacterService {
             throw new AccessDeniedException("User does not have permission to update this character");
         }
         
-        // Verify character name uniqueness for this user (excluding this character)
-        if (characterRepository.existsByNameAndUserAndIdNot(command.name(), currentUser, id)) {
-            log.warn("User {} attempted to update character {} with duplicate name '{}'", 
+        // Verify character name uniqueness for this user (excluding the current character)
+        if (!command.name().equals(character.getName()) && 
+            characterRepository.existsByNameAndUser(command.name(), currentUser)) {
+            log.warn("User {} attempted to rename character {} to existing name '{}'", 
                 currentUser.getId(), id, command.name());
-            throw new DuplicateResourceException("character", 
+            throw new DuplicateResourceException(CHARACTER_RESOURCE_NAME, 
                 "Character with name '" + command.name() + "' already exists");
         }
         
@@ -271,7 +275,7 @@ public class CharacterService {
             LLM defaultLlm = llmRepository.findById(command.defaultLlmId())
                 .orElseThrow(() -> {
                     log.warn("Attempted to set non-existent LLM id={} as default", command.defaultLlmId());
-                    return new ResourceNotFoundException("llm", "LLM not found with id: " + command.defaultLlmId());
+                    return new ResourceNotFoundException(LLM_RESOURCE_NAME, "LLM not found with id: " + command.defaultLlmId());
                 });
             character.setDefaultLlm(defaultLlm);
         } else {
@@ -299,7 +303,7 @@ public class CharacterService {
         Character character = characterRepository.findById(id)
             .orElseThrow(() -> {
                 log.warn("Attempt to delete non-existent character with id={}", id);
-                return new ResourceNotFoundException("character", "Character not found with id: " + id);
+                return new ResourceNotFoundException(CHARACTER_RESOURCE_NAME, "Character not found with id: " + id);
             });
             
         log.debug("Found character: name={}", character.getName());

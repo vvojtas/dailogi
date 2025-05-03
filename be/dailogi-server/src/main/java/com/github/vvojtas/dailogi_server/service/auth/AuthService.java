@@ -21,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthService {
 
+    private static final String USER_RESOURCE_NAME = AppUser.class.getSimpleName().toLowerCase();
+    
     private final AppUserRepository appUserRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -30,7 +32,7 @@ public class AuthService {
     @Transactional
     public UserDto register(RegisterCommand request) {
         if (appUserRepository.existsByName(request.name())) {
-            throw new DuplicateResourceException("user", "User already exists with name: " + request.name());
+            throw new DuplicateResourceException(USER_RESOURCE_NAME, "User already exists with name: " + request.name());
         }
 
         if (!request.password().equals(request.passwordConfirmation())) {

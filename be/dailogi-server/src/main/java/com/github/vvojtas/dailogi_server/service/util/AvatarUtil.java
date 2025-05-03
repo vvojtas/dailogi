@@ -17,6 +17,11 @@ import java.util.Base64;
 @Slf4j
 public class AvatarUtil {
 
+    // Private constructor to hide the implicit public one
+    private AvatarUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     // Constants for validation
     public static final int MAX_IMAGE_SIZE_BYTES = 1048576; // 1MB
     public static final int MAX_IMAGE_DIMENSION = 256; // 256 pixels

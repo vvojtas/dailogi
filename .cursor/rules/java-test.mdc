@@ -5,6 +5,19 @@ alwaysApply: false
 ---
 ### TESTING
 - Write unit tests using JUnit 5 and Spring Boot Test.
-- Use MockMvc for testing web layers.
 - Implement integration tests using @SpringBootTest.
 - Use @DataJpaTest for repository layer tests.
+- Do not add/remove/modify testable classes - it's better to write a test, which fails, rather than changing existing logic to pass a test.
+- Only changes that you are allowed to do in original classes is to remove 'private' access modificator, to make method package-private.
+- Use application-test.yml config class to adjust spring boot properties and test dependency injection
+- Configure in application-test.yml short time properties instead of waiting long time to fulfill original properties
+- Do not modify application.yml. Modify application-test.yml.
+- Tests shouldn't test many layers of dependencies in one Test. For example: If class A has injection of class B and class B has injection of class C, then when testing class A, mock class B and do not test class C in that test.
+- If class A has injection of class B and D make sure you mocked both of them. Otherwise you'll get null pointer exception.
+- Tests should have set active profile to "test" if tests need to use spring properties.
+- Testing static files doesn't need annotation @SpringBootTest.
+- One class ExampleTest.java should test methods in Example.java. If test you want to test methods from AnotherExample.java then create test AnotherExampleTest.java.
+- Connection to database and operations on database should be only performed on classes with name "Repository".
+- If possible use @ParameterizedTest to cover as many variations without duplicating testing code.
+- Test edge cases like null values or exceptions throwing.
+- When testing exceptions assert also exception messages.

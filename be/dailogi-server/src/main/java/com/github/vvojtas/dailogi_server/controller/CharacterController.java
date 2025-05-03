@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -56,32 +55,30 @@ public class CharacterController {
             Authentication is optional.
             """
     )
-    @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            description = "Successfully retrieved characters",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = CharacterListDTO.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Invalid request parameters",
-            content = @Content(
-                mediaType = "application/json",
-                schema =@Schema(implementation = ErrorResponseDTO.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "401",
-            description = "Unauthorized - user not authenticated",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponseDTO.class)
-            )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Successfully retrieved characters",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = CharacterListDTO.class)
         )
-    })
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Invalid request parameters",
+        content = @Content(
+            mediaType = "application/json",
+            schema =@Schema(implementation = ErrorResponseDTO.class)
+        )
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - user not authenticated",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponseDTO.class)
+        )
+    )
     @GetMapping
     public ResponseEntity<CharacterListDTO> getCharacters(
         @Parameter(
@@ -139,40 +136,38 @@ public class CharacterController {
             Authentication is optional.
             """
     )
-    @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            description = "Successfully retrieved character",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = CharacterDTO.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "401",
-            description = "Unauthorized - user not authenticated",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponseDTO.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "403",
-            description = "Forbidden - user does not have access to this character",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponseDTO.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Character not found",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponseDTO.class)
-            )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Successfully retrieved character",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = CharacterDTO.class)
         )
-    })
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - user not authenticated",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponseDTO.class)
+        )
+    )
+    @ApiResponse(
+        responseCode = "403",
+        description = "Forbidden - user does not have access to this character",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponseDTO.class)
+        )
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Character not found",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponseDTO.class)
+        )
+    )
     @GetMapping("/{id}")
     public ResponseEntity<CharacterDTO> getCharacter(
         @Parameter(
@@ -194,48 +189,46 @@ public class CharacterController {
             Requires authentication.
             """
     )
-    @ApiResponses({
-        @ApiResponse(
-            responseCode = "201",
-            description = "Character created successfully",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = CharacterDTO.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Invalid request parameters or invalid avatar data",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponseDTO.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "401",
-            description = "Unauthorized - user not authenticated",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponseDTO.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "409",
-            description = "Character with the same name already exists",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponseDTO.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "422",
-            description = "Character limit reached",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponseDTO.class)
-            )
+    @ApiResponse(
+        responseCode = "201",
+        description = "Character created successfully",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = CharacterDTO.class)
         )
-    })
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Invalid request parameters or invalid avatar data",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponseDTO.class)
+        )
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - user not authenticated",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponseDTO.class)
+        )
+    )
+    @ApiResponse(
+        responseCode = "409",
+        description = "Character with the same name already exists",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponseDTO.class)
+        )
+    )
+    @ApiResponse(
+        responseCode = "422",
+        description = "Character limit reached",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponseDTO.class)
+        )
+    )
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     @SecurityRequirement(name = "bearerAuth")
@@ -255,56 +248,54 @@ public class CharacterController {
             Requires authentication.
             """
     )
-    @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            description = "Character updated successfully",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = CharacterDTO.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Invalid request parameters",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponseDTO.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "401",
-            description = "Unauthorized - user not authenticated",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponseDTO.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "403",
-            description = "Forbidden - user does not own this character",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponseDTO.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Character not found",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponseDTO.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "409",
-            description = "Character with the same name already exists for this user",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponseDTO.class)
-            )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Character updated successfully",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = CharacterDTO.class)
         )
-    })
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Invalid request parameters",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponseDTO.class)
+        )
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - user not authenticated",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponseDTO.class)
+        )
+    )
+    @ApiResponse(
+        responseCode = "403",
+        description = "Forbidden - user does not own this character",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponseDTO.class)
+        )
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Character not found",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponseDTO.class)
+        )
+    )
+    @ApiResponse(
+        responseCode = "409",
+        description = "Character with the same name already exists for this user",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponseDTO.class)
+        )
+    )
     @PutMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     @SecurityRequirement(name = "bearerAuth")
@@ -328,48 +319,46 @@ public class CharacterController {
             Requires authentication.
             """
     )
-    @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            description = "Character deleted successfully",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = String.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "401",
-            description = "Unauthorized - user not authenticated",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponseDTO.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "403",
-            description = "Forbidden - user does not own this character",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponseDTO.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Character not found",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponseDTO.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "409",
-            description = "Character is used in dialogues",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ErrorResponseDTO.class)
-            )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Character deleted successfully",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = String.class)
         )
-    })
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - user not authenticated",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponseDTO.class)
+        )
+    )
+    @ApiResponse(
+        responseCode = "403",
+        description = "Forbidden - user does not own this character",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponseDTO.class)
+        )
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Character not found",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponseDTO.class)
+        )
+    )
+    @ApiResponse(
+        responseCode = "409",
+        description = "Character is used in dialogues",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponseDTO.class)
+        )
+    )
     @DeleteMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     @SecurityRequirement(name = "bearerAuth")
