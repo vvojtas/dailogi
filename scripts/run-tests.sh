@@ -28,4 +28,4 @@ mvn jacoco:report
 
 cd ../..
 
-echo "===== ALL TESTS COMPLETED =====" 
+echo "===== ALL TESTS COMPLETED ======" 

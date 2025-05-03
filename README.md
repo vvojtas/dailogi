@@ -161,8 +161,8 @@ The application uses a comprehensive testing strategy:
 
 ```bash
 # Run all tests (both frontend and backend)
-./run-tests.sh  # Linux/Mac
-run-tests.bat   # Windows
+./scripts/run-tests.sh  # Linux/Mac
+scripts/run-tests.bat   # Windows
 
 # Frontend tests only
 cd ui
