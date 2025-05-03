@@ -1,3 +1,8 @@
+---
+description: 
+globs: ui/src/test/**/*
+alwaysApply: false
+---
 ## TESTING
 
 ### Guidelines for UNIT

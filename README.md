@@ -157,11 +157,24 @@ The application uses a comprehensive testing strategy:
 - **Integration Tests**: Verifying interactions between application layers using Spring Boot Test, H2 for database testing
 - **API Tests**: Testing API endpoints using MockMvc/RestAssured and Swagger
 
-### Test Environments
-- Local Development: For developer testing
-- CI (GitHub Actions): Automated tests on every push/PR
-- Staging: For E2E tests, manual tests, and limited integration tests with external services
-- Production: Smoke tests after deployment
+### Running Tests
+
+```bash
+# Run all tests (both frontend and backend)
+./run-tests.sh  # Linux/Mac
+run-tests.bat   # Windows
+
+# Frontend tests only
+cd ui
+npm run test          # Run unit tests
+npm run test:e2e      # Run E2E tests
+
+# Backend tests only
+cd be/dailogi-server
+mvn test
+```
+
+For more detailed testing documentation, see [TESTING.md](TESTING.md).
 
 ## Project Status
 

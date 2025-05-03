@@ -28,3 +28,7 @@ pnpm-debug.log*
 
 ### 10x prompts that should not go to public repo ###
 prompts/
+
+### UI test reports ###
+ui/playwright-report/
+ui/test-results/

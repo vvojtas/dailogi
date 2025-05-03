@@ -52,8 +52,11 @@ browserApi.interceptors.response.use(
           // Other client errors (4xx)
           const message = errorData?.message || "";
           console.log("Error with backend call", status, message);
+        } else if (status == 503) {
+          toast.error("Serwery są zajętą planowaniem przyszłości AI, spróbuj ponownie później");
+          toastShown = true;
         } else if (status >= 500) {
-          // Server errors (5xx)
+          // Server errors (5xx) not 503
           toast.error("Niefortunny zbieg okoliczności doprowadził do wystąpienia błędu");
           toastShown = true;
         } else {

@@ -1,3 +1,8 @@
+---
+description: 
+globs: ui/e2e/**/*
+alwaysApply: false
+---
 ## TESTING
 
 ### Guidelines for E2E
@@ -15,4 +20,3 @@
 - Implement test hooks for setup and teardown
 - Use expect assertions with specific matchers
 - Leverage parallel execution for faster test runs
-

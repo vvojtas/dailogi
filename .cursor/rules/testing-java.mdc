@@ -22,4 +22,4 @@ alwaysApply: false
 - If possible use @ParameterizedTest to cover as many variations without duplicating testing code.
 - Test edge cases like null values or exceptions throwing.
 - When testing exceptions assert also exception messages.
-
+- Use '@MockitoBean' instead of deprecated '@MockBean'
