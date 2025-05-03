@@ -9,6 +9,7 @@ Welcome to **d‑AI‑logi**, an interactive web application that combines engag
 - [Getting Started Locally](#getting-started-locally)
 - [Available Scripts](#available-scripts)
 - [Project Scope](#project-scope)
+- [Testing](#testing)
 - [Project Status](#project-status)
 - [License](#license)
 
@@ -44,8 +45,22 @@ The application aims to provide an engaging and entertaining way to explore AI i
 ### Database
 - **PostgreSQL**: Relational database
 
-- **AI Integration:**  
-  - LLM models via API (Openrouter.ai or similar)
+### Testing
+- **Frontend Testing**:
+  - Vitest: Unit testing for JS/TS
+  - React Testing Library: Component testing
+  - Playwright: End-to-end testing
+- **Backend Testing**:
+  - JUnit 5: Java testing framework
+  - Mockito: Mocking dependencies
+  - Spring Boot Test: Integration testing
+  - H2: Database testing
+  - MockMvc/RestAssured: API testing
+- **API Testing**:
+  - Swagger: Manual API tests
+
+### AI Integration  
+- LLM models via API (Openrouter.ai or similar)
 
 ### CI/CD & Hosting
 - **GitHub Actions**: CI/CD pipelines
@@ -127,6 +142,26 @@ The application aims to provide an engaging and entertaining way to explore AI i
 - `./ui/src/lib` - Services and helpers
 - `./be/dailogi-server/src` - Backend source code
 - `./public` - Public assets
+
+## Testing
+
+The application uses a comprehensive testing strategy:
+
+### Frontend Testing
+- **Unit Tests**: Using Vitest and React Testing Library to test individual components, hooks, and helper functions
+- **Component Integration Tests**: Verifying interactions between related React components
+- **End-to-End Tests**: Using Playwright to simulate complete user flows in a browser
+
+### Backend Testing
+- **Unit Tests**: Testing individual service classes, controllers, and helper classes using JUnit 5 and Mockito
+- **Integration Tests**: Verifying interactions between application layers using Spring Boot Test, H2 for database testing
+- **API Tests**: Testing API endpoints using MockMvc/RestAssured and Swagger
+
+### Test Environments
+- Local Development: For developer testing
+- CI (GitHub Actions): Automated tests on every push/PR
+- Staging: For E2E tests, manual tests, and limited integration tests with external services
+- Production: Smoke tests after deployment
 
 ## Project Status
 

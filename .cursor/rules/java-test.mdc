@@ -1,8 +1,9 @@
 ---
 description: 
-globs: 
+globs: be/dailogi-server/src/test/**/*
 alwaysApply: false
 ---
+
 ### TESTING
 - Write unit tests using JUnit 5 and Spring Boot Test.
 - Implement integration tests using @SpringBootTest.
@@ -21,3 +22,4 @@ alwaysApply: false
 - If possible use @ParameterizedTest to cover as many variations without duplicating testing code.
 - Test edge cases like null values or exceptions throwing.
 - When testing exceptions assert also exception messages.
+
