@@ -12,6 +12,7 @@ import type { RegisterCommand } from "@/dailogi-api/model";
 import { navigate } from "@/lib/client/navigate";
 import { ROUTES } from "@/lib/config/routes";
 import { DailogiError } from "@/lib/errors/DailogiError";
+import { useHydration } from "@/lib/hooks/useHydration";
 
 const registerSchema = z
   .object({
@@ -79,6 +80,7 @@ function handleApiError(error: unknown, form: ReturnType<typeof useForm<Register
 
 export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const isHydrated = useHydration();
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -109,6 +111,8 @@ export function RegisterForm() {
     }
   }
 
+  const isDisabled = isLoading || !isHydrated;
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -119,7 +123,13 @@ export function RegisterForm() {
             <FormItem>
               <FormLabel>Nazwa użytkownika</FormLabel>
               <FormControl>
-                <Input {...field} disabled={isLoading} placeholder="Podaj swoją tożsamość" autoComplete="username" />
+                <Input
+                  {...field}
+                  disabled={isDisabled}
+                  placeholder="Podaj swoją tożsamość"
+                  autoComplete="username"
+                  data-testid="register-username-input"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -136,9 +146,10 @@ export function RegisterForm() {
                 <Input
                   {...field}
                   type="password"
-                  disabled={isLoading}
+                  disabled={isDisabled}
                   placeholder="Podaj sekretną frazę"
                   autoComplete="new-password"
+                  data-testid="register-password-input"
                 />
               </FormControl>
               <FormMessage />
@@ -156,9 +167,10 @@ export function RegisterForm() {
                 <Input
                   {...field}
                   type="password"
-                  disabled={isLoading}
+                  disabled={isDisabled}
                   placeholder="Powtórz sekretną frazę"
                   autoComplete="new-password"
+                  data-testid="register-password-confirm-input"
                 />
               </FormControl>
               <FormMessage />
@@ -166,7 +178,7 @@ export function RegisterForm() {
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="w-full" disabled={isDisabled} data-testid="register-submit-button">
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Dokonaj inicjalizacji
         </Button>
