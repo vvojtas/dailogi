@@ -1,5 +1,6 @@
 package com.github.vvojtas.dailogi_server.service;
 
+import com.github.vvojtas.dailogi_server.character.application.CharacterAuthorizationService;
 import com.github.vvojtas.dailogi_server.db.entity.Avatar;
 import com.github.vvojtas.dailogi_server.db.entity.Character;
 import com.github.vvojtas.dailogi_server.db.entity.AppUser;
@@ -33,6 +34,7 @@ public class AvatarService {
     private final AvatarRepository avatarRepository;
     private final CharacterRepository characterRepository;
     private final CurrentUserService currentUserService;
+    private final CharacterAuthorizationService authorizationService;
 
     @Transactional(readOnly = true)
     public AvatarData getAvatarData(Long characterId, Authentication authentication) {
@@ -46,7 +48,7 @@ public class AvatarService {
 
         // Check if the character is global or owned by the current user
         AppUser currentUser = currentUserService.getCurrentAppUser(authentication);
-        if (!CharacterService.isOwnedOrGlobal(character, currentUser)) {
+        if (!authorizationService.canAccess(character, currentUser)) {
              String currentUserId = (currentUser != null) ? currentUser.getId().toString() : "unauthenticated";
              log.warn("Authorization failed: User {} attempted to access avatar for character {} (Owner: {}, Global: {})", 
                  currentUserId, characterId, character.getUser() != null ? character.getUser().getId() : "null", character.getIsGlobal());
@@ -113,8 +115,8 @@ public class AvatarService {
              throw new AccessDeniedException("User must be authenticated to upload an avatar.");
         }
 
-        // Validate ownership using the static method from CharacterService
-        if (!CharacterService.isOwned(character, currentUser)) {
+        // Validate ownership using the authorization service
+        if (!authorizationService.canModify(character, currentUser)) {
             log.warn("User {} attempted to set avatar for character {} owned by user {}",
                 currentUser.getId(), characterId, character.getUser() != null ? character.getUser().getId() : "null");
             throw new AccessDeniedException("User does not have permission to set avatar for this character");
@@ -164,7 +166,7 @@ public class AvatarService {
             });
         
         var currentUser = currentUserService.getCurrentAppUser(authentication);
-        if (!CharacterService.isOwned(character, currentUser)) {
+        if (!authorizationService.canModify(character, currentUser)) {
             log.warn("User {} attempted to delete avatar for character {} without proper ownership", currentUser.getId(), characterId);
             throw new AccessDeniedException("User does not have permission to delete avatar for this character");
         }

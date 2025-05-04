@@ -1,11 +1,14 @@
 package com.github.vvojtas.dailogi_server.controller;
 
+import com.github.vvojtas.dailogi_server.character.api.CharacterQuery;
+import com.github.vvojtas.dailogi_server.character.api.CreateCharacterCommand;
+import com.github.vvojtas.dailogi_server.character.api.DeleteCharacterCommand;
+import com.github.vvojtas.dailogi_server.character.api.UpdateCharacterCommand;
+import com.github.vvojtas.dailogi_server.character.application.CharacterCommandService;
+import com.github.vvojtas.dailogi_server.character.application.CharacterQueryService;
 import com.github.vvojtas.dailogi_server.model.character.response.CharacterListDTO;
 import com.github.vvojtas.dailogi_server.model.character.response.CharacterDTO;
 import com.github.vvojtas.dailogi_server.model.common.response.ErrorResponseDTO;
-import com.github.vvojtas.dailogi_server.service.CharacterService;
-import com.github.vvojtas.dailogi_server.model.character.request.CreateCharacterCommand;
-import com.github.vvojtas.dailogi_server.model.character.request.UpdateCharacterCommand;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -43,7 +46,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class CharacterController {
 
     private static final int MAX_PAGE_SIZE = 50;
-    private final CharacterService characterService;
+    private final CharacterQueryService characterQueryService;
+    private final CharacterCommandService characterCommandService;
 
     @Operation(
         summary = "Get paginated list of characters",
@@ -104,7 +108,8 @@ public class CharacterController {
         
         Authentication authentication
     ) {
-        CharacterListDTO result = characterService.getCharacters(includeGlobal, PageRequest.of(page, size), authentication);
+        CharacterQuery query = new CharacterQuery(includeGlobal, PageRequest.of(page, size), authentication);
+        CharacterListDTO result = characterQueryService.getCharacters(query);
         
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Total-Count", String.valueOf(result.totalElements()));
@@ -176,7 +181,7 @@ public class CharacterController {
         )
         @PathVariable Long id
     ) {
-        return ResponseEntity.ok(characterService.getCharacter(id));
+        return ResponseEntity.ok(characterQueryService.getCharacter(id));
     }
 
     @Operation(
@@ -233,9 +238,16 @@ public class CharacterController {
     @PreAuthorize("isAuthenticated()")
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<CharacterDTO> createCharacter(
-        @Valid @RequestBody CreateCharacterCommand command
+        @Valid @RequestBody com.github.vvojtas.dailogi_server.model.character.request.CreateCharacterCommand requestCommand
     ) {
-        CharacterDTO character = characterService.createCharacter(command);
+        CreateCharacterCommand command = new CreateCharacterCommand(
+            requestCommand.name(),
+            requestCommand.shortDescription(),
+            requestCommand.description(),
+            requestCommand.defaultLlmId(),
+            requestCommand.avatar()
+        );
+        CharacterDTO character = characterCommandService.createCharacter(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(character);
     }
 
@@ -306,9 +318,18 @@ public class CharacterController {
         )
         @PathVariable Long id,
         
-        @Valid @RequestBody UpdateCharacterCommand command
+        @Valid @RequestBody com.github.vvojtas.dailogi_server.model.character.request.UpdateCharacterCommand requestCommand
     ) {
-        return ResponseEntity.ok(characterService.updateCharacter(id, command));
+        UpdateCharacterCommand command = new UpdateCharacterCommand(
+            id,
+            requestCommand.name(),
+            requestCommand.shortDescription(),
+            requestCommand.description(),
+            requestCommand.defaultLlmId(),
+            null // Avatar not supported in update via controller yet
+        );
+        CharacterDTO character = characterCommandService.updateCharacter(command);
+        return ResponseEntity.ok(character);
     }
 
     @Operation(
@@ -369,7 +390,8 @@ public class CharacterController {
         )
         @PathVariable Long id
     ) {
-        characterService.deleteCharacter(id);
-        return ResponseEntity.ok().body("Character successfully deleted");
+        DeleteCharacterCommand command = new DeleteCharacterCommand(id);
+        characterCommandService.deleteCharacter(command);
+        return ResponseEntity.ok("Character successfully deleted");
     }
 }

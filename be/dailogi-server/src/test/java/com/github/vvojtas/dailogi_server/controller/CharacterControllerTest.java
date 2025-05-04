@@ -1,10 +1,13 @@
 package com.github.vvojtas.dailogi_server.controller;
 
+import com.github.vvojtas.dailogi_server.character.api.CharacterQuery;
+import com.github.vvojtas.dailogi_server.character.api.CreateCharacterCommand;
+import com.github.vvojtas.dailogi_server.character.api.DeleteCharacterCommand;
+import com.github.vvojtas.dailogi_server.character.api.UpdateCharacterCommand;
+import com.github.vvojtas.dailogi_server.character.application.CharacterCommandService;
+import com.github.vvojtas.dailogi_server.character.application.CharacterQueryService;
 import com.github.vvojtas.dailogi_server.model.character.response.CharacterListDTO;
 import com.github.vvojtas.dailogi_server.model.character.response.CharacterDTO;
-import com.github.vvojtas.dailogi_server.model.character.request.CreateCharacterCommand;
-import com.github.vvojtas.dailogi_server.model.character.request.UpdateCharacterCommand;
-import com.github.vvojtas.dailogi_server.service.CharacterService;
 import com.github.vvojtas.dailogi_server.service.auth.JwtTokenProvider;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -33,8 +35,6 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -77,7 +77,10 @@ class CharacterControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private CharacterService characterService;
+    private CharacterQueryService characterQueryService;
+    
+    @MockitoBean
+    private CharacterCommandService characterCommandService;
 
     private static Stream<Arguments> invalidPaginationParameters() {
         return Stream.of(
@@ -113,7 +116,7 @@ class CharacterControllerTest {
             1
         );
         
-        when(characterService.getCharacters(eq(true), any(PageRequest.class), any()))
+        when(characterQueryService.getCharacters(any(CharacterQuery.class)))
             .thenReturn(expectedResponse);
 
         // Act & Assert
@@ -156,7 +159,7 @@ class CharacterControllerTest {
             null
         );
         
-        when(characterService.getCharacter(1L)).thenReturn(character);
+        when(characterQueryService.getCharacter(1L)).thenReturn(character);
 
         // Act & Assert
         mockMvc.perform(get("/api/characters/1"))
@@ -186,7 +189,7 @@ class CharacterControllerTest {
             null
         );
         
-        when(characterService.createCharacter(any(CreateCharacterCommand.class))).thenReturn(created);
+        when(characterCommandService.createCharacter(any(CreateCharacterCommand.class))).thenReturn(created);
 
         // Act & Assert
         mockMvc.perform(post("/api/characters")
@@ -199,6 +202,8 @@ class CharacterControllerTest {
                     }
                     """))
                 .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("New Character"))
                 .andExpect(jsonPath("$.short_description").value("Short desc"));
     }
@@ -211,8 +216,8 @@ class CharacterControllerTest {
         CharacterDTO updated = new CharacterDTO(
             1L,
             "Updated Character",
-            "New Short desc",
-            "New Description",
+            "Updated short desc",
+            "Updated description",
             false,
             null,
             false,
@@ -221,7 +226,8 @@ class CharacterControllerTest {
             OffsetDateTime.now()
         );
         
-        when(characterService.updateCharacter(eq(1L), any(UpdateCharacterCommand.class))).thenReturn(updated);
+        when(characterCommandService.updateCharacter(any(UpdateCharacterCommand.class)))
+            .thenReturn(updated);
 
         // Act & Assert
         mockMvc.perform(put("/api/characters/1")
@@ -229,13 +235,15 @@ class CharacterControllerTest {
                 .content("""
                     {
                         "name": "Updated Character",
-                        "short_description": "New Short desc",
-                        "description": "New Description"
+                        "short_description": "Updated short desc",
+                        "description": "Updated description"
                     }
                     """))
                 .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Updated Character"))
-                .andExpect(jsonPath("$.short_description").value("New Short desc"));
+                .andExpect(jsonPath("$.short_description").value("Updated short desc"));
     }
 
     @Test
@@ -243,7 +251,7 @@ class CharacterControllerTest {
     @WithMockUser
     void shouldDeleteCharacter() throws Exception {
         // Arrange
-        doNothing().when(characterService).deleteCharacter(anyLong());
+        doNothing().when(characterCommandService).deleteCharacter(any(DeleteCharacterCommand.class));
 
         // Act & Assert
         mockMvc.perform(delete("/api/characters/1"))
@@ -279,6 +287,7 @@ class CharacterControllerTest {
                         "description": ""
                     }
                     """))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Validation failed"));
     }
 } 
