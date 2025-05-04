@@ -11,7 +11,13 @@ interface CharacterListHeaderProps {
 export function CharacterListHeader({ isLoggedIn, isRefreshing, onCreate, onRefresh }: CharacterListHeaderProps) {
   return (
     <div className="flex justify-between items-center mb-8">
-      <div>{isLoggedIn && <Button onClick={onCreate}>Powołaj nową postać</Button>}</div>
+      <div>
+        {isLoggedIn && (
+          <Button onClick={onCreate} data-testid="create-character-btn">
+            Powołaj nową postać
+          </Button>
+        )}
+      </div>
       <Button variant="outline" size="icon" onClick={onRefresh} disabled={isRefreshing} title="Odśwież postacie">
         <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
       </Button>

@@ -51,6 +51,7 @@ export function CharacterCard({ character, isOwner, isDeleting, onEdit, onDelete
     <>
       <Card
         className={`overflow-hidden ${character.is_global ? "bg-secondary/50 border-secondary" : ""} ${!isOwner ? "bg-muted/25 border-muted-foreground/20" : ""}`}
+        data-testid={`character-card-${character.id}`}
       >
         <CardHeader className="relative">
           <div className="absolute right-4 top-0 flex gap-2">
@@ -86,7 +87,7 @@ export function CharacterCard({ character, isOwner, isDeleting, onEdit, onDelete
               className="h-16 w-16"
             />
             <div className="flex flex-col gap-1">
-              <CardTitle>{character.name}</CardTitle>
+              <CardTitle data-testid={`character-card-title-${character.id}`}>{character.name}</CardTitle>
               <div className="flex flex-wrap items-center gap-1">
                 {character.default_llm_id && (
                   <>
@@ -109,7 +110,13 @@ export function CharacterCard({ character, isOwner, isDeleting, onEdit, onDelete
           </p>
         </CardContent>
         <CardFooter>
-          <Button variant="secondary" className="w-full" onClick={handleViewDetails} disabled={isDeleting}>
+          <Button
+            variant="secondary"
+            className="w-full"
+            onClick={handleViewDetails}
+            disabled={isDeleting}
+            data-testid={`view-character-${character.id}`}
+          >
             Sprawdź profil
           </Button>
         </CardFooter>

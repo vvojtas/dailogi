@@ -15,3 +15,24 @@ alwaysApply: false
 - Implement useId() for generating unique IDs for accessibility attributes
 - Consider using the new useOptimistic hook for optimistic UI updates in forms
 - Use useTransition for non-urgent state updates to keep the UI responsive
+
+### Hydration Pattern for Forms
+
+- For forms and interactive components, implement a hydration state pattern to prevent interaction before hydration completes:
+```tsx
+const [hydrated, setHydrated] = useState(false);
+
+useEffect(() => {
+  setHydrated(true);
+}, []);
+
+// Disable form elements until hydration completes
+<Input disabled={isLoading || !hydrated} />
+<Button disabled={isLoading || !hydrated}>Submit</Button>
+```
+- In e2e tests, wait for elements to be enabled rather than using arbitrary timeouts:
+```typescript
+// Wait for hydration to complete
+await expect(page.getByTestId("submit-button")).toBeEnabled();
+```
+- This pattern ensures components work correctly during SSR/hydration and provides reliable test automation

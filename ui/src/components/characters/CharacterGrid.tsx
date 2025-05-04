@@ -19,7 +19,7 @@ export function CharacterGrid({
   onViewDetails,
 }: CharacterGridProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8" data-testid="character-grid">
       {characters.map((character) => (
         <CharacterCard
           key={character.id}

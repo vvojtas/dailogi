@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AvatarUploader } from "@/components/characters/AvatarUploader";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, CircleSlash } from "lucide-react";
 import { toast } from "sonner";
@@ -117,6 +117,7 @@ async function fileToBase64(file: File): Promise<string> {
 
 export function CharacterForm({ llms, initialData, onSubmitSuccess, onCancel }: CharacterFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
   const form = useForm<CharacterFormData>({
     resolver: zodResolver(characterFormSchema),
@@ -127,6 +128,10 @@ export function CharacterForm({ llms, initialData, onSubmitSuccess, onCancel }: 
       default_llm_id: initialData?.default_llm_id?.toString() || undefined,
     },
   });
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
 
   const onSubmit = async (data: CharacterFormData) => {
     setIsSubmitting(true);
@@ -187,7 +192,7 @@ export function CharacterForm({ llms, initialData, onSubmitSuccess, onCancel }: 
     <div className="max-w-2xl mx-auto">
       <Card>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form onSubmit={form.handleSubmit(onSubmit)} data-testid="character-form">
             <CardHeader>
               <CardTitle>{initialData ? "Odmień postać" : "Powołaj nową postać"}</CardTitle>
             </CardHeader>
@@ -208,7 +213,12 @@ export function CharacterForm({ llms, initialData, onSubmitSuccess, onCancel }: 
                   <FormItem>
                     <FormLabel>Imię postaci</FormLabel>
                     <FormControl>
-                      <Input placeholder="Kogo przedstawiasz?" {...field} />
+                      <Input
+                        placeholder="Kogo przedstawiasz?"
+                        {...field}
+                        disabled={isSubmitting || !hydrated}
+                        data-testid="character-name-input"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -222,7 +232,12 @@ export function CharacterForm({ llms, initialData, onSubmitSuccess, onCancel }: 
                   <FormItem>
                     <FormLabel>Krótki opis</FormLabel>
                     <FormControl>
-                      <Input placeholder="Sama esencja jestestwa" {...field} />
+                      <Input
+                        placeholder="Sama esencja jestestwa"
+                        {...field}
+                        disabled={isSubmitting || !hydrated}
+                        data-testid="character-short-desc-input"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -240,6 +255,8 @@ export function CharacterForm({ llms, initialData, onSubmitSuccess, onCancel }: 
                         placeholder="Kim ona jest?"
                         className="min-h-[150px] scrollbar-thin scrollbar-thumb-secondary scrollbar-track-transparent"
                         {...field}
+                        disabled={isSubmitting || !hydrated}
+                        data-testid="character-bio-input"
                       />
                     </FormControl>
                     <FormMessage />
@@ -253,9 +270,13 @@ export function CharacterForm({ llms, initialData, onSubmitSuccess, onCancel }: 
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Model językowy</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={isSubmitting || !hydrated}
+                    >
                       <FormControl>
-                        <SelectTrigger className="min-w-[180px]!">
+                        <SelectTrigger className="min-w-[180px]!" data-testid="character-llm-select">
                           <SelectValue placeholder="Wybierz najstosowniejszy LLM" />
                         </SelectTrigger>
                       </FormControl>
@@ -277,10 +298,16 @@ export function CharacterForm({ llms, initialData, onSubmitSuccess, onCancel }: 
             </CardContent>
 
             <CardFooter className="flex justify-end space-x-4">
-              <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+                disabled={isSubmitting || !hydrated}
+                data-testid="character-cancel-btn"
+              >
                 {initialData ? "Opuść profil" : "Porzuć postać"}
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" disabled={isSubmitting || !hydrated} data-testid="character-submit-btn">
                 {isSubmitting ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />

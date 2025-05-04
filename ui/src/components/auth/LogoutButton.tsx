@@ -49,6 +49,7 @@ export function LogoutButton() {
       onClick={handleLogout}
       disabled={isLoading}
       className="text-destructive hover:text-destructive/90"
+      data-testid="logout-button"
     >
       {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
       Odejdź

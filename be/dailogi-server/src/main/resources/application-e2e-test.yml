@@ -12,3 +12,10 @@ spring:
       ddl-auto: validate
   flyway:
     enabled: true 
+
+# E2E test user configuration
+dailogi:
+  e2e-test:
+    user:
+      name: test
+      password: test-dailogi 

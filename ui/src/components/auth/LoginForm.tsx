@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -68,6 +68,7 @@ function handleApiError(error: unknown): string | null {
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
   const setUser = useAuthStore((state: AuthState) => state.setUser);
 
   const form = useForm<LoginFormValues>({
@@ -77,6 +78,10 @@ export function LoginForm() {
       password: "",
     },
   });
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
 
   async function onSubmit(data: LoginCommand) {
     try {
@@ -111,7 +116,13 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Nazwa użytkownika</FormLabel>
               <FormControl>
-                <Input {...field} disabled={isLoading} placeholder="Kim jesteś?" autoComplete="username" />
+                <Input
+                  {...field}
+                  disabled={isLoading || !hydrated}
+                  placeholder="Kim jesteś?"
+                  autoComplete="username"
+                  data-testid="username-input"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -128,9 +139,10 @@ export function LoginForm() {
                 <Input
                   {...field}
                   type="password"
-                  disabled={isLoading}
+                  disabled={isLoading || !hydrated}
                   placeholder="Czy znasz tajną frazę?"
                   autoComplete="current-password"
+                  data-testid="password-input"
                 />
               </FormControl>
               <FormMessage />
@@ -138,7 +150,7 @@ export function LoginForm() {
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="w-full" disabled={isLoading || !hydrated} data-testid="login-submit-button">
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Zaloguj się
         </Button>

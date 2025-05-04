@@ -33,6 +33,9 @@ prompts/
 ui/playwright-report/
 ui/test-results/
 
+# Playwright authentication state
+ui/e2e/.auth/
+
 ### Docker volumes ###
 docker/sonarqube/
 

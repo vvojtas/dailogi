@@ -1,4 +1,10 @@
 import { defineConfig, devices } from "@playwright/test";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// ES Modules equivalent for __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * Read environment variables from file.
@@ -42,9 +48,32 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
+    // Setup project that will create a logged-in state
+    {
+      name: "setup",
+      testMatch: /auth\.setup\.ts/,
+    },
+
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+      },
+      // Run only public tests and general example tests
+      testMatch: ["**/*public.test.ts", "**/*example.spec.ts"],
+    },
+
+    // Project for authenticated tests
+    {
+      name: "authenticated",
+      use: {
+        ...devices["Desktop Chrome"],
+        // Use the authenticated state from setup
+        storageState: path.join(__dirname, "e2e/.auth/user.json"),
+      },
+      dependencies: ["setup"],
+      // Run only tests requiring authentication and general example tests
+      testMatch: ["**/*authenticated.test.ts", "**/*example.spec.ts", "**/*character-creation.test.ts"],
     },
   ],
 

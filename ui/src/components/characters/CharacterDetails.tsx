@@ -79,11 +79,15 @@ export function CharacterDetails({ character, llms, isDeleting, onEdit, onDelete
               className="h-24 w-24"
             />
             <div className="flex flex-col gap-2">
-              <CardTitle className="text-2xl">{character.name}</CardTitle>
+              <CardTitle className="text-2xl" data-testid="character-detail-name">
+                {character.name}
+              </CardTitle>
               <div className="flex flex-wrap items-center gap-2">
                 {character.default_llm_id && <Badge variant="secondary">{getLlmName(character.default_llm_id)}</Badge>}
               </div>
-              <p className="text-sm text-muted-foreground">{character.short_description}</p>
+              <p className="text-sm text-muted-foreground" data-testid="character-detail-short-desc">
+                {character.short_description}
+              </p>
             </div>
           </div>
         </CardHeader>
@@ -93,7 +97,7 @@ export function CharacterDetails({ character, llms, isDeleting, onEdit, onDelete
             <div>
               <h3 className="text-lg font-semibold mb-2">Biografia</h3>
               <div className="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-secondary scrollbar-track-transparent">
-                <p className="text-muted-foreground whitespace-pre-wrap">
+                <p className="text-muted-foreground whitespace-pre-wrap" data-testid="character-detail-bio">
                   {character.description || "Ta postać owiana jest tajemnicą."}
                 </p>
               </div>
@@ -102,7 +106,7 @@ export function CharacterDetails({ character, llms, isDeleting, onEdit, onDelete
         </CardContent>
 
         <CardFooter className="flex justify-end">
-          <Button variant="outline" onClick={() => navigate(ROUTES.CHARACTERS)}>
+          <Button variant="outline" onClick={() => navigate(ROUTES.CHARACTERS)} data-testid="back-to-gallery-btn">
             Powrót do galerii
           </Button>
         </CardFooter>

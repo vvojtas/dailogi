@@ -53,13 +53,15 @@ export function HeaderNav() {
           <div className="flex items-center gap-4">
             Scenarzysta:{" "}
             <a href={ROUTES.PROFILE} className="text-sm font-medium hover:text-primary">
-              <span className="italic">{userName}</span>
+              <span className="italic" data-testid="username-display">
+                {userName}
+              </span>
             </a>
             <LogoutButton />
           </div>
         ) : (
           <>
-            <a href={ROUTES.LOGIN} className="text-sm font-medium hover:text-primary mr-4">
+            <a href={ROUTES.LOGIN} className="text-sm font-medium hover:text-primary mr-4" data-testid="login-link">
               Ujawnij się
             </a>
             <a

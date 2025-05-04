@@ -11,6 +11,12 @@
       "type": "com.github.vvojtas.dailogi_server.properties.JwtProperties",
       "sourceType": "com.github.vvojtas.dailogi_server.properties.JwtProperties",
       "description": "Configuration properties for JWT."
+    },
+    {
+      "name": "dailogi.e2e-test.user",
+      "type": "com.github.vvojtas.dailogi_server.properties.E2ETestUserProperties",
+      "sourceType": "com.github.vvojtas.dailogi_server.properties.E2ETestUserProperties",
+      "description": "Configuration properties for E2E test user."
     }
   ],
   "properties": [
@@ -33,6 +39,18 @@
       "sourceType": "com.github.vvojtas.dailogi_server.properties.JwtProperties",
       "description": "Expiration time for JWT tokens in milliseconds.",
       "defaultValue": 3600000
+    },
+    {
+      "name": "dailogi.e2e-test.user.name",
+      "type": "java.lang.String",
+      "sourceType": "com.github.vvojtas.dailogi_server.properties.E2ETestUserProperties",
+      "description": "Username for the E2E test user."
+    },
+    {
+      "name": "dailogi.e2e-test.user.password",
+      "type": "java.lang.String",
+      "sourceType": "com.github.vvojtas.dailogi_server.properties.E2ETestUserProperties",
+      "description": "Password for the E2E test user."
     }
   ]
 }
