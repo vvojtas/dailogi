@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/favicon.ico").permitAll()
                 .requestMatchers("/api/llms/**").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/characters/**").permitAll()
+                .requestMatchers("/actuator/**").permitAll()
                 .anyRequest().authenticated()
             )
             .exceptionHandling(ex -> ex

@@ -35,3 +35,6 @@ ui/test-results/
 
 ### Docker volumes ###
 docker/sonarqube/
+
+# Script logs
+scripts/logs/

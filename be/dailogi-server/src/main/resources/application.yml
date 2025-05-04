@@ -37,8 +37,16 @@ dailogi:
       # Maximum number of characters a user can create (default: 50)
       max-characters-per-user: 50
 
-
-
 jwt:
   secret: ${JWT_SECRET}
   expiration-ms: 3600000  # 1 hour in milliseconds 
+
+# Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always 
