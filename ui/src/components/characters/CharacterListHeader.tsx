@@ -8,7 +8,12 @@ interface CharacterListHeaderProps {
   onRefresh: () => void;
 }
 
-export function CharacterListHeader({ isLoggedIn, isRefreshing, onCreate, onRefresh }: CharacterListHeaderProps) {
+export function CharacterListHeader({
+  isLoggedIn,
+  isRefreshing,
+  onCreate,
+  onRefresh,
+}: Readonly<CharacterListHeaderProps>) {
   return (
     <div className="flex justify-between items-center mb-8">
       <div>

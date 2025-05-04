@@ -26,7 +26,14 @@ interface CharacterCardProps {
   onViewDetails: (characterId: number) => void;
 }
 
-export function CharacterCard({ character, isOwner, isDeleting, onEdit, onDelete, onViewDetails }: CharacterCardProps) {
+export function CharacterCard({
+  character,
+  isOwner,
+  isDeleting,
+  onEdit,
+  onDelete,
+  onViewDetails,
+}: Readonly<CharacterCardProps>) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { getLlmName, isLoading: isLoadingLlms } = useLlms();
 

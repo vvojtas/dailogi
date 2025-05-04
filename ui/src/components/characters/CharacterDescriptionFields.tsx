@@ -8,7 +8,7 @@ interface CharacterDescriptionFieldsProps {
   disabled: boolean;
 }
 
-export function CharacterDescriptionFields({ disabled }: CharacterDescriptionFieldsProps) {
+export function CharacterDescriptionFields({ disabled }: Readonly<CharacterDescriptionFieldsProps>) {
   const { control } = useFormContext<CharacterFormData>();
 
   return (

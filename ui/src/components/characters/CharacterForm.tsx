@@ -20,7 +20,7 @@ interface CharacterFormProps {
   onCancel: () => void;
 }
 
-export function CharacterForm({ llms, initialData, onSubmitSuccess, onCancel }: CharacterFormProps) {
+export function CharacterForm({ llms, initialData, onSubmitSuccess, onCancel }: Readonly<CharacterFormProps>) {
   const isHydrated = useHydration();
   const { isSubmitting, createNewCharacter, updateExistingCharacter } = useCharacterForm({
     onSuccess: onSubmitSuccess,
@@ -29,10 +29,10 @@ export function CharacterForm({ llms, initialData, onSubmitSuccess, onCancel }: 
   const form = useForm<CharacterFormData>({
     resolver: zodResolver(characterFormSchema),
     defaultValues: {
-      name: initialData?.name || "",
-      short_description: initialData?.short_description || "",
-      description: initialData?.description || "",
-      default_llm_id: initialData?.default_llm_id?.toString() || undefined,
+      name: initialData?.name ?? "",
+      short_description: initialData?.short_description ?? "",
+      description: initialData?.description ?? "",
+      default_llm_id: initialData?.default_llm_id?.toString() ?? undefined,
     },
   });
 

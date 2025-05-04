@@ -7,7 +7,7 @@ interface CharacterNameFieldProps {
   disabled: boolean;
 }
 
-export function CharacterNameField({ disabled }: CharacterNameFieldProps) {
+export function CharacterNameField({ disabled }: Readonly<CharacterNameFieldProps>) {
   const { control } = useFormContext<CharacterFormData>();
 
   return (
