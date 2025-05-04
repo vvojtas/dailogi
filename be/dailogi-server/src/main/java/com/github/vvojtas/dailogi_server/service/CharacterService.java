@@ -358,8 +358,7 @@ public class CharacterService {
         if (currentUser == null) {
             return false;
         }
-        // Added null check for character.getUser() just in case
-        return character.getUser() != null && currentUser.getId().equals(character.getUser().getId());
+        return currentUser.getId().equals(character.getUser().getId());
     }
 
     /**
@@ -367,7 +366,6 @@ public class CharacterService {
      * Made public static for reuse.
      */
     public static boolean isGlobal(Character character) {
-        // Added null check for character and isGlobal field
-        return character != null && Boolean.TRUE.equals(character.getIsGlobal());
+        return Boolean.TRUE.equals(character.getIsGlobal());
     }
 } 
