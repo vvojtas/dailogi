@@ -75,7 +75,7 @@ export function CharacterForm({ llms, initialData, onSubmitSuccess, onCancel }: 
                 <CharacterLlmField llms={llms} disabled={isDisabled} />
               </CardContent>
 
-              <CardFooter>
+              <CardFooter className="flex justify-end">
                 <CharacterFormButtons
                   isSubmitting={isSubmitting}
                   isHydrated={isHydrated}
