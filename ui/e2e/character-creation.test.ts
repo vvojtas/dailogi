@@ -73,9 +73,6 @@ test.describe("Character Creation", () => {
     // Log test character name for debugging
     console.log(`Looking for character with name: ${TEST_CHARACTER.name}`);
 
-    // Add a small delay (optional, may not be needed now)
-    // await page.waitForTimeout(1000);
-
     // Verify our character is in the grid
     const characterExists = await charactersPage.hasCharacterWithName(TEST_CHARACTER.name);
     expect(characterExists, `Character "${TEST_CHARACTER.name}" should exist in the gallery`).toBeTruthy();
