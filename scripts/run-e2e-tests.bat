@@ -9,7 +9,7 @@ echo Running d-AI-logi E2E tests with local backend...
 REM Start backend server with local profile (H2 database) in a new window
 echo ===== STARTING LOCAL BACKEND =====
 cd be\dailogi-server
-start "Dailogi Backend (Local)" cmd /c "mvn spring-boot:run -Dspring-boot.run.profiles=local > ..\..\scripts\logs\backend.log 2>&1"
+start "Dailogi Backend (Local+E2E)" cmd /c "mvn spring-boot:run -Dspring-boot.run.profiles=local,e2e-test > ..\..\scripts\logs\backend.log 2>&1"
 set BACKEND_STARTED=true
 
 REM Wait for backend to start by checking the health endpoint

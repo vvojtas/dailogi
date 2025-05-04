@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    # Use in-memory H2 database for E2E tests
+    url: jdbc:h2:mem:e2etestdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: password
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true 

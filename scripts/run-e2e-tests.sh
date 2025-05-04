@@ -6,7 +6,7 @@ echo "Running d-AI-logi E2E tests with local backend..."
 # Start backend with local profile (H2 database)
 echo "===== STARTING LOCAL BACKEND ====="
 cd be/dailogi-server || exit
-mvn spring-boot:run -Dspring-boot.run.profiles=local > /dev/null 2>&1 &
+mvn spring-boot:run -Dspring-boot.run.profiles=local,e2e-test > /dev/null 2>&1 &
 BACKEND_PID=$!
 
 # Wait for backend to start by checking the health endpoint
