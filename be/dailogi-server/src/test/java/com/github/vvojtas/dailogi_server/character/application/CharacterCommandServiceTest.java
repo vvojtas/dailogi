@@ -1,5 +1,6 @@
 package com.github.vvojtas.dailogi_server.character.application;
 
+import com.github.vvojtas.dailogi_server.avatar.application.AvatarCommandService;
 import com.github.vvojtas.dailogi_server.character.api.CreateCharacterCommand;
 import com.github.vvojtas.dailogi_server.character.api.DeleteCharacterCommand;
 import com.github.vvojtas.dailogi_server.character.api.UpdateCharacterCommand;
@@ -43,7 +44,7 @@ class CharacterCommandServiceTest {
     private CharacterValidator validator;
 
     @Mock
-    private CharacterAvatarService avatarService;
+    private AvatarCommandService avatarService;
 
     @Mock
     private CharacterMapper characterMapper;

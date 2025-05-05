@@ -1,8 +1,11 @@
 package com.github.vvojtas.dailogi_server.controller;
 
-import com.github.vvojtas.dailogi_server.service.AvatarService;
+import com.github.vvojtas.dailogi_server.avatar.api.DeleteAvatarCommand;
+import com.github.vvojtas.dailogi_server.avatar.api.GetAvatarQuery;
+import com.github.vvojtas.dailogi_server.avatar.api.UploadAvatarCommand;
+import com.github.vvojtas.dailogi_server.avatar.application.AvatarCommandService;
+import com.github.vvojtas.dailogi_server.avatar.application.AvatarQueryService;
 import com.github.vvojtas.dailogi_server.model.avatar.AvatarData;
-import com.github.vvojtas.dailogi_server.model.avatar.request.UploadAvatarCommand;
 import com.github.vvojtas.dailogi_server.model.avatar.response.CharacterAvatarResponseDTO;
 import com.github.vvojtas.dailogi_server.model.common.response.ErrorResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,7 +38,8 @@ import java.io.IOException;
 @Tag(name = "Avatars", description = "Endpoints for managing character avatars")
 public class AvatarController {
 
-    private final AvatarService avatarService;
+    private final AvatarQueryService avatarQueryService;
+    private final AvatarCommandService avatarCommandService;
 
     @Operation(
         summary = "Get character avatar",
@@ -74,7 +78,8 @@ public class AvatarController {
         @PathVariable Long characterId,
         Authentication authentication // Authentication can be null for unauthenticated requests
     ) {
-        AvatarData avatarData = avatarService.getAvatarData(characterId, authentication);
+        GetAvatarQuery query = new GetAvatarQuery(characterId, authentication);
+        AvatarData avatarData = avatarQueryService.getAvatarData(query);
         
         MediaType contentType = MediaType.parseMediaType(avatarData.formatType());
         
@@ -145,7 +150,7 @@ public class AvatarController {
         )
         @Valid @ModelAttribute UploadAvatarCommand command
     ) throws IOException {
-        avatarService.uploadOrUpdateAvatar(characterId, command);
+        avatarCommandService.uploadOrUpdateAvatar(characterId, command);
         
         // Generate avatar URL using Spring HATEOAS
         String avatarUrl = WebMvcLinkBuilder.linkTo(
@@ -196,7 +201,8 @@ public class AvatarController {
         @PathVariable Long characterId,
         Authentication authentication
     ) {
-        avatarService.deleteAvatar(characterId, authentication);
+        DeleteAvatarCommand command = new DeleteAvatarCommand(characterId, authentication);
+        avatarCommandService.deleteAvatar(command);
         return ResponseEntity.ok("Avatar deleted successfully");
     }
 } 

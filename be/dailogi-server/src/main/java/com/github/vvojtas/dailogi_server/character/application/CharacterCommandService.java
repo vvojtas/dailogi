@@ -1,5 +1,6 @@
 package com.github.vvojtas.dailogi_server.character.application;
 
+import com.github.vvojtas.dailogi_server.avatar.application.AvatarCommandService;
 import com.github.vvojtas.dailogi_server.character.api.CreateCharacterCommand;
 import com.github.vvojtas.dailogi_server.character.api.DeleteCharacterCommand;
 import com.github.vvojtas.dailogi_server.character.api.UpdateCharacterCommand;
@@ -26,7 +27,7 @@ public class CharacterCommandService {
     private final CharacterRepository characterRepository;
     private final LLMRepository llmRepository;
     private final CharacterValidator validator;
-    private final CharacterAvatarService avatarService;
+    private final AvatarCommandService avatarService;
     private final CharacterMapper characterMapper;
     private final CurrentUserService currentUserService;
 
@@ -66,7 +67,7 @@ public class CharacterCommandService {
         
         // Handle avatar if provided
         if (command.avatar() != null) {
-            Optional<Avatar> avatar = avatarService.updateOrAttachAvatar(character.getId(), command.avatar());
+            Optional<Avatar> avatar = avatarService.createAndAttachAvatar(character.getId(), command.avatar());
             character.setAvatar(avatar.orElse(null));
         }
         

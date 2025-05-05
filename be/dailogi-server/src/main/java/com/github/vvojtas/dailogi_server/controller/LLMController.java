@@ -1,7 +1,8 @@
 package com.github.vvojtas.dailogi_server.controller;
 
+import com.github.vvojtas.dailogi_server.llm.api.GetLLMsQuery;
+import com.github.vvojtas.dailogi_server.llm.application.LLMQueryService;
 import com.github.vvojtas.dailogi_server.model.llm.response.LLMDTO;
-import com.github.vvojtas.dailogi_server.service.LLMService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "LLM", description = "Language Model management endpoints")
 public class LLMController {
-    private final LLMService llmService;
+    private final LLMQueryService llmQueryService;
 
     @Operation(
         summary = "Get all available LLMs",
@@ -42,6 +43,6 @@ public class LLMController {
     )
     @GetMapping
     public ResponseEntity<List<LLMDTO>> getLLMs() {
-        return ResponseEntity.ok(llmService.getLLMs());
+        return ResponseEntity.ok(llmQueryService.getLLMs(new GetLLMsQuery()));
     }
 } 

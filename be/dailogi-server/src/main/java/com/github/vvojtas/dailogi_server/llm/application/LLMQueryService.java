@@ -1,6 +1,7 @@
-package com.github.vvojtas.dailogi_server.service;
+package com.github.vvojtas.dailogi_server.llm.application;
 
 import com.github.vvojtas.dailogi_server.db.repository.LLMRepository;
+import com.github.vvojtas.dailogi_server.llm.api.GetLLMsQuery;
 import com.github.vvojtas.dailogi_server.model.llm.mapper.LLMMapper;
 import com.github.vvojtas.dailogi_server.model.llm.response.LLMDTO;
 import lombok.RequiredArgsConstructor;
@@ -13,12 +14,12 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class LLMService {
+@Transactional(readOnly = true)
+public class LLMQueryService {
     private final LLMRepository llmRepository;
     private final LLMMapper llmMapper;
 
-    @Transactional(readOnly = true)
-    public List<LLMDTO> getLLMs() {
+    public List<LLMDTO> getLLMs(GetLLMsQuery query) {
         log.debug("Fetching all LLMs");
         List<LLMDTO> llms = llmMapper.toDTOs(llmRepository.findAll());
         log.info("Found {} LLMs", llms.size());
