@@ -38,6 +38,9 @@ When introducing changes to the project, always follow the directory structure b
 - `./be/dailogi-server/src/main/java/com/github/vvojtas/dailogi_server` - root javapackage
 - `./be/dailogi-server/src/main/java/com/github/vvojtas/dailogi_server/controller` - backend REST controllers
 - `./be/dailogi-server/src/main/java/com/github/vvojtas/dailogi_server/service` - backend services
+- `./be/dailogi-server/src/main/java/com/github/vvojtas/dailogi_server/{entity}` - domain-specific package for entity functionality
+- `./be/dailogi-server/src/main/java/com/github/vvojtas/dailogi_server/{entity}/api` - commands and queries interfaces
+- `./be/dailogi-server/src/main/java/com/github/vvojtas/dailogi_server/{entity}/application` - command and query service implementations
 - `./be/dailogi-server/src/main/java/com/github/vvojtas/dailogi_server/model` - backend DTOs
 - `./be/dailogi-server/src/main/java/com/github/vvojtas/dailogi_server/db/entity` - database models
 - `./be/dailogi-server/src/main/java/com/github/vvojtas/dailogi_server/db/repository` - database repositories

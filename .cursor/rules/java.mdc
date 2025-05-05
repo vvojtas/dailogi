@@ -13,6 +13,14 @@ alwaysApply: false
 - Use descriptive method and variable names following camelCase convention.
 - Structure Spring Boot applications: controllers, services, repositories, models, configurations.
 
+#### CQS ARCHITECTURE
+- Use Command Query Separation (CQS) to separate write/mutating operations from read operations
+- Structure packages with "api" (commands/queries interfaces) and "application" (implementations)
+- Split services by responsibility: CommandService, QueryService, ValidatorService, etc.
+- Use command objects for write operations and query objects for read operations
+- Keep commands and queries as simple DTOs with validation annotations
+- Ensure command handlers have single responsibility and implement proper validation
+
 #### SPRING_BOOT
 - Use Spring Boot for simplified configuration and rapid development with sensible defaults
 - Implement proper use of annotations (e.g., @SpringBootApplication, @RestController, @Service).
@@ -47,10 +55,10 @@ alwaysApply: false
 #### LOMBOK
 - Use Lombok where it clearly simplifies the code
 - Use constructor injection with `@RequiredArgsConstructor`
-- Prefer Java `record` over Lombok’s `@Value` when applicable
+- Prefer Java `record` over Lombok's `@Value` when applicable
 - Avoid using `@Data` in non-DTO classes, instead, use specific annotations like `@Getter`, `@Setter`, and `@ToString`
 - Apply Lombok annotations to fields rather than the class if only some fields require them
-- Use Lombok’s `@Slf4j` to generate loggers
+- Use Lombok's `@Slf4j` to generate loggers
 
 
 ### CONFIGURATION
