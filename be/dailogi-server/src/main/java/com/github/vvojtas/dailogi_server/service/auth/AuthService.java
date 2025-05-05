@@ -35,10 +35,6 @@ public class AuthService {
             throw new DuplicateResourceException(USER_RESOURCE_NAME, "User already exists with name: " + request.name());
         }
 
-        if (!request.password().equals(request.passwordConfirmation())) {
-            throw new IllegalArgumentException("Password and confirmation do not match");
-        }
-
         AppUser newUser = AppUser.builder()
                 .name(request.name())
                 .passwordHash(passwordEncoder.encode(request.password()))

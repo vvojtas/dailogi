@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.experimental.Accessors;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import jakarta.persistence.*;
@@ -21,6 +22,7 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @Builder
 @Accessors(chain = true)
+@EqualsAndHashCode(callSuper = false, of = "id")
 public class Character {
 
     @Id
@@ -54,6 +56,9 @@ public class Character {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "default_llm_id", foreignKey = @ForeignKey(name = "fk_default_llm"))
     private LLM defaultLlm;
+
+    @Column(name = "default_llm_id", insertable = false, updatable = false)
+    private Long defaultLlmId;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")

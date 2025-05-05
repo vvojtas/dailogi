@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -146,11 +147,17 @@ public class AvatarController {
     ) throws IOException {
         avatarService.uploadOrUpdateAvatar(characterId, command);
         
+        // Generate avatar URL using Spring HATEOAS
+        String avatarUrl = WebMvcLinkBuilder.linkTo(
+            WebMvcLinkBuilder.methodOn(AvatarController.class)
+                .getAvatar(characterId, null))
+            .toUri().toString();
+        
         // Build and return the response DTO
         return ResponseEntity.ok(new CharacterAvatarResponseDTO(
             characterId,
             true, // We know it has an avatar now
-            "/api/characters/" + characterId + "/avatar"
+            avatarUrl
         ));
     }
 

@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.experimental.Accessors;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 
 @Entity
 @Table(name = "DialogueMessage")
@@ -16,6 +17,7 @@ import jakarta.persistence.*;
 @AllArgsConstructor
 @Builder
 @Accessors(chain = true)
+@EqualsAndHashCode(callSuper = false, of = "id")
 public class DialogueMessage {
 
     @Id

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.experimental.Accessors;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -20,6 +21,7 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @Builder
 @Accessors(chain = true)
+@EqualsAndHashCode(callSuper = false, of = "id")
 public class AppUser {
 
     @Id

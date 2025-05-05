@@ -1,10 +1,12 @@
 package com.github.vvojtas.dailogi_server.model.auth.request;
 
+import com.github.vvojtas.dailogi_server.validation.PasswordMatches;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 @Schema(description = "Command for user registration")
+@PasswordMatches
 public record RegisterCommand(
     @Schema(description = "Username", example = "new_user", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "Username is required")

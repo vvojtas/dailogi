@@ -21,6 +21,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -114,12 +115,19 @@ public class CharacterController {
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Total-Count", String.valueOf(result.totalElements()));
         
-        // Add pagination links
-        if (page > 0) {
-            headers.add("Link", buildPageLink(page - 1, size, includeGlobal, "prev"));
-        }
-        if (page < result.totalPages() - 1) {
-            headers.add("Link", buildPageLink(page + 1, size, includeGlobal, "next"));
+        // Add pagination links using Spring HATEOAS
+        if (result.totalPages() > 1) {
+            // Add "first" link if not on first page
+            if (page > 0) {
+                headers.add("Link", buildPageLink(0, size, includeGlobal, "first"));
+                headers.add("Link", buildPageLink(page - 1, size, includeGlobal, "prev"));
+            }
+            
+            // Add "next" and "last" links if not on last page
+            if (page < result.totalPages() - 1) {
+                headers.add("Link", buildPageLink(page + 1, size, includeGlobal, "next"));
+                headers.add("Link", buildPageLink(result.totalPages() - 1, size, includeGlobal, "last"));
+            }
         }
         
         return ResponseEntity.ok()
@@ -127,9 +135,21 @@ public class CharacterController {
             .body(result);
     }
     
+    /**
+     * Builds a properly formatted pagination link using Spring HATEOAS.
+     * 
+     * @param page The target page number
+     * @param size The page size
+     * @param includeGlobal Whether to include global characters
+     * @param rel The link relation ("prev", "next", "first", "last")
+     * @return A formatted link string
+     */
     private String buildPageLink(int page, int size, boolean includeGlobal, String rel) {
-        return String.format("</api/characters?page=%d&size=%d&include_global=%b>; rel=\"%s\"",
-            page, size, includeGlobal, rel);
+        String uri = WebMvcLinkBuilder.linkTo(
+            WebMvcLinkBuilder.methodOn(CharacterController.class)
+                .getCharacters(includeGlobal, page, size, null))
+            .toUri().toString();
+        return String.format("<%s>; rel=\"%s\"", uri, rel);
     }
 
     @Operation(

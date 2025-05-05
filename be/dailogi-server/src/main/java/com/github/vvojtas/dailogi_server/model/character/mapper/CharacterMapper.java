@@ -1,7 +1,9 @@
 package com.github.vvojtas.dailogi_server.model.character.mapper;
 
+import com.github.vvojtas.dailogi_server.controller.AvatarController;
 import com.github.vvojtas.dailogi_server.db.entity.Character;
 import com.github.vvojtas.dailogi_server.model.character.response.CharacterDTO;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,7 +15,15 @@ public class CharacterMapper {
         }
 
         boolean hasAvatar = character.getAvatarId() != null;
-        String avatarUrl = hasAvatar ? "/api/characters/" + character.getId() + "/avatar" : null;
+        String avatarUrl = null;
+        
+        if (hasAvatar) {
+            // Use Spring HATEOAS to generate the avatar URL
+            avatarUrl = WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(AvatarController.class)
+                    .getAvatar(character.getId(), null))
+                .toUri().toString();
+        }
 
         return new CharacterDTO(
             character.getId(),
@@ -23,7 +33,7 @@ public class CharacterMapper {
             hasAvatar,
             avatarUrl,
             character.getIsGlobal(),
-            character.getDefaultLlm() != null ? character.getDefaultLlm().getId() : null,
+            character.getDefaultLlmId(),
             character.getCreatedAt(),
             character.getUpdatedAt()
         );

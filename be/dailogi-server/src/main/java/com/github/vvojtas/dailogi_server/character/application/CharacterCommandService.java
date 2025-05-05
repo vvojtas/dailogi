@@ -6,6 +6,7 @@ import com.github.vvojtas.dailogi_server.character.api.UpdateCharacterCommand;
 import com.github.vvojtas.dailogi_server.db.entity.AppUser;
 import com.github.vvojtas.dailogi_server.db.entity.Character;
 import com.github.vvojtas.dailogi_server.db.entity.LLM;
+import com.github.vvojtas.dailogi_server.db.entity.Avatar;
 import com.github.vvojtas.dailogi_server.db.repository.CharacterRepository;
 import com.github.vvojtas.dailogi_server.db.repository.LLMRepository;
 import com.github.vvojtas.dailogi_server.model.character.mapper.CharacterMapper;
@@ -13,6 +14,8 @@ import com.github.vvojtas.dailogi_server.model.character.response.CharacterDTO;
 import com.github.vvojtas.dailogi_server.service.auth.CurrentUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,9 +66,8 @@ public class CharacterCommandService {
         
         // Handle avatar if provided
         if (command.avatar() != null) {
-            avatarService.createAndAttachAvatar(character.getId(), command.avatar());
-            // Refresh character to get the updated avatar
-            character = characterRepository.findById(character.getId()).orElseThrow();
+            Optional<Avatar> avatar = avatarService.updateOrAttachAvatar(character.getId(), command.avatar());
+            character.setAvatar(avatar.orElse(null));
         }
         
         log.info("Created new character: id={}, name={}, with avatar={}", 
@@ -110,9 +112,8 @@ public class CharacterCommandService {
         
         // Handle avatar if provided
         if (command.avatar() != null) {
-            avatarService.updateOrAttachAvatar(character.getId(), command.avatar());
-            // Refresh character to get the updated avatar
-            character = characterRepository.findById(character.getId()).orElseThrow();
+            Optional<Avatar> avatar = avatarService.updateOrAttachAvatar(character.getId(), command.avatar());
+            character.setAvatar(avatar.orElse(null));
         }
         
         log.info("Updated character: id={}, name={}", character.getId(), character.getName());
