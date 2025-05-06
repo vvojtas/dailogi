@@ -78,6 +78,10 @@ jobs:
       # Setup backend and start server
       - uses: ./.github/actions/setup-backend
       
+      - name: Build backend with Maven
+        working-directory: ./be/dailogi-server
+        run: mvn clean package -DskipTests
+        
       - name: Start backend server
         working-directory: ./be/dailogi-server
         run: mvn spring-boot:run -Dspring-boot.run.profiles=local,e2e-test &
