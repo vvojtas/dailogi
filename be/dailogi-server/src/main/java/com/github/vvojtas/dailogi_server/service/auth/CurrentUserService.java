@@ -67,8 +67,17 @@ public class CurrentUserService {
 
     @Transactional(readOnly = true)
     public AppUser getCurrentAppUser(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
+        AppUser currentUser = getCurrentAppUserOrNull(authentication);
+        if (currentUser == null) {
             throw new IllegalStateException("No authenticated user found");
+        }
+        return currentUser;
+    }
+
+    @Transactional(readOnly = true)
+    public AppUser getCurrentAppUserOrNull(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
         }
 
         return appUserRepository.findByName(authentication.getName())

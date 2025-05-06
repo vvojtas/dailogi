@@ -14,7 +14,13 @@ public class CharacterAuthorizationService {
      * Checks if a user can access a character (is owned by user or is globally accessible)
      */
     public boolean canAccess(Character character, AppUser user) {
-        return isOwner(character, user) || isGloballyAccessible(character);
+        // First check if it's globally accessible - this applies to all users, authenticated or not
+        if (isGloballyAccessible(character)) {
+            return true;
+        }
+        
+        // For non-global characters, check if the user owns it
+        return isOwner(character, user);
     }
 
     /**
@@ -36,7 +42,7 @@ public class CharacterAuthorizationService {
      */
     public boolean isOwner(Character character, AppUser user) {
         // If there's no user (unauthenticated), they cannot own the character
-        if (user == null) {
+        if (user == null || character.getUser() == null) {
             return false;
         }
         return user.getId().equals(character.getUser().getId());

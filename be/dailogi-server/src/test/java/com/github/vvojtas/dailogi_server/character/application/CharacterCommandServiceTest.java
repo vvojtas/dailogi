@@ -133,7 +133,6 @@ class CharacterCommandServiceTest {
             return savedCharacter;
         });
         
-        when(characterRepository.findById(1L)).thenReturn(Optional.of(testCharacter));
         when(characterMapper.toDTO(any(Character.class))).thenReturn(expectedDTO);
 
         // Act
@@ -183,7 +182,6 @@ class CharacterCommandServiceTest {
         when(validator.getCharacterById(1L)).thenReturn(testCharacter);
         when(llmRepository.findById(2L)).thenReturn(Optional.of(newLLM));
         when(characterRepository.save(any(Character.class))).thenReturn(testCharacter);
-        when(characterRepository.findById(1L)).thenReturn(Optional.of(testCharacter));
         when(characterMapper.toDTO(testCharacter)).thenReturn(expectedDTO);
 
         // Act

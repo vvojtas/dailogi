@@ -31,8 +31,10 @@ public class AvatarQueryService {
         // Validate the character and access authorization
         Character character = validator.validateCharacterExists(query.characterId());
         
+        // Get current user if authenticated, null otherwise
+        AppUser currentUser = currentUserService.getCurrentAppUserOrNull(query.authentication());
+        
         // Validate user has access to character
-        AppUser currentUser = currentUserService.getCurrentAppUser(query.authentication());
         validator.validateCharacterAccess(character, currentUser);
 
         // Check if character has an avatar
