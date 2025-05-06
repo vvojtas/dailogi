@@ -97,13 +97,12 @@ jobs:
       - name: Install Playwright browsers
         working-directory: ./ui
         run: npx playwright install --with-deps chromium
-        
       
       - name: Run Playwright E2E tests
         working-directory: ./ui
         run: npm run test:e2e
         env:
-          SPRING_BACKEND_BASE_URL: ${{env.SPRING_BACKEND_BASE_URL}}
+          SPRING_BACKEND_BASE_URL: ${{vars.SPRING_BACKEND_BASE_URL}}
       
       - name: Upload test results
         if: always()
