@@ -28,7 +28,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AvatarCommandService {
     private static final String AVATAR_RESOURCE_NAME = Avatar.class.getSimpleName().toLowerCase();
-    private static final String CHARACTER_RESOURCE_NAME = Character.class.getSimpleName().toLowerCase();
 
     private final AvatarRepository avatarRepository;
     private final CharacterRepository characterRepository;
