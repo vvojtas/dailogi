@@ -116,7 +116,7 @@ jobs:
     name: PR Status Comment
     needs: [backend-tests, frontend-tests, e2e-tests]
     runs-on: ubuntu-latest
-    if: ${{ always() }}
+    if: ${{ always() && github.event_name == 'pull_request' }}
     
     steps:
       - name: Check previous job status
