@@ -80,7 +80,7 @@ jobs:
       
       - name: Start backend server
         working-directory: ./be/dailogi-server
-        run: mvn spring-boot:run &
+        run: mvn spring-boot:run -Dspring-boot.run.profiles=local,e2e-test &
         env:
           SSL_KEY_STORE_PASSWORD: ${{ secrets.SSL_KEY_STORE_PASSWORD }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
