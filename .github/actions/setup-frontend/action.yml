@@ -1,0 +1,28 @@
+name: 'Setup Frontend Environment'
+description: 'Sets up Node.js and installs dependencies for the frontend'
+
+inputs:
+  working-directory:
+    description: 'Directory where the frontend code is located'
+    required: false
+    default: './ui'
+  install-dependencies:
+    description: 'Whether to install dependencies'
+    required: false
+    default: 'true'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: '${{ inputs.working-directory }}/.nvmrc'
+        cache: 'npm'
+        cache-dependency-path: '${{ inputs.working-directory }}/package-lock.json'
+    
+    - name: Install dependencies
+      if: ${{ inputs.install-dependencies == 'true' }}
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: npm ci 
