@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.vvojtas.dailogi_server.service.util.UrlUtil;
 
 @RestController
 @RequestMapping("/api/characters")
@@ -145,11 +146,16 @@ public class CharacterController {
      * @return A formatted link string
      */
     private String buildPageLink(int page, int size, boolean includeGlobal, String rel) {
-        String uri = WebMvcLinkBuilder.linkTo(
+        // Get the full URI from WebMvcLinkBuilder
+        String fullUri = WebMvcLinkBuilder.linkTo(
             WebMvcLinkBuilder.methodOn(CharacterController.class)
                 .getCharacters(includeGlobal, page, size, null))
             .toUri().toString();
-        return String.format("<%s>; rel=\"%s\"", uri, rel);
+        
+        // Extract just the path and query parts to make it relative
+        String relativeUri = UrlUtil.toRelativeUri(fullUri);
+        
+        return String.format("<%s>; rel=\"%s\"", relativeUri, rel);
     }
 
     @Operation(

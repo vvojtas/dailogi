@@ -8,6 +8,7 @@ import com.github.vvojtas.dailogi_server.avatar.application.AvatarQueryService;
 import com.github.vvojtas.dailogi_server.model.avatar.AvatarData;
 import com.github.vvojtas.dailogi_server.model.avatar.response.CharacterAvatarResponseDTO;
 import com.github.vvojtas.dailogi_server.model.common.response.ErrorResponseDTO;
+import com.github.vvojtas.dailogi_server.service.util.UrlUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -153,10 +154,13 @@ public class AvatarController {
         avatarCommandService.uploadOrUpdateAvatar(characterId, command);
         
         // Generate avatar URL using Spring HATEOAS
-        String avatarUrl = WebMvcLinkBuilder.linkTo(
+        String fullUri = WebMvcLinkBuilder.linkTo(
             WebMvcLinkBuilder.methodOn(AvatarController.class)
                 .getAvatar(characterId, null))
             .toUri().toString();
+            
+        // Extract just the path and query parts to make it relative
+        String avatarUrl = UrlUtil.toRelativeUri(fullUri);
         
         // Build and return the response DTO
         return ResponseEntity.ok(new CharacterAvatarResponseDTO(

@@ -5,6 +5,7 @@ import com.github.vvojtas.dailogi_server.db.entity.Character;
 import com.github.vvojtas.dailogi_server.model.character.response.CharacterDTO;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Component;
+import com.github.vvojtas.dailogi_server.service.util.UrlUtil;
 
 @Component
 public class CharacterMapper {
@@ -19,10 +20,11 @@ public class CharacterMapper {
         
         if (hasAvatar) {
             // Use Spring HATEOAS to generate the avatar URL
-            avatarUrl = WebMvcLinkBuilder.linkTo(
+            String fullUri = WebMvcLinkBuilder.linkTo(
                 WebMvcLinkBuilder.methodOn(AvatarController.class)
                     .getAvatar(character.getId(), null))
                 .toUri().toString();
+            avatarUrl = UrlUtil.toRelativeUri(fullUri);
         }
 
         return new CharacterDTO(
