@@ -1,0 +1,148 @@
+name: Main Branch Checks
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-frontend
+      
+      - name: Lint frontend code
+        working-directory: ./ui
+        run: npm run lint
+
+  run-tests:
+    name: Run All Tests
+    needs: lint
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      # Backend tests
+      - name: Setup backend
+        uses: ./.github/actions/setup-backend
+      
+      - name: Run backend tests
+        working-directory: ./be/dailogi-server
+        run: mvn -B test
+      
+      - name: Generate JaCoCo Coverage Report
+        working-directory: ./be/dailogi-server
+        run: mvn jacoco:report
+      
+      - name: Upload JaCoCo coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: be/dailogi-server/target/site/jacoco/
+          retention-days: 7
+      
+      # Frontend tests
+      - name: Setup frontend
+        uses: ./.github/actions/setup-frontend
+      
+      - name: Run frontend tests
+        working-directory: ./ui
+        run: npm run test:coverage
+      
+      - name: Upload Vitest coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: ui/coverage/
+          retention-days: 7
+      
+      # E2E tests
+      - name: Build backend for E2E tests
+        working-directory: ./be/dailogi-server
+        run: mvn clean package -DskipTests
+      
+      - name: Start backend server
+        working-directory: ./be/dailogi-server
+        run: |
+          rm -f backend_startup.log
+          echo "Starting backend server in background..."
+          mvn spring-boot:run -Dspring-boot.run.profiles=local,e2e-test > backend_startup.log 2>&1 &
+          
+          echo "Waiting for backend to initialize..."
+          MAX_ATTEMPTS=12
+          SLEEP_INTERVAL=10
+          attempt=0
+          until curl -k --silent --fail https://localhost:8443/actuator/health > /dev/null 2>&1; do
+            attempt=$((attempt + 1))
+            if [ "$attempt" -ge "$MAX_ATTEMPTS" ]; then
+              echo "Backend did not start after ${MAX_ATTEMPTS} attempts"
+              exit 1
+            fi
+            echo "Backend not yet ready (attempt ${attempt}/${MAX_ATTEMPTS}). Waiting ${SLEEP_INTERVAL}s..."
+            sleep $SLEEP_INTERVAL
+          done
+          echo "Backend is up and running"
+        env:
+          SSL_KEY_STORE_PASSWORD: ${{ secrets.SSL_KEY_STORE_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      
+      - name: Install Playwright browsers
+        working-directory: ./ui
+        run: npx playwright install --with-deps chromium
+      
+      - name: Run E2E tests
+        working-directory: ./ui
+        run: npm run test:e2e
+        env:
+          SPRING_BACKEND_BASE_URL: ${{vars.SPRING_BACKEND_BASE_URL}}
+          
+      - name: Upload E2E test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-report
+          path: ui/playwright-report/
+          retention-days: 7
+
+  publish-summary:
+    name: Publish Test Summary
+    needs: run-tests
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download coverage artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      
+      - name: Generate summary
+        run: |
+          echo "# Test Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Backend coverage
+          BACKEND_COVERAGE_FILE="artifacts/backend-coverage/index.html"
+          if [ -f "$BACKEND_COVERAGE_FILE" ]; then
+            BACKEND_COVERAGE=$(grep -o 'Total[^%]*%' "$BACKEND_COVERAGE_FILE" | grep -o '[0-9]*%' | head -1)
+            echo "- Backend test coverage: $BACKEND_COVERAGE" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- Backend test coverage: N/A" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Frontend coverage
+          FRONTEND_COVERAGE_FILE="artifacts/frontend-coverage/index.html"
+          if [ -f "$FRONTEND_COVERAGE_FILE" ]; then
+            FRONTEND_COVERAGE=$(grep -o 'All files[^%]*%' "$FRONTEND_COVERAGE_FILE" | grep -o '[0-9\.]*%' | head -1)
+            echo "- Frontend test coverage: $FRONTEND_COVERAGE" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- Frontend test coverage: N/A" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "For detailed reports, check the workflow artifacts." >> $GITHUB_STEP_SUMMARY 

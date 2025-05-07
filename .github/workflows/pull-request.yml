@@ -11,8 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      # Setup and lint frontend
       - uses: ./.github/actions/setup-frontend
       
       - name: Lint frontend code
@@ -36,6 +34,19 @@ jobs:
 
       - name: Generate JaCoCo Coverage Report
         run: mvn jacoco:report
+        
+      - name: Extract JaCoCo coverage percentage
+        id: jacoco-coverage
+        run: |
+          COVERAGE_FILE="target/site/jacoco/index.html"
+          if [ -f "$COVERAGE_FILE" ]; then
+            TOTAL_COVERAGE=$(grep -o 'Total[^%]*%' "$COVERAGE_FILE" | grep -o '[0-9]*%' | head -1)
+            echo "coverage=$TOTAL_COVERAGE" >> $GITHUB_OUTPUT
+            echo "Backend test coverage: $TOTAL_COVERAGE"
+          else
+            echo "coverage=N/A" >> $GITHUB_OUTPUT
+            echo "Coverage file not found"
+          fi
 
       - name: Upload JaCoCo coverage report
         uses: actions/upload-artifact@v4
@@ -59,6 +70,19 @@ jobs:
       - name: Run Vitest unit tests with coverage
         run: npm run test:coverage
       
+      - name: Extract Vitest coverage percentage
+        id: vitest-coverage
+        run: |
+          COVERAGE_FILE="coverage/index.html"
+          if [ -f "$COVERAGE_FILE" ]; then
+            TOTAL_COVERAGE=$(grep -o 'All files[^%]*%' "$COVERAGE_FILE" | grep -o '[0-9\.]*%' | head -1)
+            echo "coverage=$TOTAL_COVERAGE" >> $GITHUB_OUTPUT
+            echo "Frontend test coverage: $TOTAL_COVERAGE"
+          else
+            echo "coverage=N/A" >> $GITHUB_OUTPUT
+            echo "Coverage file not found"
+          fi
+      
       - name: Upload Vitest coverage report
         uses: actions/upload-artifact@v4
         with:
@@ -74,31 +98,23 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
-      
-      # Setup backend and start server
       - uses: ./.github/actions/setup-backend
       
       - name: Build backend with Maven
         working-directory: ./be/dailogi-server
         run: mvn clean package -DskipTests
 
-      - name: Clean previous backend startup log
-        working-directory: ./be/dailogi-server
-        run: rm -f backend_startup.log
-        
-      - name: Start backend server
+      - name: Start backend server and wait for it to be ready
         working-directory: ./be/dailogi-server
         run: |
-          echo "Starting backend server in background, logging to backend_startup.log..."
+          # Clean previous log
+          rm -f backend_startup.log
+          
+          # Start backend server
+          echo "Starting backend server in background..."
           mvn spring-boot:run -Dspring-boot.run.profiles=local,e2e-test > backend_startup.log 2>&1 &
-          echo "Backend server process started in background."
-        env:
-          SSL_KEY_STORE_PASSWORD: ${{ secrets.SSL_KEY_STORE_PASSWORD }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      
-      - name: Wait for backend to start
-        id: wait_for_backend
-        run: |
+          
+          # Wait for backend to initialize
           echo "Waiting for backend to initialize..."
           MAX_ATTEMPTS=12
           SLEEP_INTERVAL=10
@@ -106,25 +122,24 @@ jobs:
           until curl -k --silent --fail https://localhost:8443/actuator/health > /dev/null 2>&1; do
             attempt=$((attempt + 1))
             if [ "$attempt" -ge "$MAX_ATTEMPTS" ]; then
-              echo "Backend did not start at https://localhost:8443/actuator/health after ${MAX_ATTEMPTS} attempts and $((${MAX_ATTEMPTS} * ${SLEEP_INTERVAL})) seconds."
+              echo "Backend did not start after ${MAX_ATTEMPTS} attempts"
               exit 1
             fi
-            echo "Backend not yet ready (attempt ${attempt}/${MAX_ATTEMPTS}) on port 8443. Waiting ${SLEEP_INTERVAL}s..."
+            echo "Backend not yet ready (attempt ${attempt}/${MAX_ATTEMPTS}). Waiting ${SLEEP_INTERVAL}s..."
             if [ "$attempt" -gt "1" ]; then
-              echo "Current backend startup log snippet (last 50 lines):"
-              tail -n 50 backend_startup.log || echo "Could not tail backend_startup.log"
+              tail -n 50 backend_startup.log || echo "Could not tail log"
             fi
             sleep $SLEEP_INTERVAL
           done
-          echo "Backend is up and running on https://localhost:8443/actuator/health"
-        working-directory: ./be/dailogi-server
+          echo "Backend is up and running"
+        env:
+          SSL_KEY_STORE_PASSWORD: ${{ secrets.SSL_KEY_STORE_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
       - name: Display backend logs on failure
         if: failure()
         working-directory: ./be/dailogi-server
-        run: |
-          echo "Displaying full backend_startup.log due to previous failure:"
-          cat backend_startup.log || echo "backend_startup.log not found or is empty."
+        run: cat backend_startup.log || echo "Log file not found"
 
       # Setup frontend and run tests
       - uses: ./.github/actions/setup-frontend
@@ -154,7 +169,12 @@ jobs:
     if: ${{ always() && github.event_name == 'pull_request' }}
     
     steps:
-      - name: Check previous job status
+      - name: Download coverage artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          
+      - name: Check job status
         id: check_status
         run: |
           if [[ "${{ needs.backend-tests.result }}" == "success" && "${{ needs.frontend-tests.result }}" == "success" && "${{ needs.e2e-tests.result }}" == "success" ]]; then
@@ -163,7 +183,7 @@ jobs:
             echo "status=failure" >> $GITHUB_OUTPUT
           fi
 
-      - name: Create or update comment
+      - name: Create or update PR comment
         uses: actions/github-script@v7
         if: always()
         with:
@@ -171,8 +191,10 @@ jobs:
           script: |
             const status = "${{ steps.check_status.outputs.status }}";
             const emoji = status === "success" ? "✅" : "❌";
-            const color = status === "success" ? "brightgreen" : "red";
             const title = status === "success" ? "All checks passed!" : "Checks failed!";
+            
+            const backendCoverage = "${{ needs.backend-tests.outputs.jacoco-coverage || 'N/A' }}";
+            const frontendCoverage = "${{ needs.frontend-tests.outputs.vitest-coverage || 'N/A' }}";
             
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
@@ -187,11 +209,11 @@ jobs:
             
             const body = `## PR Check Status: ${emoji} ${title}
             
-            | Check | Status |
-            | ----- | ------ |
-            | Backend Tests | ${{ needs.backend-tests.result == 'success' && '✅ Pass' || '❌ Fail' }} |
-            | Frontend Tests | ${{ needs.frontend-tests.result == 'success' && '✅ Pass' || '❌ Fail' }} |
-            | E2E Tests | ${{ needs.e2e-tests.result == 'success' && '✅ Pass' || '❌ Fail' }} |
+            | Check | Status | Coverage |
+            | ----- | ------ | -------- |
+            | Backend Tests | ${{ needs.backend-tests.result == 'success' && '✅ Pass' || '❌ Fail' }} | ${backendCoverage} |
+            | Frontend Tests | ${{ needs.frontend-tests.result == 'success' && '✅ Pass' || '❌ Fail' }} | ${frontendCoverage} |
+            | E2E Tests | ${{ needs.e2e-tests.result == 'success' && '✅ Pass' || '❌ Fail' }} | N/A |
             
             [View workflow run](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
             `;
