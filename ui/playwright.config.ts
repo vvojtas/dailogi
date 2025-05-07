@@ -1,6 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 import path from "path";
 import { fileURLToPath } from "url";
+import dotenv from "dotenv";
 
 // ES Modules equivalent for __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -10,7 +11,14 @@ const __dirname = path.dirname(__filename);
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
-// require('dotenv').config();
+dotenv.config({ path: path.resolve(__dirname, ".env.e2e") });
+
+const springBackendUrl = process.env.SPRING_BACKEND_BASE_URL ?? "https://localhost:8443";
+if (!process.env.SPRING_BACKEND_BASE_URL) {
+  console.warn(
+    `WARN: SPRING_BACKEND_BASE_URL not found in process.env (expected from .env.e2e), defaulting webServer to ${springBackendUrl}`
+  );
+}
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -79,7 +87,7 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: "npm run dev",
+    command: `cross-env SPRING_BACKEND_BASE_URL=${springBackendUrl} npm run dev`,
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
   },

@@ -13,6 +13,9 @@ spring:
   flyway:
     enabled: true 
 
+server:
+  port: 8443
+
 # E2E test user configuration
 dailogi:
   e2e-test:

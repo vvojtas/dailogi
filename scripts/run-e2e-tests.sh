@@ -19,7 +19,7 @@ while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
     RETRY_COUNT=$((RETRY_COUNT+1))
     echo "Checking if backend is healthy (attempt $RETRY_COUNT of $MAX_RETRIES)..."
     
-    HTTP_STATUS=$(curl -k -s -o /dev/null -w "%{http_code}" https://localhost/actuator/health)
+    HTTP_STATUS=$(curl -k -s -o /dev/null -w "%{http_code}" https://localhost:8443/actuator/health)
     echo "HTTP Status: $HTTP_STATUS"
     
     if [ "$HTTP_STATUS" = "200" ]; then

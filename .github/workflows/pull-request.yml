@@ -99,20 +99,20 @@ jobs:
           MAX_ATTEMPTS=12
           SLEEP_INTERVAL=10
           attempt=0
-          until curl -k --silent --fail https://localhost:443/actuator/health > /dev/null 2>&1; do
+          until curl -k --silent --fail https://localhost:8443/actuator/health > /dev/null 2>&1; do
             attempt=$((attempt + 1))
             if [ "$attempt" -ge "$MAX_ATTEMPTS" ]; then
-              echo "Backend did not start at https://localhost:443/actuator/health after ${MAX_ATTEMPTS} attempts and $((${MAX_ATTEMPTS} * ${SLEEP_INTERVAL})) seconds."
+              echo "Backend did not start at https://localhost:8443/actuator/health after ${MAX_ATTEMPTS} attempts and $((${MAX_ATTEMPTS} * ${SLEEP_INTERVAL})) seconds."
               exit 1
             fi
-            echo "Backend not yet ready (attempt ${attempt}/${MAX_ATTEMPTS}). Waiting ${SLEEP_INTERVAL}s..."
+            echo "Backend not yet ready (attempt ${attempt}/${MAX_ATTEMPTS}) on port 8443. Waiting ${SLEEP_INTERVAL}s..."
             if [ "$attempt" -gt "1" ]; then
               echo "Current backend startup log snippet (last 50 lines):"
               tail -n 50 backend_startup.log || echo "Could not tail backend_startup.log"
             fi
             sleep $SLEEP_INTERVAL
           done
-          echo "Backend is up and running on https://localhost:443/actuator/health"
+          echo "Backend is up and running on https://localhost:8443/actuator/health"
         working-directory: ./be/dailogi-server
 
       - name: Display backend logs on failure
