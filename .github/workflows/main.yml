@@ -76,7 +76,7 @@ jobs:
         run: |
           COVERAGE_FILE="coverage/index.html"
           if [ -f "$COVERAGE_FILE" ]; then
-            TOTAL_COVERAGE=$(grep -o 'All files[^%]*%' "$COVERAGE_FILE" | grep -o '[0-9\.]*%' | head -1)
+            TOTAL_COVERAGE=$(grep -A 1 'class="strong"' "$COVERAGE_FILE" | head -1 | grep -o '[0-9\.]*%' | head -1)
             echo "coverage=$TOTAL_COVERAGE" >> $GITHUB_OUTPUT
             echo "Frontend test coverage: $TOTAL_COVERAGE"
           else
