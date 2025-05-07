@@ -84,19 +84,44 @@ jobs:
         
       - name: Start backend server
         working-directory: ./be/dailogi-server
-        run: mvn spring-boot:run -Dspring-boot.run.profiles=local,e2e-test &
+        run: |
+          echo "Starting backend server in background, logging to backend_startup.log..."
+          mvn spring-boot:run -Dspring-boot.run.profiles=local,e2e-test > backend_startup.log 2>&1 &
+          echo "Backend server process started in background."
         env:
           SSL_KEY_STORE_PASSWORD: ${{ secrets.SSL_KEY_STORE_PASSWORD }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
       
       - name: Wait for backend to start
+        id: wait_for_backend
         run: |
           echo "Waiting for backend to initialize..."
-          sleep 30s
-          # Try connecting to the backend with curl
-          curl -k https://localhost:443/actuator/health || echo "Backend not responding on port 443"
-          echo "Backend should be running now"
-      
+          MAX_ATTEMPTS=12
+          SLEEP_INTERVAL=10
+          attempt=0
+          until curl -k --silent --fail https://localhost:443/actuator/health > /dev/null 2>&1; do
+            attempt=$((attempt + 1))
+            if [ "$attempt" -ge "$MAX_ATTEMPTS" ]; then
+              echo "Backend did not start at https://localhost:443/actuator/health after ${MAX_ATTEMPTS} attempts and $((${MAX_ATTEMPTS} * ${SLEEP_INTERVAL})) seconds."
+              exit 1
+            fi
+            echo "Backend not yet ready (attempt ${attempt}/${MAX_ATTEMPTS}). Waiting ${SLEEP_INTERVAL}s..."
+            if [ "$attempt" -gt "3" ]; then
+              echo "Current backend startup log snippet:"
+              tail -n 10 backend_startup.log || echo "Could not tail backend_startup.log"
+            fi
+            sleep $SLEEP_INTERVAL
+          done
+          echo "Backend is up and running on https://localhost:443/actuator/health"
+        working-directory: ./be/dailogi-server
+
+      - name: Display backend logs on failure
+        if: failure()
+        working-directory: ./be/dailogi-server
+        run: |
+          echo "Displaying full backend_startup.log due to previous failure:"
+          cat backend_startup.log || echo "backend_startup.log not found or is empty."
+
       # Setup frontend and run tests
       - uses: ./.github/actions/setup-frontend
       
