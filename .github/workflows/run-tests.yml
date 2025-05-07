@@ -8,6 +8,13 @@ on:
         required: false
         type: number
         default: 7
+    secrets:
+      SSL_KEY_STORE_PASSWORD:
+        description: 'Password for the SSL key store'
+        required: true
+      JWT_SECRET:
+        description: 'Secret for JWT signing'
+        required: true
     outputs:
       backend_coverage:
         description: 'Backend test coverage percentage'

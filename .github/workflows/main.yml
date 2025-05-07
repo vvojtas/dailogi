@@ -10,6 +10,9 @@ jobs:
     name: Run All Tests
     
     uses: ./.github/workflows/run-tests.yml
+    secrets:
+      SSL_KEY_STORE_PASSWORD: ${{ secrets.SSL_KEY_STORE_PASSWORD }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
     with:
       artifact_retention_days: 7
     permissions:
