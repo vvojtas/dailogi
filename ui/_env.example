@@ -1,0 +1,5 @@
+# .env file for d-AI-logi UI (Astro)
+
+# Base URL for the Java backend API (used by server-side API routes/proxies)
+# Make sure this matches where your Java backend is running (e.g., https://localhost:8080 if not default port)
+SPRING_BACKEND_BASE_URL=https://localhost
