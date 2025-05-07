@@ -21,6 +21,7 @@ jobs:
     name: Run All Tests
     needs: lint
     runs-on: ubuntu-latest
+    environment: ci-test
     
     steps:
       - uses: actions/checkout@v4
