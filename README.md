@@ -1,5 +1,7 @@
 # d‑AI‑logi
 
+TEST
+
 Welcome to **d‑AI‑logi**, an interactive web application that combines engaging AI-driven dialogues with an innovative flashcard-based learning system. This project leverages state-of-the-art AI models to generate flashcards from user-supplied text, allowing users to learn more efficiently while interacting with dynamic AI personas.
 
 ## Table of Contents
