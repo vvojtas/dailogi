@@ -106,9 +106,9 @@ jobs:
               exit 1
             fi
             echo "Backend not yet ready (attempt ${attempt}/${MAX_ATTEMPTS}). Waiting ${SLEEP_INTERVAL}s..."
-            if [ "$attempt" -gt "3" ]; then
-              echo "Current backend startup log snippet:"
-              tail -n 10 backend_startup.log || echo "Could not tail backend_startup.log"
+            if [ "$attempt" -gt "1" ]; then
+              echo "Current backend startup log snippet (last 50 lines):"
+              tail -n 50 backend_startup.log || echo "Could not tail backend_startup.log"
             fi
             sleep $SLEEP_INTERVAL
           done
