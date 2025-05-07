@@ -81,6 +81,10 @@ jobs:
       - name: Build backend with Maven
         working-directory: ./be/dailogi-server
         run: mvn clean package -DskipTests
+
+      - name: Clean previous backend startup log
+        working-directory: ./be/dailogi-server
+        run: rm -f backend_startup.log
         
       - name: Start backend server
         working-directory: ./be/dailogi-server
