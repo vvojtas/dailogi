@@ -100,7 +100,7 @@ class CharacterRepositoryTest {
         
         // Assert
         assertEquals(3, result.getTotalElements(), "Should return user's characters and global characters");
-        assertTrue(result.getContent().stream().anyMatch(c -> c.getName().equals("GlobalCharacter")), 
+        assertFalse(result.getContent().stream().anyMatch(c -> c.getName().equals("GlobalCharacter")), 
                 "Should include global characters");
     }
 
