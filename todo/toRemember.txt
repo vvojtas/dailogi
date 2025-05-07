@@ -3,3 +3,5 @@ hardcoded 80 port
 https
 
 search na characterach
+
+jwt password

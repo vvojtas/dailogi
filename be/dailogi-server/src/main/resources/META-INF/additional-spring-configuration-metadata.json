@@ -51,6 +51,11 @@
       "type": "java.lang.String",
       "sourceType": "com.github.vvojtas.dailogi_server.properties.E2ETestUserProperties",
       "description": "Password for the E2E test user."
+    },
+    {
+      "name": "server.http.port",
+      "type": "java.lang.String",
+      "description": "HTTP port for the server."
     }
   ]
 }
