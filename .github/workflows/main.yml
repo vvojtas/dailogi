@@ -22,6 +22,9 @@ jobs:
     needs: lint
     runs-on: ubuntu-latest
     environment: ci-test
+    outputs:
+      backend_coverage: ${{ steps.extract-backend-coverage.outputs.coverage }}
+      frontend_coverage: ${{ steps.extract-frontend-coverage.outputs.coverage }}
     
     steps:
       - uses: actions/checkout@v4
@@ -38,6 +41,20 @@ jobs:
         working-directory: ./be/dailogi-server
         run: mvn jacoco:report
       
+      - name: Extract backend coverage
+        id: extract-backend-coverage
+        working-directory: ./be/dailogi-server
+        run: |
+          COVERAGE_FILE="target/site/jacoco/index.html"
+          if [ -f "$COVERAGE_FILE" ]; then
+            TOTAL_COVERAGE=$(grep -o 'Total[^%]*%' "$COVERAGE_FILE" | grep -o '[0-9]*%' | head -1)
+            echo "coverage=$TOTAL_COVERAGE" >> $GITHUB_OUTPUT
+            echo "Backend test coverage: $TOTAL_COVERAGE"
+          else
+            echo "coverage=N/A" >> $GITHUB_OUTPUT
+            echo "Coverage file not found"
+          fi
+      
       - name: Upload JaCoCo coverage report
         uses: actions/upload-artifact@v4
         with:
@@ -52,6 +69,20 @@ jobs:
       - name: Run frontend tests
         working-directory: ./ui
         run: npm run test:coverage
+      
+      - name: Extract frontend coverage
+        id: extract-frontend-coverage
+        working-directory: ./ui
+        run: |
+          COVERAGE_FILE="coverage/index.html"
+          if [ -f "$COVERAGE_FILE" ]; then
+            TOTAL_COVERAGE=$(grep -o 'All files[^%]*%' "$COVERAGE_FILE" | grep -o '[0-9\.]*%' | head -1)
+            echo "coverage=$TOTAL_COVERAGE" >> $GITHUB_OUTPUT
+            echo "Frontend test coverage: $TOTAL_COVERAGE"
+          else
+            echo "coverage=N/A" >> $GITHUB_OUTPUT
+            echo "Coverage file not found"
+          fi
       
       - name: Upload Vitest coverage report
         uses: actions/upload-artifact@v4
@@ -126,24 +157,7 @@ jobs:
         run: |
           echo "# Test Results Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
-          # Backend coverage
-          BACKEND_COVERAGE_FILE="artifacts/backend-coverage/index.html"
-          if [ -f "$BACKEND_COVERAGE_FILE" ]; then
-            BACKEND_COVERAGE=$(grep -o 'Total[^%]*%' "$BACKEND_COVERAGE_FILE" | grep -o '[0-9]*%' | head -1)
-            echo "- Backend test coverage: $BACKEND_COVERAGE" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "- Backend test coverage: N/A" >> $GITHUB_STEP_SUMMARY
-          fi
-          
-          # Frontend coverage
-          FRONTEND_COVERAGE_FILE="artifacts/frontend-coverage/index.html"
-          if [ -f "$FRONTEND_COVERAGE_FILE" ]; then
-            FRONTEND_COVERAGE=$(grep -o 'All files[^%]*%' "$FRONTEND_COVERAGE_FILE" | grep -o '[0-9\.]*%' | head -1)
-            echo "- Frontend test coverage: $FRONTEND_COVERAGE" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "- Frontend test coverage: N/A" >> $GITHUB_STEP_SUMMARY
-          fi
-          
+          echo "- Backend test coverage: ${{ needs.run-tests.outputs.backend_coverage || 'N/A' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Frontend test coverage: ${{ needs.run-tests.outputs.frontend_coverage || 'N/A' }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "For detailed reports, check the workflow artifacts." >> $GITHUB_STEP_SUMMARY 

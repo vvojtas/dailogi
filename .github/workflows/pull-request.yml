@@ -21,6 +21,8 @@ jobs:
     name: Backend Unit Tests
     needs: lint
     runs-on: ubuntu-latest
+    outputs:
+      coverage: ${{ steps.jacoco-coverage.outputs.coverage }}
     defaults:
       run:
         working-directory: ./be/dailogi-server
@@ -59,6 +61,8 @@ jobs:
     name: Frontend Unit Tests
     needs: lint
     runs-on: ubuntu-latest
+    outputs:
+      coverage: ${{ steps.vitest-coverage.outputs.coverage }}
     defaults:
       run:
         working-directory: ./ui
@@ -193,8 +197,8 @@ jobs:
             const emoji = status === "success" ? "✅" : "❌";
             const title = status === "success" ? "All checks passed!" : "Checks failed!";
             
-            const backendCoverage = "${{ needs.backend-tests.outputs.jacoco-coverage || 'N/A' }}";
-            const frontendCoverage = "${{ needs.frontend-tests.outputs.vitest-coverage || 'N/A' }}";
+            const backendCoverage = "${{ needs.backend-tests.outputs.coverage || 'N/A' }}";
+            const frontendCoverage = "${{ needs.frontend-tests.outputs.coverage || 'N/A' }}";
             
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
