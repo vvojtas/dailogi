@@ -30,14 +30,13 @@ jobs:
     name: Build and Push Images
     needs: tests
     runs-on: ubuntu-latest
-    environment: prod # Assumes 'prod' GitHub Environment is configured and has PUBLIC_ENV_NAME secret
     strategy:
       matrix:
         service:
-          - name: ${{ env.SERVER_IMAGE_NAME }}
+          - name: dailogi-server
             context: ./be/dailogi-server
             dockerfile: ./be/dailogi-server/Dockerfile
-          - name: ${{ env.UI_IMAGE_NAME }}
+          - name: dailogi-ui
             context: ./ui
             dockerfile: ./ui/Dockerfile
             build_args: ""
