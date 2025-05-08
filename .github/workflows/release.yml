@@ -22,7 +22,9 @@ jobs:
   tests:
     name: Run All Tests
     uses: ./.github/workflows/run-tests.yml
-    secrets: inherit # Inherits all secrets from the caller's context that match the callee's defined secrets.
+    secrets:
+      SSL_KEY_STORE_PASSWORD: ${{ secrets.SSL_KEY_STORE_PASSWORD }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
     # inputs: # Pass any inputs run-tests.yml expects, e.g.:
     #   artifact_retention_days: 7
 
