@@ -1,14 +1,14 @@
 import type { APIRoute } from "astro";
 import { SESSION_COOKIE_NAME, createExpiredCookieOptions } from "@/lib/config/cookies";
 
-const backendBaseUrl = import.meta.env.SPRING_BACKEND_BASE_URL;
+const backendBaseUrl = process.env.SPRING_BACKEND_BASE_URL;
 
 export const ALL: APIRoute = async ({ request, cookies, params }) => {
   const token = cookies.get(SESSION_COOKIE_NAME)?.value;
   const slug = params.slug;
 
   if (!backendBaseUrl) {
-    console.error("BACKEND_API_URL environment variable is not set.");
+    console.error("SPRING_BACKEND_BASE_URL environment variable is not set.");
     return new Response(JSON.stringify({ message: "Backend service configuration error." }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

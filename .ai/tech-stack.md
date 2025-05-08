@@ -42,4 +42,5 @@
 
 ## CI/CD i Hosting
 - Github Actions do tworzenia pipeline'ów CI/CD
-- Konteneryzacja aplikacji za pomocą Docker 
+- Konteneryzacja aplikacji za pomocą Docker
+- DigitalOcean App Platform do hostowania aplikacji Astro i backendu Java

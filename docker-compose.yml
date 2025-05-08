@@ -1,0 +1,87 @@
+services:
+  dailogi-server:
+    build:
+      context: ./be/dailogi-server
+      dockerfile: Dockerfile
+    image: dailogi-server:${GIT_TAG:-latest}
+    container_name: dailogi-server
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_HTTP_PORT:-8080}:${SERVER_PORT:-8080}" # Host:Container; SERVER_PORT inside container defaults to 8080
+      # If backend handles HTTPS directly (less common behind a gateway):
+      - "${BACKEND_HTTPS_PORT:-8443}:${SERVER_HTTPS_PORT:-8443}"
+    environment:
+      - SERVER_PORT=${SERVER_HTTPS_PORT:-8443} # Spring boot port
+      - SERVER_HTTP_PORT=${SERVER_PORT:-8080} # Spring boot port
+      # Database connection - ensure these match your postgres-db service
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/${POSTGRES_DB:-dailogidb}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER:-dailogiuser}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:-dailogipass}
+      #
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
+      - SSL_KEY_STORE_PASSWORD=${SSL_KEY_STORE_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - SONAR_TOKEN=${SONAR_TOKEN}
+
+      # Add other backend specific environment variables here
+      # Example: - JWT_SECRET=your_super_secret_jwt_key
+    depends_on:
+      postgres-db:
+        condition: service_healthy # Wait for DB to be healthy
+    networks:
+      - dailogi-net
+
+  dailogi-ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    image: dailogi-ui:${GIT_TAG:-latest}
+    container_name: dailogi-ui
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_HTTP_PORT:-3000}:${PORT:-3000}" # Host:Container; PORT inside container defaults to 3000
+    environment:
+      - PORT=${PORT:-3000} # Astro server port
+      - HOST=0.0.0.0
+      # URL for the backend API, accessible from the browser or via server-side calls
+      # If running locally via docker-compose, this would be http://dailogi-server:BACKEND_PORT_IN_CONTAINER
+      # If frontend calls backend from browser, it needs the host-exposed backend URL.
+      # For server-to-server calls from Astro backend to Spring backend:
+      - SPRING_BACKEND_BASE_URL=https://dailogi-server:${SERVER_PORT:-8443}
+      # For client-side calls, you might need to set a public URL variable during build or runtime:
+      # Example: PUBLIC_BACKEND_API_URL=http://localhost:${BACKEND_HTTP_PORT:-8080}/api
+      # This needs to be handled by your Astro app's configuration strategy.
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+    depends_on:
+      - dailogi-server
+    networks:
+      - dailogi-net
+
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: postgres-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-dailogiuser}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-dailogipass}
+      - POSTGRES_DB=${POSTGRES_DB:-dailogidb}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432" # Expose DB port to host (optional, for direct access)
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dailogiuser} -d ${POSTGRES_DB:-dailogidb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dailogi-net
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  dailogi-net:
+    driver: bridge 

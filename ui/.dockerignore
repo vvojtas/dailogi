@@ -1,0 +1,43 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.pnp.cjs
+*.pnp.loader.mjs
+.pnp.meta.json
+
+# Astro
+dist/
+.astro/
+
+# Test & Coverage artifacts
+coverage/
+playwright-report/
+test-results/
+junit.xml
+
+# Logs
+*.log
+logs/
+
+# IDE files
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+.DS_Store
+.vscode/
+
+# OS generated files
+Thumbs.db
+
+# Secrets or local configs not for image
+.env
+.env.*
+!/.env.example
+
+# Git
+.git/
+.gitignore 

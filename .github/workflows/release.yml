@@ -1,0 +1,135 @@
+name: Release CI/CD
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  packages: write # Required to push images to GHCR
+  id-token: write # Required for OIDC if used by actions, good to have
+
+env:
+  GIT_TAG: ${{ github.ref_name }}
+  GHCR_REGISTRY: ghcr.io
+  ORG_NAME: vvojtas # Your GitHub organization or username
+  REPO_NAME: dailogi # Your GitHub repository name
+  SERVER_IMAGE_NAME: dailogi-server
+  UI_IMAGE_NAME: dailogi-ui
+
+jobs:
+  tests:
+    name: Run All Tests
+    uses: ./.github/workflows/run-tests.yml
+    secrets: inherit # Inherits all secrets from the caller's context that match the callee's defined secrets.
+    # inputs: # Pass any inputs run-tests.yml expects, e.g.:
+    #   artifact_retention_days: 7
+
+  build-and-push-images:
+    name: Build and Push Images
+    needs: tests
+    runs-on: ubuntu-latest
+    environment: prod # Assumes 'prod' GitHub Environment is configured and has PUBLIC_ENV_NAME secret
+    strategy:
+      matrix:
+        service:
+          - name: ${{ env.SERVER_IMAGE_NAME }}
+            context: ./be/dailogi-server
+            dockerfile: ./be/dailogi-server/Dockerfile
+          - name: ${{ env.UI_IMAGE_NAME }}
+            context: ./ui
+            dockerfile: ./ui/Dockerfile
+            build_args: ""
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.GHCR_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.GHCR_REGISTRY }}/${{ env.ORG_NAME }}/${{ env.REPO_NAME }}/${{ matrix.service.name }}
+          tags: |
+            type=raw,value=${{ env.GIT_TAG }}
+            type=sha,prefix=,suffix=,format=short
+
+      - name: Build and push Docker image for ${{ matrix.service.name }}
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.service.context }}
+          file: ${{ matrix.service.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: ${{ matrix.service.build_args }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-to-digitalocean:
+    name: Deploy to DigitalOcean App Platform
+    needs: build-and-push-images
+    runs-on: ubuntu-latest
+    environment: prod # Assumes 'prod' GitHub Environment is configured and has DIGITALOCEAN_ACCESS_TOKEN secret
+    steps:
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Deploy to DigitalOcean App Platform
+        run: |
+          # IMPORTANT: Replace NEW-DIGITAL-OCEAN-APP with your actual DigitalOcean App ID or Name.
+          # IMPORTANT: Verify that the component names in your DO App Spec match the image names used below (e.g., dailogi-server, dailogi-ui).
+          # If your DO app components are named differently (e.g., 'backend', 'frontend'), adjust the image parameters accordingly.
+          # Example: --image backend=${{ env.GHCR_REGISTRY }}/${{ env.ORG_NAME }}/${{ env.REPO_NAME }}/${{ env.SERVER_IMAGE_NAME }}:${{ env.GIT_TAG }}
+          doctl apps update NEW-DIGITAL-OCEAN-APP \
+            --image ${{ env.SERVER_IMAGE_NAME }}=${{ env.GHCR_REGISTRY }}/${{ env.ORG_NAME }}/${{ env.REPO_NAME }}/${{ env.SERVER_IMAGE_NAME }}:${{ env.GIT_TAG }} \
+            --image ${{ env.UI_IMAGE_NAME }}=${{ env.GHCR_REGISTRY }}/${{ env.ORG_NAME }}/${{ env.REPO_NAME }}/${{ env.UI_IMAGE_NAME }}:${{ env.GIT_TAG }}
+        env:
+          # This env var is just for clarity in the logs if needed, the actual app name is in the command.
+          DIGITALOCEAN_APP_ID_OR_NAME: "NEW-DIGITAL-OCEAN-APP"
+
+      # Optional: More robust deployment by updating the App Spec directly
+      # This is useful if the --image flag is not sufficient or for more complex changes.
+      # - name: Checkout repository # Needed if app spec is in repo, otherwise skip
+      #   uses: actions/checkout@v4
+
+      # - name: Get App Spec
+      #   id: get_spec
+      #   run: |
+      #     doctl apps spec get ${{ env.DIGITALOCEAN_APP_ID_OR_NAME }} > app_spec.yaml
+      #     echo "Fetched app_spec.yaml"
+
+      # - name: Update App Spec with new image tags (example using yq for YAML)
+      #   # This step requires yq to be installed (e.g., via mikefarah/yq@master action)
+      #   # Or use other tools like sed, awk, or a script.
+      #   run: |
+      #     echo "Updating app_spec.yaml with new image tags..."
+      #     # Example: Update service 'dailogi-server' and 'dailogi-ui'
+      #     # Adjust .services[] names and paths according to your actual App Spec structure.
+      #     yq e '.services[] |= (select(.name == "${{ env.SERVER_IMAGE_NAME }}") .image.tag = "${{ env.GIT_TAG }}" else . )' -i app_spec.yaml
+      #     yq e '.services[] |= (select(.name == "${{ env.UI_IMAGE_NAME }}") .image.tag = "${{ env.GIT_TAG }}" else . )' -i app_spec.yaml
+      #     # For jobs or other component types, the yq path would differ.
+      #     echo "--- Updated app_spec.yaml --- "
+      #     cat app_spec.yaml
+      #     echo "---------------------------"
+
+      # - name: Validate updated App Spec (optional but recommended)
+      #   run: doctl apps spec validate app_spec.yaml
+
+      # - name: Apply updated App Spec
+      #   run: doctl apps update ${{ env.DIGITALOCEAN_APP_ID_OR_NAME }} --spec app_spec.yaml
+
+      # - name: Trigger new deployment (if not automatic after spec update or --wait desired)
+      #   run: doctl apps create-deployment ${{ env.DIGITALOCEAN_APP_ID_OR_NAME }} --wait 
