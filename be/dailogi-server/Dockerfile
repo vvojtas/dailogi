@@ -36,10 +36,10 @@ USER appuser
 
 # Expose the application port (default 8080, can be overridden by SERVER_PORT env var)
 EXPOSE 8080
-EXPOSE 8443
 
-# Default port, can be overridden by environment variable at runtime
+# Default port and bind address, can be overridden by environment variables at runtime
 ENV SERVER_PORT=8080
+ENV SERVER_ADDRESS=0.0.0.0
 
 # Healthcheck
 # Spring Boot Actuator health endpoint

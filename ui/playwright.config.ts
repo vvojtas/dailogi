@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename);
  */
 dotenv.config({ path: path.resolve(__dirname, ".env.e2e") });
 
-const springBackendUrl = process.env.SPRING_BACKEND_BASE_URL ?? "https://localhost:8443";
+const springBackendUrl = process.env.SPRING_BACKEND_BASE_URL ?? "http://localhost:8080";
 if (!process.env.SPRING_BACKEND_BASE_URL) {
   console.warn(
     `WARN: SPRING_BACKEND_BASE_URL not found in process.env (expected from .env.e2e), defaulting webServer to ${springBackendUrl}`

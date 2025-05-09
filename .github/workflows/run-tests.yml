@@ -9,9 +9,6 @@ on:
         type: number
         default: 7
     secrets:
-      SSL_KEY_STORE_PASSWORD:
-        description: 'Password for the SSL key store'
-        required: true
       JWT_SECRET:
         description: 'Secret for JWT signing'
         required: true
@@ -118,7 +115,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: ci-test
     env:
-      SSL_KEY_STORE_PASSWORD: ${{ secrets.SSL_KEY_STORE_PASSWORD }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
     
     steps:
@@ -144,7 +140,7 @@ jobs:
           MAX_ATTEMPTS=12
           SLEEP_INTERVAL=10
           attempt=0
-          until curl -k --silent --fail https://localhost:8443/actuator/health > /dev/null 2>&1; do
+          until curl --silent --fail http://localhost:8080/actuator/health > /dev/null 2>&1; do
             attempt=$((attempt + 1))
             if [ "$attempt" -ge "$MAX_ATTEMPTS" ]; then
               echo "Backend did not start after ${MAX_ATTEMPTS} attempts"

@@ -23,7 +23,6 @@ jobs:
     name: Run All Tests
     uses: ./.github/workflows/run-tests.yml
     secrets:
-      SSL_KEY_STORE_PASSWORD: ${{ secrets.SSL_KEY_STORE_PASSWORD }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
     # inputs: # Pass any inputs run-tests.yml expects, e.g.:
     #   artifact_retention_days: 7
@@ -99,7 +98,7 @@ jobs:
             --image ${{ env.UI_IMAGE_NAME }}=${{ env.GHCR_REGISTRY }}/${{ env.ORG_NAME }}/${{ env.REPO_NAME }}/${{ env.UI_IMAGE_NAME }}:${{ env.GIT_TAG }}
         env:
           # This env var is just for clarity in the logs if needed, the actual app name is in the command.
-          DIGITALOCEAN_APP_ID_OR_NAME: "NEW-DIGITAL-OCEAN-APP"
+          DIGITALOCEAN_APP_ID_OR_NAME: "dailogi"
 
       # Optional: More robust deployment by updating the App Spec directly
       # This is useful if the --image flag is not sufficient or for more complex changes.

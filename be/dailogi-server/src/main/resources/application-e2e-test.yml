@@ -14,9 +14,7 @@ spring:
     enabled: true 
 
 server:
-  port: 8443
-  http:
-    port: 8080
+  port: 8080
 
 # E2E test user configuration
 dailogi:

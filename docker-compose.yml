@@ -8,18 +8,14 @@ services:
     restart: unless-stopped
     ports:
       - "${BACKEND_HTTP_PORT:-8080}:${SERVER_PORT:-8080}" # Host:Container; SERVER_PORT inside container defaults to 8080
-      # If backend handles HTTPS directly (less common behind a gateway):
-      - "${BACKEND_HTTPS_PORT:-8443}:${SERVER_HTTPS_PORT:-8443}"
     environment:
-      - SERVER_PORT=${SERVER_HTTPS_PORT:-8443} # Spring boot port
-      - SERVER_HTTP_PORT=${SERVER_PORT:-8080} # Spring boot port
+      - SERVER_PORT=${SERVER_PORT:-8080} # Spring boot port
       # Database connection - ensure these match your postgres-db service
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/${POSTGRES_DB:-dailogidb}
       - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER:-dailogiuser}
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:-dailogipass}
       #
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
-      - SSL_KEY_STORE_PASSWORD=${SSL_KEY_STORE_PASSWORD}
       - JWT_SECRET=${JWT_SECRET}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - SONAR_TOKEN=${SONAR_TOKEN}
@@ -48,11 +44,10 @@ services:
       # If running locally via docker-compose, this would be http://dailogi-server:BACKEND_PORT_IN_CONTAINER
       # If frontend calls backend from browser, it needs the host-exposed backend URL.
       # For server-to-server calls from Astro backend to Spring backend:
-      - SPRING_BACKEND_BASE_URL=https://dailogi-server:${SERVER_PORT:-8443}
+      - SPRING_BACKEND_BASE_URL=http://dailogi-server:${SERVER_PORT:-8080}
       # For client-side calls, you might need to set a public URL variable during build or runtime:
       # Example: PUBLIC_BACKEND_API_URL=http://localhost:${BACKEND_HTTP_PORT:-8080}/api
       # This needs to be handled by your Astro app's configuration strategy.
-      - NODE_TLS_REJECT_UNAUTHORIZED=0
     depends_on:
       - dailogi-server
     networks:
