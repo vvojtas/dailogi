@@ -83,16 +83,14 @@ jobs:
     environment: prod # Assumes 'prod' GitHub Environment is configured and has DIGITALOCEAN_ACCESS_TOKEN secret
     env:
       DIGITALOCEAN_APP_ID: "dailogi-3ugdc" # Replace with your actual DigitalOcean App ID
+      IMAGE_TAG_DAILOGI_SERVER: ${{ github.ref_name }}
+      IMAGE_TAG_DAILOGI_UI: ${{ github.ref_name }}
     steps:
-      - name: Install doctl
-        uses: digitalocean/action-doctl@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to DigitalOcean App Platform
+        uses: digitalocean/app_action/deploy@v2
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-
-      - name: Update DigitalOcean App Platform
-        run: |
-          # Using component-specific deployment to ensure compatibility with older doctl versions
-          doctl apps create-deployment ${{ env.DIGITALOCEAN_APP_ID }} \
-            --image ${{ env.SERVER_IMAGE_NAME }}=${{ env.GHCR_REGISTRY }}/${{ env.ORG_NAME }}/${{ env.REPO_NAME }}/${{ env.SERVER_IMAGE_NAME }}:${{ env.GIT_TAG }} \
-            --image ${{ env.UI_IMAGE_NAME }}=${{ env.GHCR_REGISTRY }}/${{ env.ORG_NAME }}/${{ env.REPO_NAME }}/${{ env.UI_IMAGE_NAME }}:${{ env.GIT_TAG }} \
-            --wait 
+          app_name: ${{ env.DIGITALOCEAN_APP_ID }} 
