@@ -41,10 +41,10 @@ services:
     value: /server/swagger-ui/custom.html
   http_port: 8080
   image:
-    registry: ${{env.GHCR_REGISTRY}}
+    registry: vvojtas
     registry_credentials: EV[1:cRBzD9r08L8Ue6VCVirtDnMmxdZJwrwS:Q1ruTX7NBJK+8yvv1ushsHBk4ec2nUEhm8xPB2G0By0SyPwzzA/OxWeoM0J63+5UhMcChteKlOqmsZm4+qcsLQ==]
     registry_type: GHCR
-    repository: ${{env.ORG_NAME}}/${{env.REPO_NAME}}/${{env.SERVER_IMAGE_NAME}}
+    repository: dailogi/dailogi-server
     tag: ${{env.IMAGE_TAG_DAILOGI_SERVER}}
   instance_count: 1
   instance_size_slug: apps-s-1vcpu-0.5gb
@@ -55,10 +55,10 @@ services:
     value: http://vvojtas-dailogi-dailogi-server
   http_port: 8080
   image:
-    registry: ${{env.GHCR_REGISTRY}}
+    registry: vvojtas
     registry_credentials: EV[1:E2sADg/NhXMh82OkLDd6s3gQQa4+DZB9:lh/zQAile86IJp1O+jk2VPBfgJQ4UtoQqNgexOtJowhRlGFDCYaAk+GUrWVDMPRSP/av8Y/Jre9vntVjfu5jcw==]
     registry_type: GHCR
-    repository: ${{env.ORG_NAME}}/${{env.REPO_NAME}}/${{env.UI_IMAGE_NAME}}
+    repository: dailogi/dailogi-ui
     tag: ${{env.IMAGE_TAG_DAILOGI_UI}}
   instance_count: 1
   instance_size_slug: apps-s-1vcpu-0.5gb
