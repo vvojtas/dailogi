@@ -82,8 +82,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: prod # Assumes 'prod' GitHub Environment is configured and has DIGITALOCEAN_ACCESS_TOKEN secret
     env:
-      IMAGE_TAG_DAILOGI_SERVER: ${{ github.ref_name }}
-      IMAGE_TAG_DAILOGI_UI: ${{ github.ref_name }}
+      GIT_TAG: ${{ env.GIT_TAG }}
+      GHCR_CREDENTIALS: ${{ secrets.GHCR_CREDENTIALS }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
