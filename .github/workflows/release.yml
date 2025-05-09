@@ -82,7 +82,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: prod # Assumes 'prod' GitHub Environment is configured and has DIGITALOCEAN_ACCESS_TOKEN secret
     env:
-      GIT_TAG: ${{ env.GIT_TAG }}
+      GIT_TAG: ${{ github.ref_name }}
       GHCR_CREDENTIALS: ${{ secrets.GHCR_CREDENTIALS }}
     steps:
       - name: Checkout repository
