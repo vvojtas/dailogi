@@ -1,0 +1,351 @@
+{
+  "app": {
+    "id": "e946367f-a728-47bb-af82-ed66a9437a88",
+    "owner_uuid": "f1923221-7f27-4dcd-a531-c3cd5e1362d0",
+    "spec": {
+      "name": "dailogi",
+      "services": [
+        {
+          "name": "vvojtas-dailogi-dailogi-server",
+          "image": {
+            "registry_type": "GHCR",
+            "registry": "vvojtas",
+            "repository": "dailogi/dailogi-server",
+            "tag": "v1.0.6",
+            "registry_credentials": "EV[1:cRBzD9r08L8Ue6VCVirtDnMmxdZJwrwS:Q1ruTX7NBJK+8yvv1ushsHBk4ec2nUEhm8xPB2G0By0SyPwzzA/OxWeoM0J63+5UhMcChteKlOqmsZm4+qcsLQ==]"
+          },
+          "envs": [
+            {
+              "key": "JWT_SECRET",
+              "value": "EV[1:4SJ++wcmjcc1GKGLCXY8Pmp/mdwSmehF:0jKZq4ktITuzsDVv7+Ua+Ql5/cHJiEKOCIOgoc2gbi3IJkQPsM05oVYbw8zLj/jNwQrkN2tmtwKT+u0QPtW1kqb0]",
+              "scope": "RUN_AND_BUILD_TIME",
+              "type": "SECRET"
+            },
+            {
+              "key": "DB_PASSWORD",
+              "value": "EV[1:DQ0fhn3ogaAPe0qdqW/3nGIw218YaGs9:kuhn8RU5oKtlx71bDOCpmRYFXC73dkAQRGOCQXctLA==]",
+              "scope": "RUN_AND_BUILD_TIME",
+              "type": "SECRET"
+            },
+            {
+              "key": "SPRING_PROFILES_ACTIVE",
+              "value": "prod",
+              "scope": "RUN_AND_BUILD_TIME"
+            },
+            {
+              "key": "SPRINGDOC_API_DOCS_PATH",
+              "value": "/v3/api-docs",
+              "scope": "RUN_AND_BUILD_TIME"
+            },
+            {
+              "key": "SPRINGDOC_API_SWAGGER_UI_CONFIG_URL",
+              "value": "/server/v3/api-docs/swagger-config",
+              "scope": "RUN_AND_BUILD_TIME"
+            },
+            {
+              "key": "SPRINGDOC_API_SWAGGER_UI_PATH",
+              "value": "/server/swagger-ui/custom.html",
+              "scope": "RUN_AND_BUILD_TIME"
+            }
+          ],
+          "instance_size_slug": "apps-s-1vcpu-0.5gb",
+          "instance_count": 1,
+          "http_port": 8080
+        },
+        {
+          "name": "vvojtas-dailogi-dailogi-ui",
+          "image": {
+            "registry_type": "GHCR",
+            "registry": "vvojtas",
+            "repository": "dailogi/dailogi-ui",
+            "tag": "v1.0.6",
+            "registry_credentials": "EV[1:E2sADg/NhXMh82OkLDd6s3gQQa4+DZB9:lh/zQAile86IJp1O+jk2VPBfgJQ4UtoQqNgexOtJowhRlGFDCYaAk+GUrWVDMPRSP/av8Y/Jre9vntVjfu5jcw==]"
+          },
+          "envs": [
+            {
+              "key": "SPRING_BACKEND_BASE_URL",
+              "value": "http://vvojtas-dailogi-dailogi-server",
+              "scope": "RUN_AND_BUILD_TIME"
+            }
+          ],
+          "instance_size_slug": "apps-s-1vcpu-0.5gb",
+          "instance_count": 1,
+          "http_port": 8080
+        }
+      ],
+      "region": "fra",
+      "alerts": [{ "rule": "DEPLOYMENT_FAILED" }, { "rule": "DOMAIN_FAILED" }],
+      "ingress": {
+        "rules": [
+          {
+            "match": { "path": { "prefix": "/" } },
+            "component": { "name": "vvojtas-dailogi-dailogi-ui" }
+          },
+          {
+            "match": { "path": { "prefix": "/server" } },
+            "component": { "name": "vvojtas-dailogi-dailogi-server" }
+          }
+        ]
+      },
+      "features": ["buildpack-stack=ubuntu-22"]
+    },
+    "last_deployment_active_at": "2025-05-09T21:07:06Z",
+    "default_ingress": "https://dailogi-3ugdc.ondigitalocean.app",
+    "created_at": "2025-05-08T22:49:43Z",
+    "updated_at": "2025-05-09T21:07:12Z",
+    "active_deployment": {
+      "id": "108e13c2-cb1b-4464-a143-4adb26748bb9",
+      "spec": {
+        "name": "dailogi",
+        "services": [
+          {
+            "name": "vvojtas-dailogi-dailogi-server",
+            "image": {
+              "registry_type": "GHCR",
+              "registry": "vvojtas",
+              "repository": "dailogi/dailogi-server",
+              "tag": "v1.0.6",
+              "registry_credentials": "EV[1:cRBzD9r08L8Ue6VCVirtDnMmxdZJwrwS:Q1ruTX7NBJK+8yvv1ushsHBk4ec2nUEhm8xPB2G0By0SyPwzzA/OxWeoM0J63+5UhMcChteKlOqmsZm4+qcsLQ==]"
+            },
+            "envs": [
+              {
+                "key": "JWT_SECRET",
+                "value": "EV[1:4SJ++wcmjcc1GKGLCXY8Pmp/mdwSmehF:0jKZq4ktITuzsDVv7+Ua+Ql5/cHJiEKOCIOgoc2gbi3IJkQPsM05oVYbw8zLj/jNwQrkN2tmtwKT+u0QPtW1kqb0]",
+                "scope": "RUN_AND_BUILD_TIME",
+                "type": "SECRET"
+              },
+              {
+                "key": "DB_PASSWORD",
+                "value": "EV[1:DQ0fhn3ogaAPe0qdqW/3nGIw218YaGs9:kuhn8RU5oKtlx71bDOCpmRYFXC73dkAQRGOCQXctLA==]",
+                "scope": "RUN_AND_BUILD_TIME",
+                "type": "SECRET"
+              },
+              {
+                "key": "SPRING_PROFILES_ACTIVE",
+                "value": "prod",
+                "scope": "RUN_AND_BUILD_TIME"
+              },
+              {
+                "key": "SPRINGDOC_API_DOCS_PATH",
+                "value": "/v3/api-docs",
+                "scope": "RUN_AND_BUILD_TIME"
+              },
+              {
+                "key": "SPRINGDOC_API_SWAGGER_UI_CONFIG_URL",
+                "value": "/server/v3/api-docs/swagger-config",
+                "scope": "RUN_AND_BUILD_TIME"
+              },
+              {
+                "key": "SPRINGDOC_API_SWAGGER_UI_PATH",
+                "value": "/server/swagger-ui/custom.html",
+                "scope": "RUN_AND_BUILD_TIME"
+              }
+            ],
+            "instance_size_slug": "apps-s-1vcpu-0.5gb",
+            "instance_count": 1,
+            "http_port": 8080
+          },
+          {
+            "name": "vvojtas-dailogi-dailogi-ui",
+            "image": {
+              "registry_type": "GHCR",
+              "registry": "vvojtas",
+              "repository": "dailogi/dailogi-ui",
+              "tag": "v1.0.6",
+              "registry_credentials": "EV[1:E2sADg/NhXMh82OkLDd6s3gQQa4+DZB9:lh/zQAile86IJp1O+jk2VPBfgJQ4UtoQqNgexOtJowhRlGFDCYaAk+GUrWVDMPRSP/av8Y/Jre9vntVjfu5jcw==]"
+            },
+            "envs": [
+              {
+                "key": "SPRING_BACKEND_BASE_URL",
+                "value": "http://vvojtas-dailogi-dailogi-server",
+                "scope": "RUN_AND_BUILD_TIME"
+              }
+            ],
+            "instance_size_slug": "apps-s-1vcpu-0.5gb",
+            "instance_count": 1,
+            "http_port": 8080
+          }
+        ],
+        "region": "fra",
+        "alerts": [
+          { "rule": "DEPLOYMENT_FAILED" },
+          { "rule": "DOMAIN_FAILED" }
+        ],
+        "ingress": {
+          "rules": [
+            {
+              "match": { "path": { "prefix": "/" } },
+              "component": { "name": "vvojtas-dailogi-dailogi-ui" }
+            },
+            {
+              "match": { "path": { "prefix": "/server" } },
+              "component": { "name": "vvojtas-dailogi-dailogi-server" }
+            }
+          ]
+        },
+        "features": ["buildpack-stack=ubuntu-22"]
+      },
+      "services": [
+        {
+          "name": "vvojtas-dailogi-dailogi-server",
+          "source_image_digest": "sha256:9005805b269a5907c5aed9b20b255e8e0df0638069ec2134085f6e6696d235b8"
+        },
+        {
+          "name": "vvojtas-dailogi-dailogi-ui",
+          "source_image_digest": "sha256:0fe93932a860f79d815705caf8806ef08c37b64429593ceafe1e2ac337227808"
+        }
+      ],
+      "phase_last_updated_at": "2025-05-09T21:07:06Z",
+      "created_at": "2025-05-09T21:04:11Z",
+      "updated_at": "2025-05-09T21:07:06Z",
+      "cause": "app spec updated",
+      "progress": {
+        "success_steps": 9,
+        "total_steps": 9,
+        "steps": [
+          {
+            "name": "build",
+            "status": "SUCCESS",
+            "steps": [
+              {
+                "name": "initialize",
+                "status": "SUCCESS",
+                "started_at": "2025-05-09T21:04:12.562424960Z",
+                "ended_at": "2025-05-09T21:04:12.590788568Z"
+              },
+              {
+                "name": "components",
+                "status": "SUCCESS",
+                "steps": [
+                  {
+                    "name": "vvojtas-dailogi-dailogi-server",
+                    "status": "SUCCESS",
+                    "reason": {
+                      "code": "PreBuiltImage",
+                      "message": "Your build job was skipped because you specified a pre-built image."
+                    },
+                    "component_name": "vvojtas-dailogi-dailogi-server",
+                    "message_base": "Building service"
+                  },
+                  {
+                    "name": "vvojtas-dailogi-dailogi-ui",
+                    "status": "SUCCESS",
+                    "reason": {
+                      "code": "PreBuiltImage",
+                      "message": "Your build job was skipped because you specified a pre-built image."
+                    },
+                    "component_name": "vvojtas-dailogi-dailogi-ui",
+                    "message_base": "Building service"
+                  }
+                ],
+                "started_at": "2025-05-09T21:04:12.590831306Z",
+                "ended_at": "2025-05-09T21:04:12.591923961Z"
+              }
+            ],
+            "started_at": "2025-05-09T21:04:12.562209960Z",
+            "ended_at": "2025-05-09T21:04:12.592239713Z"
+          },
+          {
+            "name": "deploy",
+            "status": "SUCCESS",
+            "steps": [
+              {
+                "name": "initialize",
+                "status": "SUCCESS",
+                "started_at": "2025-05-09T21:05:22.170989893Z",
+                "ended_at": "2025-05-09T21:05:22.974958064Z"
+              },
+              {
+                "name": "components",
+                "status": "SUCCESS",
+                "steps": [
+                  {
+                    "name": "vvojtas-dailogi-dailogi-server",
+                    "status": "SUCCESS",
+                    "steps": [
+                      {
+                        "name": "deploy",
+                        "status": "SUCCESS",
+                        "component_name": "vvojtas-dailogi-dailogi-server",
+                        "message_base": "Deploying service"
+                      },
+                      {
+                        "name": "wait",
+                        "status": "SUCCESS",
+                        "component_name": "vvojtas-dailogi-dailogi-server",
+                        "message_base": "Waiting for service"
+                      }
+                    ],
+                    "component_name": "vvojtas-dailogi-dailogi-server"
+                  },
+                  {
+                    "name": "vvojtas-dailogi-dailogi-ui",
+                    "status": "SUCCESS",
+                    "steps": [
+                      {
+                        "name": "deploy",
+                        "status": "SUCCESS",
+                        "component_name": "vvojtas-dailogi-dailogi-ui",
+                        "message_base": "Deploying service"
+                      },
+                      {
+                        "name": "wait",
+                        "status": "SUCCESS",
+                        "component_name": "vvojtas-dailogi-dailogi-ui",
+                        "message_base": "Waiting for service"
+                      }
+                    ],
+                    "component_name": "vvojtas-dailogi-dailogi-ui"
+                  }
+                ],
+                "started_at": "2025-05-09T21:05:22.974976150Z",
+                "ended_at": "2025-05-09T21:07:04.592103580Z"
+              },
+              {
+                "name": "finalize",
+                "status": "SUCCESS",
+                "started_at": "2025-05-09T21:07:05.254780260Z",
+                "ended_at": "2025-05-09T21:07:06.259167524Z"
+              }
+            ],
+            "started_at": "2025-05-09T21:05:22.170968568Z",
+            "ended_at": "2025-05-09T21:07:06.259261979Z"
+          }
+        ]
+      },
+      "phase": "ACTIVE",
+      "tier_slug": "basic",
+      "previous_deployment_id": "dc58d371-9473-4ea5-8444-b07d9a6a3486",
+      "cause_details": {
+        "digitalocean_user_action": {
+          "user": {
+            "uuid": "2e3b050d-f4e0-4bd7-8636-d1b4b74ed399",
+            "email": "wojciech.oro.slusarczyk@gmail.com",
+            "full_name": "wojciech.oro.slusarczyk@gmail.com"
+          },
+          "name": "UPDATE_SPEC"
+        },
+        "type": "MANUAL"
+      },
+      "timing": {
+        "pending": "1.562424960s",
+        "build_total": "0.029814753s",
+        "build_billable": "0s"
+      }
+    },
+    "last_deployment_created_at": "2025-05-09T21:04:11Z",
+    "live_url": "https://dailogi-3ugdc.ondigitalocean.app",
+    "region": {
+      "slug": "fra",
+      "label": "Frankfurt",
+      "flag": "germany",
+      "continent": "Europe",
+      "data_centers": ["fra1"]
+    },
+    "tier_slug": "basic",
+    "live_url_base": "https://dailogi-3ugdc.ondigitalocean.app",
+    "live_domain": "dailogi-3ugdc.ondigitalocean.app",
+    "build_config": {},
+    "project_id": "816f879f-a59d-42c5-9eec-2ede6aebdc93"
+  }
+}

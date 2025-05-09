@@ -1,0 +1,65 @@
+alerts:
+- rule: DEPLOYMENT_FAILED
+- rule: DOMAIN_FAILED
+features:
+- buildpack-stack=ubuntu-22
+ingress:
+  rules:
+  - component:
+      name: vvojtas-dailogi-dailogi-ui
+    match:
+      path:
+        prefix: /
+  - component:
+      name: vvojtas-dailogi-dailogi-server
+    match:
+      path:
+        prefix: /server
+name: dailogi
+region: fra
+services:
+- envs:
+  - key: JWT_SECRET
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+    value: EV[1:4SJ++wcmjcc1GKGLCXY8Pmp/mdwSmehF:0jKZq4ktITuzsDVv7+Ua+Ql5/cHJiEKOCIOgoc2gbi3IJkQPsM05oVYbw8zLj/jNwQrkN2tmtwKT+u0QPtW1kqb0]
+  - key: DB_PASSWORD
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+    value: EV[1:DQ0fhn3ogaAPe0qdqW/3nGIw218YaGs9:kuhn8RU5oKtlx71bDOCpmRYFXC73dkAQRGOCQXctLA==]
+  - key: SPRING_PROFILES_ACTIVE
+    scope: RUN_AND_BUILD_TIME
+    value: prod
+  - key: SPRINGDOC_API_DOCS_PATH
+    scope: RUN_AND_BUILD_TIME
+    value: /v3/api-docs
+  - key: SPRINGDOC_API_SWAGGER_UI_CONFIG_URL
+    scope: RUN_AND_BUILD_TIME
+    value: /server/v3/api-docs/swagger-config
+  - key: SPRINGDOC_API_SWAGGER_UI_PATH
+    scope: RUN_AND_BUILD_TIME
+    value: /server/swagger-ui/custom.html
+  http_port: 8080
+  image:
+    registry: ${{env.GHCR_REGISTRY}}
+    registry_credentials: EV[1:cRBzD9r08L8Ue6VCVirtDnMmxdZJwrwS:Q1ruTX7NBJK+8yvv1ushsHBk4ec2nUEhm8xPB2G0By0SyPwzzA/OxWeoM0J63+5UhMcChteKlOqmsZm4+qcsLQ==]
+    registry_type: GHCR
+    repository: ${{env.ORG_NAME}}/${{env.REPO_NAME}}/${{env.SERVER_IMAGE_NAME}}
+    tag: ${{env.IMAGE_TAG_DAILOGI_SERVER}}
+  instance_count: 1
+  instance_size_slug: apps-s-1vcpu-0.5gb
+  name: vvojtas-dailogi-dailogi-server
+- envs:
+  - key: SPRING_BACKEND_BASE_URL
+    scope: RUN_AND_BUILD_TIME
+    value: http://vvojtas-dailogi-dailogi-server
+  http_port: 8080
+  image:
+    registry: ${{env.GHCR_REGISTRY}}
+    registry_credentials: EV[1:E2sADg/NhXMh82OkLDd6s3gQQa4+DZB9:lh/zQAile86IJp1O+jk2VPBfgJQ4UtoQqNgexOtJowhRlGFDCYaAk+GUrWVDMPRSP/av8Y/Jre9vntVjfu5jcw==]
+    registry_type: GHCR
+    repository: ${{env.ORG_NAME}}/${{env.REPO_NAME}}/${{env.UI_IMAGE_NAME}}
+    tag: ${{env.IMAGE_TAG_DAILOGI_UI}}
+  instance_count: 1
+  instance_size_slug: apps-s-1vcpu-0.5gb
+  name: vvojtas-dailogi-dailogi-ui

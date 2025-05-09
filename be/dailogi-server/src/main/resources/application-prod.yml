@@ -19,3 +19,4 @@ spring:
 springdoc:
   swagger-ui:
     config-url: /server/v3/api-docs/swagger-config
+    url: /server/v3/api-docs
