@@ -19,16 +19,6 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     operationsSorter: method
-    disable-swagger-default-url: true
-    url: /v3/api-docs
-    urls:
-      - url: /v3/api-docs
-        name: API Documentation
-  # Add for DigitalOcean deployment - don't try to resolve hostnames by default
-  cache:
-    disabled: true
-  use-management-port: false
-  use-fqn: false
 
 server:
   port: 8080
@@ -36,7 +26,6 @@ server:
     enabled: false
   http2:
     enabled: true
-  forward-headers-strategy: framework
 
 dailogi:
   user:
