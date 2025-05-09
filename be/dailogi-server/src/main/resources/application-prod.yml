@@ -15,3 +15,7 @@ spring:
     create-schemas: true
     default-schema: dail
 
+# Swagger under reverse proxy
+springdoc:
+  swagger-ui:
+    config-url: /server/v3/api-docs/swagger-config
