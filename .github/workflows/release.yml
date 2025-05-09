@@ -81,55 +81,18 @@ jobs:
     needs: build-and-push-images
     runs-on: ubuntu-latest
     environment: prod # Assumes 'prod' GitHub Environment is configured and has DIGITALOCEAN_ACCESS_TOKEN secret
+    env:
+      DIGITALOCEAN_APP_ID: "dailogi-3ugdc" # Replace with your actual DigitalOcean App ID
     steps:
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-      - name: Deploy to DigitalOcean App Platform
+      - name: Update DigitalOcean App Platform
         run: |
-          # IMPORTANT: Replace NEW-DIGITAL-OCEAN-APP with your actual DigitalOcean App ID or Name.
-          # IMPORTANT: Verify that the component names in your DO App Spec match the image names used below (e.g., dailogi-server, dailogi-ui).
-          # If your DO app components are named differently (e.g., 'backend', 'frontend'), adjust the image parameters accordingly.
-          # Example: --image backend=${{ env.GHCR_REGISTRY }}/${{ env.ORG_NAME }}/${{ env.REPO_NAME }}/${{ env.SERVER_IMAGE_NAME }}:${{ env.GIT_TAG }}
-          doctl apps update NEW-DIGITAL-OCEAN-APP \
+          # Using component-specific deployment to ensure compatibility with older doctl versions
+          doctl apps create-deployment ${{ env.DIGITALOCEAN_APP_ID }} \
             --image ${{ env.SERVER_IMAGE_NAME }}=${{ env.GHCR_REGISTRY }}/${{ env.ORG_NAME }}/${{ env.REPO_NAME }}/${{ env.SERVER_IMAGE_NAME }}:${{ env.GIT_TAG }} \
-            --image ${{ env.UI_IMAGE_NAME }}=${{ env.GHCR_REGISTRY }}/${{ env.ORG_NAME }}/${{ env.REPO_NAME }}/${{ env.UI_IMAGE_NAME }}:${{ env.GIT_TAG }}
-        env:
-          # This env var is just for clarity in the logs if needed, the actual app name is in the command.
-          DIGITALOCEAN_APP_ID_OR_NAME: "dailogi"
-
-      # Optional: More robust deployment by updating the App Spec directly
-      # This is useful if the --image flag is not sufficient or for more complex changes.
-      # - name: Checkout repository # Needed if app spec is in repo, otherwise skip
-      #   uses: actions/checkout@v4
-
-      # - name: Get App Spec
-      #   id: get_spec
-      #   run: |
-      #     doctl apps spec get ${{ env.DIGITALOCEAN_APP_ID_OR_NAME }} > app_spec.yaml
-      #     echo "Fetched app_spec.yaml"
-
-      # - name: Update App Spec with new image tags (example using yq for YAML)
-      #   # This step requires yq to be installed (e.g., via mikefarah/yq@master action)
-      #   # Or use other tools like sed, awk, or a script.
-      #   run: |
-      #     echo "Updating app_spec.yaml with new image tags..."
-      #     # Example: Update service 'dailogi-server' and 'dailogi-ui'
-      #     # Adjust .services[] names and paths according to your actual App Spec structure.
-      #     yq e '.services[] |= (select(.name == "${{ env.SERVER_IMAGE_NAME }}") .image.tag = "${{ env.GIT_TAG }}" else . )' -i app_spec.yaml
-      #     yq e '.services[] |= (select(.name == "${{ env.UI_IMAGE_NAME }}") .image.tag = "${{ env.GIT_TAG }}" else . )' -i app_spec.yaml
-      #     # For jobs or other component types, the yq path would differ.
-      #     echo "--- Updated app_spec.yaml --- "
-      #     cat app_spec.yaml
-      #     echo "---------------------------"
-
-      # - name: Validate updated App Spec (optional but recommended)
-      #   run: doctl apps spec validate app_spec.yaml
-
-      # - name: Apply updated App Spec
-      #   run: doctl apps update ${{ env.DIGITALOCEAN_APP_ID_OR_NAME }} --spec app_spec.yaml
-
-      # - name: Trigger new deployment (if not automatic after spec update or --wait desired)
-      #   run: doctl apps create-deployment ${{ env.DIGITALOCEAN_APP_ID_OR_NAME }} --wait 
+            --image ${{ env.UI_IMAGE_NAME }}=${{ env.GHCR_REGISTRY }}/${{ env.ORG_NAME }}/${{ env.REPO_NAME }}/${{ env.UI_IMAGE_NAME }}:${{ env.GIT_TAG }} \
+            --wait 
