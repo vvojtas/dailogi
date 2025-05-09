@@ -16,7 +16,6 @@ spring:
 springdoc:
   swagger-ui:
     operationsSorter: method
-    config-url: /server/v3/api-docs/swagger-config
 
 server:
   port: 8080
