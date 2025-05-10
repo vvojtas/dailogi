@@ -41,11 +41,11 @@ services:
     value: /server/swagger-ui/custom.html
   http_port: 8080
   image:
-    registry: ghcr.io
-    registry_credentials: ${{env.GHCR_CREDENTIALS}}
     registry_type: GHCR
+    registry: ghcr.io
     repository: vvojtas/dailogi/dailogi-server
-    tag: ${{env.GIT_TAG}}
+    registry_credentials: ${{env.GHCR_CREDENTIALS}}
+    tag: v1.0.13
   instance_count: 1
   instance_size_slug: apps-s-1vcpu-0.5gb
   name: vvojtas-dailogi-dailogi-server
@@ -55,11 +55,11 @@ services:
     value: http://vvojtas-dailogi-dailogi-server
   http_port: 8080
   image:
-    registry: ghcr.io
-    registry_credentials: ${{env.GHCR_CREDENTIALS}}
     registry_type: GHCR
+    registry: ghcr.io
     repository: vvojtas/dailogi/dailogi-ui
-    tag: ${{env.GIT_TAG}}
+    registry_credentials: ${{env.GHCR_CREDENTIALS}}
+    tag: v1.0.13
   instance_count: 1
   instance_size_slug: apps-s-1vcpu-0.5gb
-  name: vvojtas-dailogi-dailogi-ui
+  name: vvojtas-dailogi-dailogi-ui 
