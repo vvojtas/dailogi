@@ -45,7 +45,7 @@ services:
     registry: ghcr.io
     repository: vvojtas/dailogi/dailogi-server
     registry_credentials: ${GHCR_CREDENTIALS}
-    tag: v${GIT_TAG}
+    tag: ${GIT_TAG}
   instance_count: 1
   instance_size_slug: apps-s-1vcpu-0.5gb
   name: vvojtas-dailogi-dailogi-server
