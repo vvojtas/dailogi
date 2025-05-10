@@ -22,11 +22,11 @@ services:
   - key: JWT_SECRET
     scope: RUN_AND_BUILD_TIME
     type: SECRET
-    value: EV[1:4SJ++wcmjcc1GKGLCXY8Pmp/mdwSmehF:0jKZq4ktITuzsDVv7+Ua+Ql5/cHJiEKOCIOgoc2gbi3IJkQPsM05oVYbw8zLj/jNwQrkN2tmtwKT+u0QPtW1kqb0]
+    value: ${JWT_SECRET}
   - key: DB_PASSWORD
     scope: RUN_AND_BUILD_TIME
     type: SECRET
-    value: EV[1:DQ0fhn3ogaAPe0qdqW/3nGIw218YaGs9:kuhn8RU5oKtlx71bDOCpmRYFXC73dkAQRGOCQXctLA==]
+    value: ${DB_PASSWORD}
   - key: SPRING_PROFILES_ACTIVE
     scope: RUN_AND_BUILD_TIME
     value: prod

@@ -84,9 +84,14 @@ jobs:
     env:
       GIT_TAG: ${{ github.ref_name }}
       GHCR_CREDENTIALS: ${{ secrets.GHCR_CREDENTIALS }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Print GIT_TAG
+        run: echo "GIT_TAG is $GIT_TAG"
 
       - name: Deploy to DigitalOcean App Platform
         uses: digitalocean/app_action/deploy@v2
