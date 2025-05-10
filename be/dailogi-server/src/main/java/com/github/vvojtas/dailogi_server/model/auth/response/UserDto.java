@@ -13,5 +13,8 @@ public record UserDto(
     @JsonProperty("name") String name,
 
     @Schema(description = "Timestamp when the user was created", example = "2023-10-26T10:15:30+00:00", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-    @JsonProperty("created_at") OffsetDateTime createdAt
+    @JsonProperty("created_at") OffsetDateTime createdAt,
+    
+    @Schema(description = "Indicates if the user has an OpenRouter API key set", example = "true", requiredMode = Schema.RequiredMode.REQUIRED)
+    @JsonProperty("has_api_key") boolean hasApiKey
 ) {} 

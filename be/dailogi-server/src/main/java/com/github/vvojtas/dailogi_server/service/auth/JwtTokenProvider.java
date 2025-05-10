@@ -14,8 +14,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import com.github.vvojtas.dailogi_server.properties.JwtProperties;
+import com.github.vvojtas.dailogi_server.service.util.KeyUtils;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import javax.crypto.SecretKey;
 
@@ -86,7 +86,7 @@ public class JwtTokenProvider {
     }
     
     private SecretKey getSigningKey() {
-        byte[] keyBytes = jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8);
+        byte[] keyBytes = KeyUtils.decodeKey(jwtProperties.getSecret());
         return Keys.hmacShaKeyFor(keyBytes);
     }
     

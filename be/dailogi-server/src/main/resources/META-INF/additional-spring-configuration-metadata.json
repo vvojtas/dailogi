@@ -17,6 +17,12 @@
       "type": "com.github.vvojtas.dailogi_server.properties.E2ETestUserProperties",
       "sourceType": "com.github.vvojtas.dailogi_server.properties.E2ETestUserProperties",
       "description": "Configuration properties for E2E test user."
+    },
+    {
+      "name": "openrouter.encryption",
+      "type": "com.github.vvojtas.dailogi_server.properties.OpenRouterEncryptionProperties",
+      "sourceType": "com.github.vvojtas.dailogi_server.properties.OpenRouterEncryptionProperties",
+      "description": "Configuration properties for API key encryption."
     }
   ],
   "properties": [
@@ -56,6 +62,26 @@
       "name": "server.http.port",
       "type": "java.lang.String",
       "description": "HTTP port for the server."
+    },
+    {
+      "name": "openrouter.encryption.key",
+      "type": "java.lang.String",
+      "sourceType": "com.github.vvojtas.dailogi_server.properties.OpenRouterEncryptionProperties",
+      "description": "The encryption key used for API key encryption/decryption."
+    },
+    {
+      "name": "openrouter.encryption.iv-length",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.vvojtas.dailogi_server.properties.OpenRouterEncryptionProperties",
+      "description": "GCM initialization vector length in bytes.",
+      "defaultValue": 12
+    },
+    {
+      "name": "openrouter.encryption.tag-length",
+      "type": "java.lang.Integer",
+      "sourceType": "com.github.vvojtas.dailogi_server.properties.OpenRouterEncryptionProperties",
+      "description": "GCM tag length in bits.",
+      "defaultValue": 128
     }
   ]
 }

@@ -86,6 +86,7 @@ jobs:
       GHCR_CREDENTIALS: ${{ secrets.GHCR_CREDENTIALS }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      OPENROUTER_ENCRYPTION_KEY: ${{ secrets.OPENROUTER_ENCRYPTION_KEY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

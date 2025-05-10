@@ -37,6 +37,12 @@ jwt:
   secret: ${JWT_SECRET}
   expiration-ms: 3600000  # 1 hour in milliseconds 
 
+openrouter:
+  encryption:
+    key: ${OPENROUTER_ENCRYPTION_KEY}
+    iv-length: 12  # GCM initialization vector length in bytes (96 bits)
+    tag-length: 128  # GCM tag length in bits
+
 # Actuator configuration
 management:
   endpoints:

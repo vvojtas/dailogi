@@ -4,6 +4,7 @@ import com.github.vvojtas.dailogi_server.db.entity.AppUser;
 import com.github.vvojtas.dailogi_server.model.auth.response.UserDto;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Component
 public class UserMapper {
@@ -12,7 +13,8 @@ public class UserMapper {
         return new UserDto(
             user.getId(),
             user.getName(),
-            user.getCreatedAt()
+            user.getCreatedAt(),
+            StringUtils.hasText(user.getEncryptedApiKey())
         );
     }
 } 
