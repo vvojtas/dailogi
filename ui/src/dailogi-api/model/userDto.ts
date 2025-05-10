@@ -16,4 +16,6 @@ export interface UserDto {
   name: string;
   /** Timestamp when the user was created */
   created_at?: string;
+  /** Indicates if the user has an OpenRouter API key set */
+  has_api_key: boolean;
 }

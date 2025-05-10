@@ -6,6 +6,8 @@
  * OpenAPI spec version: v1.0.0
  */
 
+export * from "./apiKeyRequest";
+export * from "./apiKeyResponseDTO";
 export * from "./avatarRequest";
 export * from "./characterAvatarResponseDTO";
 export * from "./characterDTO";

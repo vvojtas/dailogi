@@ -82,10 +82,10 @@
 
 ### API Keys
 
-#### Save OpenRouter API Key
+#### Set or update OpenRouter API Key
 - **Method**: PUT
 - **Path**: `/api/users/current/api-key`
-- **Description**: Save user's OpenRouter API key (encrypted in storage)
+- **Description**: Sets or updates the OpenRouter API key for the authenticated user
 - **Request Body**:
   ```json
   {
@@ -95,7 +95,6 @@
 - **Response Body**:
   ```json
   {
-    "message": "string",
     "has_api_key": "boolean"
   }
   ```
@@ -105,11 +104,23 @@
 #### Delete OpenRouter API Key
 - **Method**: DELETE
 - **Path**: `/api/users/current/api-key`
-- **Description**: Remove user's OpenRouter API key
+- **Description**: Deletes the OpenRouter API key for the authenticated user
 - **Response Body**:
   ```json
   {
-    "message": "string",
+    "has_api_key": "boolean"
+  }
+  ```
+- **Success Codes**: 200 OK
+- **Error Codes**: 401 Unauthorized
+
+#### Check OpenRouter API Key Status
+- **Method**: GET
+- **Path**: `/api/users/current/api-key`
+- **Description**: Checks if the authenticated user has an OpenRouter API key set
+- **Response Body**:
+  ```json
+  {
     "has_api_key": "boolean"
   }
   ```
