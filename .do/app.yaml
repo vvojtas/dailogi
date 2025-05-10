@@ -44,8 +44,8 @@ services:
     registry_type: GHCR
     registry: ghcr.io
     repository: vvojtas/dailogi/dailogi-server
-    registry_credentials: vEV[1:cRBzD9r08L8Ue6VCVirtDnMmxdZJwrwS:Q1ruTX7NBJK+8yvv1ushsHBk4ec2nUEhm8xPB2G0By0SyPwzzA/OxWeoM0J63+5UhMcChteKlOqmsZm4+qcsLQ==]
-    tag: v1.0.14
+    registry_credentials: ${{env.GHCR_CREDENTIALS}}
+    tag: v1.0.15
   instance_count: 1
   instance_size_slug: apps-s-1vcpu-0.5gb
   name: vvojtas-dailogi-dailogi-server
@@ -58,8 +58,8 @@ services:
     registry_type: GHCR
     registry: ghcr.io
     repository: vvojtas/dailogi/dailogi-ui
-    registry_credentials: EV[1:cRBzD9r08L8Ue6VCVirtDnMmxdZJwrwS:Q1ruTX7NBJK+8yvv1ushsHBk4ec2nUEhm8xPB2G0By0SyPwzzA/OxWeoM0J63+5UhMcChteKlOqmsZm4+qcsLQ==]
-    tag: v1.0.14
+    registry_credentials: ${{env.GHCR_CREDENTIALS}}
+    tag: v1.0.15
   instance_count: 1
   instance_size_slug: apps-s-1vcpu-0.5gb
   name: vvojtas-dailogi-dailogi-ui 
