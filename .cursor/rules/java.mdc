@@ -77,4 +77,5 @@ alwaysApply: false
 - Use Maven for dependency management and build processes.
 - Implement proper profiles for different environments (dev, test, prod).
 - Use Docker for containerization
+
     
