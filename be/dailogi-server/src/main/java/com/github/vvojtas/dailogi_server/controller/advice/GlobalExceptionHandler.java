@@ -19,6 +19,7 @@ import com.github.vvojtas.dailogi_server.exception.InvalidJwtException;
 import com.github.vvojtas.dailogi_server.model.common.response.ErrorResponseDTO;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import com.github.vvojtas.dailogi_server.exception.CharacterLimitExceededException;
+import com.github.vvojtas.dailogi_server.exception.CryptoException;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
@@ -214,6 +215,28 @@ public class GlobalExceptionHandler {
                 e.getMessage(),
                 "CHARACTER_LIMIT_EXCEEDED",
                 Map.of("limit", e.getLimit()),
+                OffsetDateTime.now()
+            ));
+    }
+
+    @ExceptionHandler(CryptoException.class)
+    public ResponseEntity<ErrorResponseDTO> handleCryptoException(CryptoException e) {
+        log.error("Cryptography error occurred", e);
+
+        Map<String, Object> details = new HashMap<>();
+        details.put("message", e.getMessage());
+        if (e.getCause() != null) {
+            details.put("cause", e.getCause().getClass().getSimpleName() + ": " + e.getCause().getMessage());
+        }
+        details.put("exception_type", e.getClass().getSimpleName());
+
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new ErrorResponseDTO(
+                "A critical error occurred during a cryptographic operation",
+                "CRYPTO_OPERATION_FAILED",
+                details,
                 OffsetDateTime.now()
             ));
     }

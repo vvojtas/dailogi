@@ -45,6 +45,7 @@ export function useApiKey() {
   };
 
   const saveKey = async (apiKey: string) => {
+    console.log("Save API key start", apiKey); //TODO: remove
     if (!apiKey.trim()) {
       toast.error("OpenApi zdradzili nam sekret - klucz musi posiadać znaki");
       return;

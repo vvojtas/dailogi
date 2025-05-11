@@ -58,22 +58,21 @@ export class ProfilePage {
     await this.saveApiKeyButton.waitFor({ state: "visible" });
     await expect(this.saveApiKeyButton).toBeEnabled();
 
-    // Log before clicking
     console.log("ProfilePage: About to click save API key button");
 
     await this.saveApiKeyButton.click();
 
-    // Wait for the API response to complete - watch network
     try {
       console.log("ProfilePage: Waiting for save API key response...");
-      await this.page.waitForResponse(
+      const response = await this.page.waitForResponse(
         (resp) => resp.url().includes("/api/users/current/api-key") && resp.request().method() === "PUT",
-        { timeout: 10000 } // Keep existing timeout for the network request
+        { timeout: 10000 }
       );
       console.log("ProfilePage: Received API response for saving API key");
+      const responseBody = await response.json();
+      console.log(`ProfilePage: API Response Status: ${response.status()}, Body: ${JSON.stringify(responseBody)}`);
     } catch (error) {
-      console.error("ProfilePage: Error waiting for API response in saveApiKey:", error);
-      // Depending on test strategy, might want to re-throw or handle this more explicitly
+      console.error("ProfilePage: Error waiting for API response or processing it in saveApiKey:", error);
     }
   }
 
