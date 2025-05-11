@@ -12,6 +12,7 @@ jobs:
     uses: ./.github/workflows/run-tests.yml
     secrets:
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      OPENROUTER_ENCRYPTION_KEY: ${{ secrets.OPENROUTER_ENCRYPTION_KEY }}
     with:
       artifact_retention_days: 7
     permissions:
