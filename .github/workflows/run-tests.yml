@@ -12,6 +12,9 @@ on:
       JWT_SECRET:
         description: 'Secret for JWT signing'
         required: true
+      OPENROUTER_ENCRYPTION_KEY:
+        description: 'Secret for OPENROUTER encryption'
+        required: true
     outputs:
       backend_coverage:
         description: 'Backend test coverage percentage'
@@ -116,6 +119,8 @@ jobs:
     environment: ci-test
     env:
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      OPENROUTER_ENCRYPTION_KEY: ${{ secrets.OPENROUTER_ENCRYPTION_KEY }}
+      SPRING_BACKEND_BASE_URL: ${{ vars.SPRING_BACKEND_BASE_URL }}
     
     steps:
       - uses: actions/checkout@v4
@@ -169,8 +174,6 @@ jobs:
       - name: Run Playwright E2E tests
         working-directory: ./ui
         run: npm run test:e2e
-        env:
-          SPRING_BACKEND_BASE_URL: ${{vars.SPRING_BACKEND_BASE_URL}}
       
       - name: Upload test results
         if: always()
