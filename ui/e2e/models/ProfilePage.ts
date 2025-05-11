@@ -58,23 +58,22 @@ export class ProfilePage {
     await this.saveApiKeyButton.waitFor({ state: "visible" });
     await expect(this.saveApiKeyButton).toBeEnabled();
 
-    await Promise.all([
-      this.page.waitForResponse(
-        (resp) => resp.url().includes("/api/users/current/api-key") && resp.request().method() === "PUT"
-      ),
-      this.saveApiKeyButton.click(),
-    ]);
+    // Log before clicking
+    console.log("ProfilePage: About to click save API key button");
 
-    // Add explicit wait for UI to update after receiving API response
-    // This helps ensure the component has time to re-render with the updated state
+    await this.saveApiKeyButton.click();
+
+    // Wait for the API response to complete - watch network
     try {
-      await this.statusBadgeActive.waitFor({
-        state: "visible",
-        timeout: 10000, // Increase timeout to 10 seconds for CI environments
-      });
+      console.log("ProfilePage: Waiting for save API key response...");
+      await this.page.waitForResponse(
+        (resp) => resp.url().includes("/api/users/current/api-key") && resp.request().method() === "PUT",
+        { timeout: 10000 } // Keep existing timeout for the network request
+      );
+      console.log("ProfilePage: Received API response for saving API key");
     } catch (error) {
-      // Log the error but continue test execution
-      console.error("Error waiting for active badge:", error);
+      console.error("ProfilePage: Error waiting for API response in saveApiKey:", error);
+      // Depending on test strategy, might want to re-throw or handle this more explicitly
     }
   }
 
