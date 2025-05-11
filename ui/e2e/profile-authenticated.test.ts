@@ -28,7 +28,7 @@ test.describe("Profile API key management", () => {
     await profilePage.saveApiKey();
 
     // Verify the API key is saved (active badge is shown)
-    await expect(profilePage.statusBadgeActive).toBeVisible({ timeout: 15000 });
+    await expect(profilePage.statusBadgeActive).toBeVisible();
 
     // Check input field is emptied after saving
     await expect(profilePage.apiKeyInput).toHaveValue("");

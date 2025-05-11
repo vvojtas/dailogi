@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponseDTO> handleConstraintViolationException(ConstraintViolationException e) {
-        log.warn("Validation error", e);
+        log.warn("Constraint validation failed. Violations listed in response. Message: {}", e.getMessage(), e);
         
         Map<String, Object> details = new HashMap<>();
         e.getConstraintViolations().forEach(violation -> 
@@ -59,7 +59,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponseDTO> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
-        log.warn("Type mismatch error", e);
+        String requiredType = Optional.ofNullable(e.getRequiredType()).map(Class::getSimpleName).orElse("N/A");
+        log.warn("Method argument type mismatch. Parameter: '{}', Value: '{}', Required Type: {}. Message: {}",
+                e.getName(), e.getValue(), requiredType, e.getMessage(), e);
         
         Map<String, Object> details = new HashMap<>();
         details.put("parameter", e.getName());
@@ -81,7 +83,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleResourceNotFoundException(ResourceNotFoundException e) {
-        log.warn("Resource not found", e);
+        log.warn("Resource not found. Type: {}. Message: {}", e.getType(), e.getMessage(), e);
         
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
@@ -96,7 +98,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponseDTO> handleAccessDeniedException(AccessDeniedException e) {
-        log.warn("Access denied", e);
+        log.warn("Access denied. Message: {}", e.getMessage(), e);
         
         return ResponseEntity
             .status(HttpStatus.FORBIDDEN)
@@ -111,7 +113,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DuplicateResourceException.class)
     public ResponseEntity<ErrorResponseDTO> handleDuplicateResourceException(DuplicateResourceException e) {
-        log.warn("Duplicate resource error", e);
+        log.warn("Duplicate resource. Resource: '{}'. Message: {}", e.getResourceName(), e.getMessage(), e);
         
         return ResponseEntity
             .status(HttpStatus.CONFLICT)
@@ -126,7 +128,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponseDTO> handleBadCredentialsException(BadCredentialsException e) {
-        log.warn("Authentication failed due to bad credentials", e);
+        log.warn("Bad credentials provided. Message: {}", e.getMessage(), e);
         
         return ResponseEntity
             .status(HttpStatus.UNAUTHORIZED)
@@ -141,7 +143,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidJwtException.class)
     public ResponseEntity<ErrorResponseDTO> handleInvalidJwtException(InvalidJwtException e) {
-        log.warn("Invalid JWT token", e);
+        log.warn("Invalid JWT token. Message: {}", e.getMessage(), e);
         
         return ResponseEntity
             .status(HttpStatus.UNAUTHORIZED)
@@ -156,7 +158,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthenticationErrorException.class)
     public ResponseEntity<ErrorResponseDTO> handleAuthenticationErrorException(AuthenticationErrorException e) {
-        log.error("Authentication error occurred", e);
+        log.error("Authentication error occurred. Message: {}", e.getMessage(), e);
         
         return ResponseEntity
             .status(HttpStatus.UNAUTHORIZED)
@@ -171,7 +173,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponseDTO> handleAuthenticationException(AuthenticationException e) {
-        log.warn("Authentication failed", e);
+        log.warn("General authentication failure. Message: {}", e.getMessage(), e);
         
         return ResponseEntity
             .status(HttpStatus.UNAUTHORIZED)
@@ -186,7 +188,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDTO> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        log.warn("Method argument validation failed", e);
+        log.warn("Method argument validation failed. Violations in response. Message: {}", e.getMessage(), e);
         
         Map<String, Object> details = new HashMap<>();
         e.getBindingResult().getFieldErrors().forEach(error -> 
@@ -206,7 +208,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CharacterLimitExceededException.class)
     public ResponseEntity<ErrorResponseDTO> handleCharacterLimitExceededException(CharacterLimitExceededException e) {
-        log.warn("Character limit exceeded", e);
+        log.warn("Character limit exceeded. Limit: {}. Message: {}", e.getLimit(), e.getMessage(), e);
         
         return ResponseEntity
             .status(HttpStatus.UNPROCESSABLE_ENTITY)
@@ -221,29 +223,22 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CryptoException.class)
     public ResponseEntity<ErrorResponseDTO> handleCryptoException(CryptoException e) {
-        log.error("Cryptography error occurred", e);
-
-        Map<String, Object> details = new HashMap<>();
-        details.put("message", e.getMessage());
-        if (e.getCause() != null) {
-            details.put("cause", e.getCause().getClass().getSimpleName() + ": " + e.getCause().getMessage());
-        }
-        details.put("exception_type", e.getClass().getSimpleName());
+        log.error("Cryptography error occurred: {}", e.getMessage(), e);
 
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .contentType(MediaType.APPLICATION_JSON)
             .body(new ErrorResponseDTO(
-                "A critical error occurred during a cryptographic operation",
+                "A critical error occurred during a security operation. Please contact support if the issue persists.",
                 "CRYPTO_OPERATION_FAILED",
-                details,
+                Map.of(),
                 OffsetDateTime.now()
             ));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleGenericException(Exception e) {
-        log.error("Unexpected error", e);
+        log.error("Unexpected error occurred. Message: {}", e.getMessage(), e);
         
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)

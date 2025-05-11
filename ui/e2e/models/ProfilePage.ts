@@ -58,22 +58,12 @@ export class ProfilePage {
     await this.saveApiKeyButton.waitFor({ state: "visible" });
     await expect(this.saveApiKeyButton).toBeEnabled();
 
-    console.log("ProfilePage: About to click save API key button");
-
-    await this.saveApiKeyButton.click();
-
-    try {
-      console.log("ProfilePage: Waiting for save API key response...");
-      const response = await this.page.waitForResponse(
-        (resp) => resp.url().includes("/api/users/current/api-key") && resp.request().method() === "PUT",
-        { timeout: 10000 }
-      );
-      console.log("ProfilePage: Received API response for saving API key");
-      const responseBody = await response.json();
-      console.log(`ProfilePage: API Response Status: ${response.status()}, Body: ${JSON.stringify(responseBody)}`);
-    } catch (error) {
-      console.error("ProfilePage: Error waiting for API response or processing it in saveApiKey:", error);
-    }
+    await Promise.all([
+      this.page.waitForResponse(
+        (resp) => resp.url().includes("/api/users/current/api-key") && resp.request().method() === "PUT"
+      ),
+      this.saveApiKeyButton.click(),
+    ]);
   }
 
   /**

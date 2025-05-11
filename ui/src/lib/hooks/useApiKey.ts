@@ -45,7 +45,6 @@ export function useApiKey() {
   };
 
   const saveKey = async (apiKey: string) => {
-    console.log("Save API key start", apiKey); //TODO: remove
     if (!apiKey.trim()) {
       toast.error("OpenApi zdradzili nam sekret - klucz musi posiadać znaki");
       return;
@@ -54,17 +53,16 @@ export function useApiKey() {
     setState((prev) => ({ ...prev, loading: true }));
 
     try {
-      console.log("Saving API key:", apiKey); //TODO: remove
       const request: ApiKeyRequest = { api_key: apiKey.trim() };
       const response = await setApiKey(request);
-      console.log("API key saved successfully"); //TODO: remove
+
       setState((prev) => ({
         ...prev,
         hasApiKey: response.data.has_api_key,
         loading: false,
         apiKey: "",
       }));
-      console.log("API key saved - state updated"); //TODO: remove
+
       toast.success("Klucz API zachowany w naszych archiwach");
     } catch (error) {
       console.error("Error saving API key:", error);
