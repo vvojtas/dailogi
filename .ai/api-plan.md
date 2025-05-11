@@ -388,7 +388,6 @@
 - **Success Codes**: 200 OK
 - **Error Codes**: 401 Unauthorized, 403 Forbidden (not owner), 404 Not Found
 
-
 #### Generate Dialogue
 - **Method**: POST
 - **Path**: `/api/dialogues/generate`
@@ -415,6 +414,89 @@
 - **Success Codes**: 202 Accepted
 - **Error Codes**: 400 Bad Request (already generated), 401 Unauthorized, 402 Payment Required (no API key), 403 Forbidden (not owner), 404 Not Found
 
+#### Stream Dialogue Generation
+- **Method**: POST
+- **Path**: `/api/dialogues/stream`
+- **Description**: Start dialogue generation with real-time streaming using Server-Sent Events (SSE)
+- **Request Body**:
+  ```json
+  {
+    "scene_description": "string",
+    "character_configs": [
+      {
+        "character_id": "long",
+        "llm_id": "long"
+      }
+    ]
+  }
+  ```
+- **Response Type**: `text/event-stream`
+- **Event Types**:
+  - `dialogue-start`: Initial event with dialogue metadata
+    ```json
+    {
+      "dialogue_id": "long",
+      "character_configs": [
+        {
+          "character_id": "long",
+          "character_name": "string",
+          "has_avatar": "boolean",
+          "avatar_url": "string" 
+        }
+      ],
+      "turn_count": 0
+    }
+    ```
+  - `token`: Character response being generated token by token
+    ```json
+    {
+      "character_id": "long",
+      "token": "string",
+      "id": "string" // Event ID for reconnection support
+    }
+    ```
+  - `character-complete`: Signals end of current character's turn
+    ```json
+    {
+      "character_id": "long",
+      "token_count": "integer",
+      "id": "string" // Event ID for reconnection support
+    }
+    ```
+  - `dialogue-complete`: Signals completion of entire dialogue
+    ```json
+    {
+      "status": "completed",
+      "turn_count": "integer",
+      "id": "string" // Event ID for reconnection support
+    }
+    ```
+  - `error`: Sent when an error occurs
+    ```json
+    {
+      "message": "string",
+      "recoverable": "boolean",
+      "id": "string" // Event ID for reconnection support
+    }
+    ```
+- **Reconnection**: Client can reconnect with `Last-Event-ID` header for resuming stream
+- **Success Codes**: 200 OK with streaming response
+- **Error Codes**: 400 Bad Request (invalid configuration), 401 Unauthorized, 402 Payment Required (no API key), 409 Conflict (invalid state)
+
+#### Resume Dialogue Stream
+- **Method**: GET
+- **Path**: `/api/dialogues/{id}/stream`
+- **Description**: Resume streaming a dialogue that was previously started using SSE
+- **Headers**:
+  - `Last-Event-ID`: Optional, ID of the last event received before disconnection
+- **Response Type**: `text/event-stream`
+- **Event Types**: Same as `/api/dialogues/stream`
+- **Behavior**:
+  - When `Last-Event-ID` is provided, streaming resumes from that point
+  - Without `Last-Event-ID`, returns a dialogue summary event followed by real-time updates
+  - For completed dialogues, streams all existing messages and sends `dialogue-complete`
+- **Success Codes**: 200 OK with streaming response
+- **Error Codes**: 401 Unauthorized, 403 Forbidden (not owner), 404 Not Found (dialogue doesn't exist)
 
 #### Delete Dialogue
 - **Method**: DELETE
@@ -476,11 +558,21 @@
    - Updates dialogue status to COMPLETED or FAILED based on outcome
    - Saves generated messages to the database
 
-2. **Character Usage Restriction**:
+2. **Dialogue Streaming Process**:
+   - Implemented using Server-Sent Events (SSE) for real-time updates
+   - Maintains persistent connection until dialogue completion or error
+   - Supports token-by-token streaming from LLM to frontend
+   - Handles reconnection with idempotent event IDs to resume from disconnection points
+   - Uses thread pool to handle concurrent dialogue generation sessions
+   - Maps OpenRouter streaming API to SSE events
+   - Manages dialogue state to ensure consistency during reconnections
+   - Performs proper resource cleanup when connections are terminated
+
+3. **Character Usage Restriction**:
    - Prevents deletion of characters used in dialogues
    - Implemented via database constraints and API validation
 
-3. **Special User Handling**:
+4. **Special User Handling**:
    - Checks is_special_user flag during dialogue generation
    - Uses global API key if no user key is provided
    - Regular users must provide their own API key 
