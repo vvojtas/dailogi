@@ -1,13 +1,10 @@
 ---
 import { ROUTES } from "@/lib/config/routes";
+import { buttonVariants } from "@/components/ui/button";
 
 // Extracting button variants to reuse styles similar to button.tsx
-const primaryButtonClass =
-  "inline-flex items-center justify-center gap-2 h-10 px-6 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs";
-const outlineButtonClass =
-  "inline-flex items-center justify-center gap-2 h-10 px-6 rounded-md text-sm font-medium border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground";
-const secondaryButtonClass =
-  "inline-flex items-center justify-center w-full h-10 px-4 py-2 text-sm font-medium rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-xs border border-secondary-foreground/20";
+const primaryButtonClass = buttonVariants({ variant: "default", size: "lg" });
+const secondaryButtonClass = buttonVariants({ variant: "secondary", size: "default" });
 ---
 
 <div class="container mx-auto px-4 py-12">
@@ -58,7 +55,7 @@ const secondaryButtonClass =
           </p>
         </div>
         <div class="flex items-center px-6 mt-auto">
-          <a href={ROUTES.CHARACTERS} class={secondaryButtonClass}> Galeria postaci </a>
+          <a href={ROUTES.CHARACTERS} class={`${secondaryButtonClass} w-full`}> Galeria postaci </a>
         </div>
       </div>
 
@@ -145,7 +142,7 @@ const secondaryButtonClass =
           </p>
         </div>
         <div class="flex items-center px-6 mt-auto">
-          <a href={ROUTES.SCENES} class={secondaryButtonClass}> Archiwum dialogów </a>
+          <a href={ROUTES.SCENES} class={`${secondaryButtonClass} w-full`}> Archiwum dialogów </a>
         </div>
       </div>
     </div>
