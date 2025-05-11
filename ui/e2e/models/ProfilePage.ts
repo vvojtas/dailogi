@@ -64,6 +64,18 @@ export class ProfilePage {
       ),
       this.saveApiKeyButton.click(),
     ]);
+
+    // Add explicit wait for UI to update after receiving API response
+    // This helps ensure the component has time to re-render with the updated state
+    try {
+      await this.statusBadgeActive.waitFor({
+        state: "visible",
+        timeout: 10000, // Increase timeout to 10 seconds for CI environments
+      });
+    } catch (error) {
+      // Log the error but continue test execution
+      console.error("Error waiting for active badge:", error);
+    }
   }
 
   /**
