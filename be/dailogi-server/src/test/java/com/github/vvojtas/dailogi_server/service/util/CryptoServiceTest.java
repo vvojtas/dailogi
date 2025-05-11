@@ -3,10 +3,6 @@ package com.github.vvojtas.dailogi_server.service.util;
 import com.github.vvojtas.dailogi_server.exception.CryptoException;
 import com.github.vvojtas.dailogi_server.properties.OpenRouterEncryptionProperties;
 
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Encoders;
-import io.jsonwebtoken.security.Keys;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,12 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Base64;
 
-import javax.crypto.SecretKey;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
-import org.junit.jupiter.api.Disabled;
 
 @ExtendWith(MockitoExtension.class)
 class CryptoServiceTest {

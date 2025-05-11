@@ -1,7 +1,8 @@
 import type { APIRoute } from "astro";
 import { SESSION_COOKIE_NAME, createExpiredCookieOptions } from "@/lib/config/cookies";
+import { ENV } from "@/lib/config/env";
 
-const backendBaseUrl = process.env.SPRING_BACKEND_BASE_URL;
+const backendBaseUrl = ENV.SPRING_BACKEND_BASE_URL;
 
 export const ALL: APIRoute = async ({ request, cookies, params }) => {
   const token = cookies.get(SESSION_COOKIE_NAME)?.value;

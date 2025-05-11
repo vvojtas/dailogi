@@ -1,9 +1,10 @@
 import axios, { type AxiosInstance } from "axios";
+import { ENV } from "../env";
 
 // Astro-to-Spring instance (for server-side usage)
 export const serverApi: AxiosInstance = axios.create({
   // Spring backend URL
-  baseURL: process.env.SPRING_BACKEND_BASE_URL,
+  baseURL: ENV.SPRING_BACKEND_BASE_URL,
 });
 
 // Add request interceptors
