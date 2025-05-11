@@ -8,7 +8,7 @@ import { InfoIcon } from "lucide-react";
 export function ProfileApiKeyManager() {
   const { apiKey, hasApiKey, loading, setApiKey, saveKey, deleteKey } = useApiKey();
   const user = useAuthStore((state) => state.getUser());
-  const username = user?.name || "anonimie";
+  const username = user?.name ?? "anonimie";
 
   return (
     <div data-testid="profile-api-key-manager">
