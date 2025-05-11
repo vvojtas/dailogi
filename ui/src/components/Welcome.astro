@@ -1,6 +1,153 @@
-<div>
-  <div class="flex flex-col items-center gap-4">
-    <img src="/d-ai-logi-logo.svg" alt="D-AI-logi logo" class="w-128 h-64" />
-    <div class="text-xl font-semibold">Witaj w D-AI-logi!</div>
+---
+import { ROUTES } from "@/lib/config/routes";
+
+// Extracting button variants to reuse styles similar to button.tsx
+const primaryButtonClass =
+  "inline-flex items-center justify-center gap-2 h-10 px-6 rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs";
+const outlineButtonClass =
+  "inline-flex items-center justify-center gap-2 h-10 px-6 rounded-md text-sm font-medium border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground";
+const secondaryButtonClass =
+  "inline-flex items-center justify-center w-full h-10 px-4 py-2 text-sm font-medium rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-xs border border-secondary-foreground/20";
+---
+
+<div class="container mx-auto px-4 py-12">
+  <div class="flex flex-col items-center justify-center text-center space-y-10 pt-10 max-w-5xl mx-auto">
+    <div class="w-full max-w-[600px]">
+      <img src="/d-ai-logi-logo.svg" alt="D-AI-logi logo" class="w-full" />
+    </div>
+
+    <h1 class="text-3xl md:text-6xl font-bold text-card-foreground">Witaj w D-AI-logi!</h1>
+
+    <p class="text-xl text-muted-foreground max-w-3xl">
+      Twórz interaktywne dialogi między postaciami AI o unikalnych osobowościach. Wybieraj z naszej biblioteki lub
+      stwórz własne postacie i obserwuj ich rozmowy.
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mt-10">
+      <!-- Kreuj Postacie -->
+      <div
+        class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm overflow-hidden hover:border-primary hover:shadow-md hover:bg-card/80 transition-all"
+      >
+        <div class="grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6">
+          <div class="leading-none font-semibold text-xl">Kreuj Postacie</div>
+        </div>
+        <div class="px-6 flex items-center justify-center">
+          <div class="p-4 bg-secondary/50 rounded-full">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="40"
+              height="40"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="h-10 w-10 text-primary"
+            >
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="px-6 h-24">
+          <p class="text-muted-foreground">
+            Projektuj unikalne osobowości AI z własnymi awatarami i szczegółowymi opisami.
+          </p>
+        </div>
+        <div class="flex items-center px-6 mt-auto">
+          <a href={ROUTES.CHARACTERS} class={secondaryButtonClass}> Galeria postaci </a>
+        </div>
+      </div>
+
+      <!-- Generuj Dialogi -->
+      <div
+        class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm overflow-hidden hover:border-primary hover:shadow-md hover:bg-card/80 transition-all"
+      >
+        <div class="grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6">
+          <div class="leading-none font-semibold text-xl">Generuj Dialogi</div>
+        </div>
+        <div class="px-6 flex items-center justify-center">
+          <div class="p-4 bg-secondary/50 rounded-full">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="40"
+              height="40"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="h-10 w-10 text-primary"
+            >
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="px-6 h-24">
+          <p class="text-muted-foreground">Aranżuj sceny z 2-3 postaciami i obserwuj ich dynamiczne konwersacje.</p>
+        </div>
+        <div class="flex items-center px-6 mt-auto">
+          <a href={ROUTES.SCENE_NEW} class={`${primaryButtonClass} w-full`}>
+            Zaaranżuj nową scenę
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="ml-2 h-5 w-5"
+            >
+              <path d="M5 12h14"></path>
+              <path d="m12 5 7 7-7 7"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Zapisuj Historię -->
+      <div
+        class="bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm overflow-hidden hover:border-primary hover:shadow-md hover:bg-card/80 transition-all"
+      >
+        <div class="grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6">
+          <div class="leading-none font-semibold text-xl">Zapisuj Historię</div>
+        </div>
+        <div class="px-6 flex items-center justify-center">
+          <div class="p-4 bg-secondary/50 rounded-full">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="40"
+              height="40"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="h-10 w-10 text-primary"
+            >
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+              <path d="M3 3v5h5"></path>
+              <path d="M12 7v5l3 3"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="px-6 h-24">
+          <p class="text-muted-foreground">
+            Zachowaj ulubione dialogi, by móc do nich wrócić i podzielić się nimi później.
+          </p>
+        </div>
+        <div class="flex items-center px-6 mt-auto">
+          <a href={ROUTES.SCENES} class={secondaryButtonClass}> Archiwum dialogów </a>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
