@@ -91,8 +91,24 @@ export const createCharacter = <TData = AxiosResponse<CharacterDTO>>(
 ): Promise<TData> => {
   return axios.post(`/api/characters`, createCharacterCommand, options);
 };
+/**
+ * Retrieves all characters available to the current user (owned and global characters).
+Returns only essential fields needed for dropdown selection.
+If the user is authenticated, includes both personal characters and global characters.
+If the user is not authenticated, only global characters are returned.
+Results are sorted with personal characters first, then global characters, both groups sorted by name.
+Authentication is optional.
+
+ * @summary Get all available characters for dropdown selection
+ */
+export const getAllAvailableCharacters = <TData = AxiosResponse<string>>(
+  options?: AxiosRequestConfig
+): Promise<TData> => {
+  return axios.get(`/api/characters/dropdown`, options);
+};
 export type GetCharacterResult = AxiosResponse<CharacterDTO>;
 export type UpdateCharacterResult = AxiosResponse<CharacterDTO>;
 export type DeleteCharacterResult = AxiosResponse<string>;
 export type GetCharactersResult = AxiosResponse<CharacterListDTO>;
 export type CreateCharacterResult = AxiosResponse<CharacterDTO>;
+export type GetAllAvailableCharactersResult = AxiosResponse<string>;
