@@ -4,49 +4,42 @@ import com.github.vvojtas.dailogi_server.character.application.CharacterQuerySer
 import com.github.vvojtas.dailogi_server.db.entity.AppUser;
 import com.github.vvojtas.dailogi_server.dialogue.stream.api.CharacterConfigDto;
 import com.github.vvojtas.dailogi_server.dialogue.stream.api.StreamDialogueCommand;
-import com.github.vvojtas.dailogi_server.dialogue.stream.api.event.CharacterCompleteEventDto;
-import com.github.vvojtas.dailogi_server.dialogue.stream.api.event.DialogueCompleteEventDto;
-import com.github.vvojtas.dailogi_server.dialogue.stream.api.event.DialogueStartEventDto;
-import com.github.vvojtas.dailogi_server.dialogue.stream.api.event.ErrorEventDto;
-import com.github.vvojtas.dailogi_server.dialogue.stream.api.event.TokenEventDto;
+import com.github.vvojtas.dailogi_server.dialogue.stream.api.DialogueEventHandler;
 import com.github.vvojtas.dailogi_server.llm.application.LLMQueryService;
-import com.github.vvojtas.dailogi_server.llm.application.OpenRouterMock;
 import com.github.vvojtas.dailogi_server.model.character.response.CharacterDTO;
 import com.github.vvojtas.dailogi_server.model.llm.response.LLMDTO;
+import com.github.vvojtas.dailogi_server.model.dialogue.mapper.DialogueEventMapper;
 import com.github.vvojtas.dailogi_server.service.auth.CurrentUserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 /**
- * Service for streaming dialogue generation using Server-Sent Events
+ * Service for streaming dialogue generation using Server-Sent Events.
+ * Handles SSE connection setup and delegates generation logic to DialogueGenerationOrchestrator.
  */
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class DialogueStreamService {
 
-    private static final long SSE_TIMEOUT = 300000L; // 5 minutes timeout
-    private static final int DEFAULT_LENGTH = 5; // Default number of dialogue turns
+    private static final long SSE_TIMEOUT = 1800000L; // 30 minutes timeout
     
     private final CharacterQueryService characterQueryService;
     private final LLMQueryService llmQueryService;
-    private final OpenRouterMock openRouterMock;
     private final CurrentUserService currentUserService;
+    private final DialogueGenerationOrchestrator dialogueGenerationOrchestrator;
+    private final DialogueEventMapper dialogueEventMapper;
     // Store active emitters to be able to close them if needed
     private final Map<Long, SseEmitter> activeEmitters = new ConcurrentHashMap<>();
     
@@ -60,63 +53,58 @@ public class DialogueStreamService {
     @Transactional
     public SseEmitter streamDialogue(StreamDialogueCommand command, Authentication authentication) {
         AppUser currentUser = currentUserService.getCurrentAppUser();
-        
+        final long dialogueId = ThreadLocalRandom.current().nextLong(1, 1001);
+        log.info("Received request to stream dialogue {} for user {}", dialogueId, currentUser.getId());
+
         // Create SseEmitter with timeout
         SseEmitter emitter = new SseEmitter(SSE_TIMEOUT);
-        
+
         try {
-            // Generate unique dialogue ID
-            final long dialogueId = ThreadLocalRandom.current().nextLong(11, 1001);
-            
-            // Setup emitter callbacks
-            emitter.onCompletion(() -> {
-                log.info("SSE stream completed for user {}", currentUser.getId());
-                // Remove from active emitters
-                activeEmitters.remove(dialogueId);
-            });
-            
-            emitter.onTimeout(() -> {
-                log.info("SSE stream timed out for user {}", currentUser.getId());
-                // Handle timeout, notify client if possible
-                try {
-                    sendErrorEvent(emitter, "Stream timed out", false);
-                } catch (IOException e) {
-                    log.error("Error sending timeout notification", e);
-                }
-            });
-            
-            emitter.onError(ex -> {
-                log.error("SSE stream error for user {}: {}", currentUser.getId(), ex.getMessage());
-                // Error handling
-            });
-            
-            // Store emitter for potential cancellation
+            // Register the emitter so we can track it
             activeEmitters.put(dialogueId, emitter);
+            log.debug("Emitter for dialogue {} registered. Active emitters: {}", dialogueId, activeEmitters.size());
+            
+            // Create callback for when the handler becomes inactive
+            Consumer<Long> onInactivate = (id) -> {
+                activeEmitters.remove(id);
+                log.debug("Removed emitter for dialogue {} from active emitters. Remaining: {}", id, activeEmitters.size());
+            };
             
             // Load character and LLM entities, validate character ownership
             Map<Long, CharacterDTO> characters = new HashMap<>();
             Map<Long, LLMDTO> llms = new HashMap<>();
             loadEntities(command.characterConfigs(), characters, llms, currentUser);
-            
+            log.debug("Entities loaded for dialogue {}", dialogueId);
 
-            // Send initial dialogue start event
-            sendEvent(emitter, "dialogue-start", 
-                    new DialogueStartEventDto(dialogueId, command.characterConfigs(), 0));
+            // Create the event handler that will send events through SSE
+            DialogueEventHandler eventHandler = new SseDialogueEventHandler(
+                    dialogueId, 
+                    emitter,
+                    onInactivate,
+                    dialogueEventMapper);
+
+            // Start dialogue generation asynchronously using the event handler
+            dialogueGenerationOrchestrator.generateDialogue(
+                    dialogueId, 
+                    command, 
+                    characters, 
+                    llms, 
+                    eventHandler);
             
-            // Start dialogue generation in a separate thread to not block the request
-            new Thread(() -> generateDialogue(dialogueId, emitter, command, characters, llms, authentication))
-                    .start();
-            
+            log.info("Delegated dialogue {} generation to orchestrator with event handler.", dialogueId);
+
+            // Return emitter immediately to the client
             return emitter;
-            
+
         } catch (Exception e) {
-            log.error("Error starting dialogue stream", e);
-            emitter.completeWithError(e);
+            log.error("Error setting up dialogue stream for dialogueId {}: {}", dialogueId, e.getMessage(), e);
+            // Clean up if an error occurred during setup *before* async task started
+            activeEmitters.remove(dialogueId);
+            emitter.completeWithError(e); // Complete emitter with error
             return emitter;
         }
     }
 
-    
     /**
      * Validates character configurations and loads related entities
      */
@@ -125,7 +113,8 @@ public class DialogueStreamService {
             Map<Long, CharacterDTO> characters,
             Map<Long, LLMDTO> llms,
             AppUser user) {
-        
+        log.debug("Loading entities for user {}", user.getId());
+        // Consider adding more specific exception handling here if needed
         for (CharacterConfigDto config : configs) {
             // Check if character exists and user has access
             CharacterDTO character = characterQueryService.getCharacter(config.characterId());
@@ -134,124 +123,8 @@ public class DialogueStreamService {
             // Check if LLM exists
             LLMDTO llm = llmQueryService.findById(config.llmId());
             llms.put(llm.id(), llm);
+             log.trace("Loaded character {} and LLM {} for config.", character.id(), llm.id());
         }
-    }
-    
-    
-    /**
-     * Generates the dialogue by prompting the OpenRouter mock for each character turn
-     */
-    private void generateDialogue(
-            long dialogueId,
-            SseEmitter emitter,
-            StreamDialogueCommand command,
-            Map<Long, CharacterDTO> characters,
-            Map<Long, LLMDTO> llms,
-            Authentication authentication
-           ) {
-        // Na początku metody ustaw kontekst bezpieczeństwa
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        
-        try {
-            // Use command length or default if not provided
-            int turnCount = command.length() != null ? command.length() : DEFAULT_LENGTH;
-            
-            // For each turn, have each character generate a response
-            for (int turn = 0; turn < turnCount; turn++) {
-                if (!activeEmitters.containsKey(dialogueId)) {
-                    log.debug("Emitter completed, stopping dialogue generation");
-                    break;
-                }
-                
-                for (CharacterConfigDto config : command.characterConfigs()) {
-                    CharacterDTO character = characters.get(config.characterId());
-                    LLMDTO llm = llms.get(config.llmId());
-                    
-                    // Prepare a simple prompt
-                    String prompt = String.format(
-                            "Continue the conversation as %s. Topic: %s",
-                            character.name(),
-                            command.sceneDescription());
-                    
-                    // Track tokens using a wrapper to make it effectively final
-                    final int[] tokenCountWrapper = new int[1];
-                    
-                    // Generate text using OpenRouter mock
-                    CompletableFuture<Void> future = new CompletableFuture<>();
-                    
-                    openRouterMock.generateText(
-                            llm.openrouterIdentifier(),
-                            prompt,
-                            token -> {
-                                try {
-                                    tokenCountWrapper[0]++;
-                                    // Send token event
-                                    String eventId = UUID.randomUUID().toString();
-                                    sendEvent(emitter, "token", new TokenEventDto(
-                                            character.id(), token, eventId));
-                                    
-                                } catch (Exception e) {
-                                    log.error("Error sending token", e);
-                                }
-                            },
-                            () -> {
-                                try {
-                                    // Character's turn is complete
-                                    String completeId = UUID.randomUUID().toString();
-                                    
-                                    // Send character complete event
-                                    sendEvent(emitter, "character-complete", new CharacterCompleteEventDto(
-                                            character.id(), tokenCountWrapper[0], completeId));
-                                    
-                                } catch (Exception e) {
-                                    log.error("Error handling character completion", e);
-                                }
-                                future.complete(null);
-                            }
-                    );
-                    
-                    future.join();
-                }
-            }
-            
-            // All turns completed, send dialogue complete event
-            String dialogueCompleteId = UUID.randomUUID().toString();
-            sendEvent(emitter, "dialogue-complete", new DialogueCompleteEventDto(
-                    "completed", turnCount, dialogueCompleteId));
-            
-            log.info("Dialogue complete event sent");
-            // Complete the emitter
-            emitter.complete();
-            
-        } catch (Exception e) {
-            log.error("Error during dialogue generation", e);
-            try {
-                // Send error event and complete with error
-                sendErrorEvent(emitter, "Error during dialogue generation: " + e.getMessage(), false);
-                emitter.completeWithError(e);
-            } catch (IOException ex) {
-                log.error("Failed to send error event", ex);
-            }
-        } finally {
-            // Clean up resources
-            activeEmitters.remove(dialogueId);
-        }
-    }
-    
-    /**
-     * Sends an SSE event with the given name and data
-     */
-    private <T> void sendEvent(SseEmitter emitter, String eventName, T data) throws IOException {
-        emitter.send(SseEmitter.event()
-                .name(eventName)
-                .data(data));
-    }
-    
-    /**
-     * Sends an error event
-     */
-    private void sendErrorEvent(SseEmitter emitter, String message, boolean recoverable) throws IOException {
-        sendEvent(emitter, "error", new ErrorEventDto(
-                message, recoverable, UUID.randomUUID().toString()));
+         log.debug("Finished loading entities.");
     }
 } 

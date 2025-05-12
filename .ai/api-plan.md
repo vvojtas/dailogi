@@ -421,6 +421,16 @@
       "turn_count": 0
     }
     ```
+  - `character-start`: Signals the beginning of a character's turn
+    ```json
+    {
+      "character_config": {
+        "character_id": "long",
+        "llm_id": "long"
+      },
+      "id": "string" // Event ID for reconnection support
+    }
+    ```
   - `token`: Character response being generated token by token
     ```json
     {
