@@ -57,6 +57,7 @@ Poniżej znajduje się kompleksowy plan struktury bazy danych wraz z tabelami, r
   - FOREIGN KEY REFERENCES `User`(id) ON DELETE CASCADE  
 - **name**: VARCHAR(255) NOT NULL  
 - **scene_description**: TEXT  
+- **is_global**: BOOLEAN NOT NULL DEFAULT FALSE  
 - **status**: VARCHAR(20) NOT NULL  
   - CHECK (status IN ('COMPLETED', 'FAILED'))  
 - **created_at**: TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP  
