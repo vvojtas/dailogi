@@ -434,7 +434,10 @@
   - `token`: Character response being generated token by token
     ```json
     {
-      "character_id": "long",
+      "character_config": {
+        "character_id": "long",
+        "llm_id": "long"
+      },
       "token": "string",
       "id": "string" // Event ID for reconnection support
     }
