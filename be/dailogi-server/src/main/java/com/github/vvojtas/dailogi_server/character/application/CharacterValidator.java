@@ -5,6 +5,7 @@ import com.github.vvojtas.dailogi_server.character.api.DeleteCharacterCommand;
 import com.github.vvojtas.dailogi_server.character.api.UpdateCharacterCommand;
 import com.github.vvojtas.dailogi_server.db.entity.AppUser;
 import com.github.vvojtas.dailogi_server.db.entity.Character;
+import com.github.vvojtas.dailogi_server.db.entity.LLM;
 import com.github.vvojtas.dailogi_server.db.repository.CharacterRepository;
 import com.github.vvojtas.dailogi_server.db.repository.LLMRepository;
 import com.github.vvojtas.dailogi_server.exception.CharacterLimitExceededException;
@@ -23,7 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 public class CharacterValidator {
     private static final String CHARACTER_RESOURCE_NAME = Character.class.getSimpleName().toLowerCase();
-    private static final String LLM_RESOURCE_NAME = "llm";
+    private static final String LLM_RESOURCE_NAME = LLM.class.getSimpleName().toLowerCase();
 
     private final CharacterRepository characterRepository;
     private final LLMRepository llmRepository;
