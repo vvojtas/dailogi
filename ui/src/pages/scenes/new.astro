@@ -1,0 +1,15 @@
+---
+import "../../styles/global.css";
+import Layout from "../../layouts/Layout.astro";
+import NewSceneForm from "../../components/scenes/NewSceneForm";
+import { ErrorBoundary } from "../../components/ErrorBoundary";
+---
+
+<Layout title={`Nowa scena`}>
+  <main class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Nowa scena</h1>
+    <ErrorBoundary client:only="react">
+      <NewSceneForm client:load />
+    </ErrorBoundary>
+  </main>
+</Layout>

@@ -10,6 +10,7 @@ import type { AxiosRequestConfig, AxiosResponse } from "axios";
 
 import type {
   CharacterDTO,
+  CharacterDropdownDTO,
   CharacterListDTO,
   CreateCharacterCommand,
   GetCharactersParams,
@@ -101,7 +102,7 @@ Authentication is optional.
 
  * @summary Get all available characters for dropdown selection
  */
-export const getAllAvailableCharacters = <TData = AxiosResponse<string>>(
+export const getAllAvailableCharacters = <TData = AxiosResponse<CharacterDropdownDTO[]>>(
   options?: AxiosRequestConfig
 ): Promise<TData> => {
   return axios.get(`/api/characters/dropdown`, options);
@@ -111,4 +112,4 @@ export type UpdateCharacterResult = AxiosResponse<CharacterDTO>;
 export type DeleteCharacterResult = AxiosResponse<string>;
 export type GetCharactersResult = AxiosResponse<CharacterListDTO>;
 export type CreateCharacterResult = AxiosResponse<CharacterDTO>;
-export type GetAllAvailableCharactersResult = AxiosResponse<string>;
+export type GetAllAvailableCharactersResult = AxiosResponse<CharacterDropdownDTO[]>;

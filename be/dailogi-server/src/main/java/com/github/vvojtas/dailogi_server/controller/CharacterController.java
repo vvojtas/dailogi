@@ -13,6 +13,7 @@ import com.github.vvojtas.dailogi_server.model.character.response.CharacterDTO;
 import com.github.vvojtas.dailogi_server.model.common.response.ErrorResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -441,7 +442,7 @@ public class CharacterController {
         description = "Successfully retrieved characters",
         content = @Content(
             mediaType = "application/json",
-            schema = @Schema(implementation = List.class)
+            array = @ArraySchema(schema = @Schema(implementation = CharacterDropdownDTO.class))
         )
     )
     @ApiResponse(

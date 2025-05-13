@@ -12,6 +12,7 @@ export * from "./avatarRequest";
 export * from "./characterAvatarResponseDTO";
 export * from "./characterConfigDto";
 export * from "./characterDTO";
+export * from "./characterDropdownDTO";
 export * from "./characterListDTO";
 export * from "./createCharacterCommand";
 export * from "./errorResponseDTO";
