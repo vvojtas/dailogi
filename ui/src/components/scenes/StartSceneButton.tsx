@@ -18,7 +18,7 @@ export function StartSceneButton({ onClick, disabled, isLoading = false }: Reado
       ) : (
         <>
           <Play className="mr-2 h-4 w-4" />
-          Rozpocznij scenę
+          Rozpocznij dialog
         </>
       )}
     </Button>
