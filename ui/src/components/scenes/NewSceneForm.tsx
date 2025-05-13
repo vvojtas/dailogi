@@ -20,7 +20,8 @@ import { handleSceneApiError } from "@/lib/utils/errorHandlers/sceneErrors";
 
 export default function NewSceneForm() {
   const isHydrated = useHydration();
-  const { characters, setCharacters, llms, setLlms, phase, isLoading, error, startScene } = useNewScene();
+  const { characters, setCharacters, llms, setLlms, phase, isLoading, error, startScene, dialogueEvents } =
+    useNewScene();
 
   const form = useForm<NewSceneFormData>({
     resolver: zodResolver(newSceneFormSchema),
@@ -62,8 +63,9 @@ export default function NewSceneForm() {
     }
   }, [isHydrated, setCharacters, setLlms]);
 
-  const handleStartScene = () => {
-    startScene();
+  const handleStartScene = (formData: NewSceneFormData) => {
+    console.log("Starting scene with form data:", formData);
+    startScene(formData);
   };
 
   const renderPhaseContent = (phase: FormPhase) => {
@@ -87,7 +89,7 @@ export default function NewSceneForm() {
       case "result":
         return (
           <>
-            <SceneResult />
+            <SceneResult dialogueEvents={dialogueEvents} characters={characters} />
             <SaveSceneForm
               defaultName=""
               onSave={(name: string) => console.log("Saving scene with name:", name)}

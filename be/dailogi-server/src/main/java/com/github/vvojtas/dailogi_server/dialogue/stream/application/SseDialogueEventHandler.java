@@ -101,9 +101,22 @@ public class SseDialogueEventHandler implements DialogueEventHandler {
             log.warn("Attempted to send event '{}' to a null emitter for dialogue {}", eventName, dialogueId);
             return;
         }
-        emitter.send(SseEmitter.event()
+        
+        // Create SSE event object
+        SseEmitter.SseEventBuilder event = SseEmitter.event()
                 .name(eventName)
-                .data(data));
+                .data(data);
+        
+        try {
+            // Send the event immediately
+            emitter.send(event);
+            
+            // Additional flush after each event - forces immediate delivery
+            emitter.send(SseEmitter.event().comment(""));
+        } catch (IOException e) {
+            log.error("Failed to send event '{}' for dialogue {}: {}", eventName, dialogueId, e.getMessage());
+            throw e; // Propagate to calling method for proper error handling
+        }
     }
 
     @Override

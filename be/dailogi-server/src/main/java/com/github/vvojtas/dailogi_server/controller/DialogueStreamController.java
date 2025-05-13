@@ -102,7 +102,9 @@ public class DialogueStreamController {
                 request.length()
         );
         
-        // Start dialogue streaming
-        return dialogueStreamService.streamDialogue(command, authentication);
+        // Start dialogue streaming - this should return quickly as the actual generation is async
+        var emitter = dialogueStreamService.streamDialogue(command, authentication);
+        log.info("Dialogue stream started!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        return emitter;
     }
 } 
