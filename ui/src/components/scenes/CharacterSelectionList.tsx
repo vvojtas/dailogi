@@ -1,9 +1,10 @@
 import { CharacterSlot } from "./CharacterSlot.tsx";
-import type { CharacterOption, LLMOption } from "@/lib/hooks/useNewScene";
+import type { CharacterDropdownDTO } from "@/dailogi-api/model/characterDropdownDTO";
+import type { Llmdto } from "@/dailogi-api/model/llmdto";
 
 interface CharacterSelectionListProps {
-  characters: CharacterOption[];
-  llms: LLMOption[];
+  characters: CharacterDropdownDTO[];
+  llms: Llmdto[];
   disabled?: boolean;
 }
 

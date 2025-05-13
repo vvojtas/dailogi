@@ -21,13 +21,13 @@ export function SceneDescriptionInput({ disabled = false }: Readonly<SceneDescri
             <Textarea
               placeholder='"Nie jesteśmy produktem naszych okoliczności. Jesteśmy produktem naszych decyzji."'
               className="resize-none min-h-24"
-              maxLength={500}
+              maxLength={1000}
               disabled={disabled}
               {...field}
               data-testid="scene-description-input"
             />
           </FormControl>
-          <FormDescription>Maksymalnie 500 znaków. Opisz co uczestnicy mają omówić.</FormDescription>
+          <FormDescription>Nakreśl temat rozmowy oraz okoliczności sceny</FormDescription>
           <FormMessage />
         </FormItem>
       )}
