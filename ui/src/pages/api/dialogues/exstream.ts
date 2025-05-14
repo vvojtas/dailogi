@@ -5,8 +5,8 @@ import { ENV } from "@/lib/config/env";
 const backendBaseUrl = ENV.SPRING_BACKEND_BASE_URL;
 
 /**
- * Specjalny endpoint do obsługi SSE (Server-Sent Events) dla dialogów.
- * Skonfigurowany tak, aby prawidłowo przekazywać strumień bez buforowania.
+ * Special endpoint for handling SSE (Server-Sent Events) for dialogues.
+ * Configured to properly forward the stream without buffering.
  */
 export const POST: APIRoute = async ({ request, cookies }) => {
   const token = cookies.get(SESSION_COOKIE_NAME)?.value;
@@ -25,11 +25,11 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   // Prepare headers for the backend request
   const backendHeaders = new Headers();
 
-  // Ustaw krytyczne nagłówki
+  // Set critical headers
   backendHeaders.set("Content-Type", "application/json");
   backendHeaders.set("Accept", "text/event-stream");
 
-  // Dodaj nagłówki zapobiegające buforowaniu
+  // Add headers to prevent buffering
   backendHeaders.set("Cache-Control", "no-cache, no-store, no-transform");
   backendHeaders.set("Connection", "keep-alive");
   backendHeaders.set("X-Accel-Buffering", "no");
@@ -40,10 +40,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   }
 
   try {
-    // Pobierz dane JSON z żądania
+    // Get JSON data from the request
     const requestData = await request.json();
 
-    console.log("Przekazuję żądanie do backendu:", {
+    console.log("Forwarding request to backend:", {
       url: targetUrl,
       method: "POST",
       headers: Object.fromEntries(backendHeaders.entries()),
@@ -58,7 +58,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     });
 
     if (!backendResponse.ok) {
-      // Jeśli backend zwrócił błąd, przekaż go dalej
+      // If backend returned an error, pass it on
       const errorText = await backendResponse.text();
       console.error(`Backend SSE error (${backendResponse.status}):`, errorText);
 
@@ -68,10 +68,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       });
     }
 
-    // Stwórz nowy TransformStream do przekazywania danych
+    // Create a new TransformStream for data forwarding
     const { readable, writable } = new TransformStream();
 
-    // Uruchom przetwarzanie w tle, bez czekania na jego zakończenie
+    // Run processing in the background, without waiting for it to complete
     (async () => {
       const reader = backendResponse.body?.getReader();
       const writer = writable.getWriter();
@@ -87,18 +87,18 @@ export const POST: APIRoute = async ({ request, cookies }) => {
           const { done, value } = await reader.read();
 
           if (done) {
-            console.log("SSE stream zakończony");
+            console.log("SSE stream completed");
             await writer.close();
             break;
           }
 
-          // Loguj otrzymanie chunka
-          console.log(`SSE chunk otrzymany: ${value.byteLength} bajtów`);
+          // Log receipt of chunk
+          console.log(`SSE chunk received: ${value.byteLength} bytes`);
 
-          // Natychmiast zapisz do strumienia wyjściowego
+          // Immediately write to output stream
           await writer.write(value);
 
-          // Pokaż zawartość chunka w formacie tekstowym (opcjonalnie)
+          // Show chunk content in text format (optional)
           try {
             const textChunk = new TextDecoder().decode(value, { stream: true });
             console.log("Chunk text preview:", textChunk.substring(0, 100) + (textChunk.length > 100 ? "..." : ""));
@@ -112,7 +112,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       }
     })();
 
-    // Zwróć odpowiedź z własnym strumieniem - natychmiast, bez czekania na zakończenie przetwarzania
+    // Return response with custom stream - immediately, without waiting for processing to complete
     return new Response(readable, {
       status: 200,
       headers: {

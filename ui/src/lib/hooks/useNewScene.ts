@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { ZodError } from "zod";
 import type { CharacterDropdownDTO } from "@/dailogi-api/model/characterDropdownDTO";
 import type { Llmdto } from "@/dailogi-api/model/llmdto";
 import { newSceneFormSchema, type NewSceneFormData } from "@/lib/validation/sceneSchema";
-import type { DialogueEvent } from "@/dailogi-api-custom/dialogues";
 import type { CharacterConfigDto } from "@/dailogi-api/model/characterConfigDto";
+import { useDialogueStream } from "./useDialogueStream";
 
 // Define types for the form
 export interface LLMOption {
@@ -21,75 +23,29 @@ export function useNewScene() {
 
   // Phase management
   const [phase, setPhase] = useState<FormPhase>("config");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  // SSE state
-  const [dialogueEvents, setDialogueEvents] = useState<DialogueEvent[]>([]);
-  const [abortController, setAbortController] = useState<AbortController | null>(null);
+  // Use the dialogue stream hook
+  const { dialogueEvents, isLoading, error: streamError, startStream } = useDialogueStream();
 
-  // Cleanup fetch controller on unmount
+  // Monitor stream errors and show toast when they occur
   useEffect(() => {
-    return () => {
-      if (abortController) {
-        abortController.abort();
-      }
-    };
-  }, [abortController]);
-
-  // Helper to parse SSE events
-  const processSSEChunk = (chunk: string) => {
-    // Znajdź wszystkie kompletne zdarzenia SSE (format: "data: {...}\n\n")
-    const pattern = /data: ({.*?})\n\n/g;
-    let match;
-
-    // Iteruj po wszystkich dopasowaniach
-    while ((match = pattern.exec(chunk)) !== null) {
-      try {
-        // Wyciągnij JSON ze zdarzenia
-        const jsonData = match[1];
-        const eventData = JSON.parse(jsonData);
-
-        console.log("Parsed SSE event:", eventData);
-
-        // Dodaj zdarzenie do stanu
-        setDialogueEvents((prev) => [...prev, eventData]);
-      } catch (error) {
-        console.error("Error parsing SSE event JSON:", error, match[0]);
-      }
+    if (streamError) {
+      toast.error(streamError);
     }
-  };
+  }, [streamError]);
 
   // Start scene generation
   const startScene = async (formData: NewSceneFormData) => {
     setPhase("loading");
-    setIsLoading(true);
-    setDialogueEvents([]);
-
-    // Abort any existing request
-    if (abortController) {
-      abortController.abort();
-    }
-
-    // Create new abort controller
-    const controller = new AbortController();
-    setAbortController(controller);
 
     try {
+      // Validate form data using Zod schema
+      const validatedData = newSceneFormSchema.parse(formData);
+
       // Filter out unused character configs
-      const validConfigs = formData.configs.filter(
+      const validConfigs = validatedData.configs.filter(
         (config) => config.characterId !== undefined && config.llmId !== undefined
       );
-
-      // Sprawdź, czy mamy wystarczającą liczbę postaci
-      if (validConfigs.length < 2) {
-        throw new Error("Wymagane są co najmniej dwie postacie");
-      }
-
-      // Sprawdź, czy mamy opis sceny
-      if (!formData.description.trim()) {
-        throw new Error("Opis sceny jest wymagany");
-      }
 
       // Map to the format expected by the API
       const characterConfigs: CharacterConfigDto[] = validConfigs.map((config) => ({
@@ -97,88 +53,34 @@ export function useNewScene() {
         llm_id: config.llmId || 0,
       }));
 
-      const requestData = {
-        scene_description: formData.description,
+      // Start the stream using the extracted hook
+      const success = await startStream({
+        scene_description: validatedData.description,
         character_configs: characterConfigs,
-        length: 10, // Number of turns - can be configurable later
-      };
-
-      console.log("Starting scene with data:", requestData);
-
-      // Użyj jednego żądania POST do uruchomienia strumienia
-      const response = await fetch("/api/dialogues/stream", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "text/event-stream",
-          "Cache-Control": "no-cache",
-        },
-        body: JSON.stringify(requestData),
-        signal: controller.signal,
+        length: 5, // Number of turns - can be configurable later
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("API error:", response.status, errorText);
-        throw new Error(`HTTP error! Status: ${response.status}, Details: ${errorText || "No details"}`);
+      // Change phase to result only if successful
+      if (success) {
+        setPhase("result");
+      } else {
+        setPhase("config");
+      }
+    } catch (error: unknown) {
+      console.error("Error starting scene:", error);
+
+      // Handle ZodErrors from form validation
+      if (error instanceof ZodError) {
+        const errorMessage = error.errors?.[0]?.message || "Nieprawidłowe dane formularza";
+        toast.error(errorMessage);
+      } else {
+        // Handle other errors
+        const errorMessage = error instanceof Error ? error.message : "Nie zagrało - nieznany błąd";
+        toast.error(errorMessage);
       }
 
-      if (!response.body) {
-        throw new Error("Response body is null");
-      }
-
-      // Zmień fazę na result już teraz
-      setPhase("result");
-
-      // Czytaj i przetwarzaj strumień SSE
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-
-          if (done) {
-            // Przetwórz pozostałe dane w buforze, jeśli istnieją
-            if (buffer.trim()) {
-              processSSEChunk(buffer);
-            }
-            console.log("Stream complete");
-            break;
-          }
-
-          // Dekoduj chunk i dodaj do bufora
-          const chunk = decoder.decode(value, { stream: true });
-          console.log("Received chunk:", chunk);
-          buffer += chunk;
-
-          // Przetwórz zdarzenia SSE
-          processSSEChunk(buffer);
-
-          // Usuń przetworzony tekst z bufora, ale zachowaj potencjalnie niekompletne zdarzenie
-          const lastEventIndex = buffer.lastIndexOf("\n\n");
-          if (lastEventIndex !== -1) {
-            buffer = buffer.substring(lastEventIndex + 2);
-          }
-        }
-      } catch (readError) {
-        if (readError instanceof DOMException && readError.name === "AbortError") {
-          console.log("Stream reading aborted");
-        } else {
-          console.error("Error reading from stream:", readError);
-          setError("Błąd podczas odczytu strumienia dialogu");
-          setPhase("config");
-        }
-      }
-    } catch (err) {
-      console.error("Error starting scene:", err);
-      const errorMessage = err instanceof Error ? err.message : "Nie zagrało - nieznany błąd";
-      setError(errorMessage);
+      // Revert to config phase
       setPhase("config");
-      throw err;
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -190,8 +92,8 @@ export function useNewScene() {
     setLlms,
     phase,
     isLoading,
-    error,
-    dialogueEvents, // Export events for display
+    hasError: !!streamError,
+    dialogueEvents, // From dialogue stream hook
 
     // Actions
     startScene,

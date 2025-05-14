@@ -6,7 +6,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { SceneDescriptionInput } from "./SceneDescriptionInput.tsx";
 import { CharacterSelectionList } from "./CharacterSelectionList.tsx";
 import { StartSceneButton } from "./StartSceneButton.tsx";
-import { LoadingIndicator } from "./LoadingIndicator.tsx";
 import { SceneResult } from "./SceneResult.tsx";
 import { SaveSceneForm } from "./SaveSceneForm.tsx";
 import { useNewScene, type FormPhase } from "@/lib/hooks/useNewScene";
@@ -20,7 +19,7 @@ import { handleSceneApiError } from "@/lib/utils/errorHandlers/sceneErrors";
 
 export default function NewSceneForm() {
   const isHydrated = useHydration();
-  const { characters, setCharacters, llms, setLlms, phase, isLoading, error, startScene, dialogueEvents } =
+  const { characters, setCharacters, llms, setLlms, phase, isLoading, hasError, startScene, dialogueEvents } =
     useNewScene();
 
   const form = useForm<NewSceneFormData>({
@@ -85,10 +84,11 @@ export default function NewSceneForm() {
           </>
         );
       case "loading":
-        return <LoadingIndicator />;
       case "result":
         return (
           <>
+            <SceneDescriptionInput disabled={true} />
+            <CharacterSelectionList characters={characters} llms={llms} disabled={true} />
             <SceneResult dialogueEvents={dialogueEvents} characters={characters} />
             <SaveSceneForm
               defaultName=""
@@ -110,7 +110,11 @@ export default function NewSceneForm() {
             <Form {...form}>
               <form data-testid="new-scene-form">
                 {renderPhaseContent(phase)}
-                {error && <div className="text-destructive mt-4 text-sm">{error}</div>}
+                {hasError && (
+                  <div className="text-destructive mt-4 text-sm">
+                    Wystąpił błąd podczas generowania dialogu. Zobacz powiadomienia, aby poznać szczegóły.
+                  </div>
+                )}
               </form>
             </Form>
           </FormProvider>
