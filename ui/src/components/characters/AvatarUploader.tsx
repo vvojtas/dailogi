@@ -24,7 +24,7 @@ export function AvatarUploader({ initialAvatarUrl, characterId, onAvatarChange }
 
   const validateFile = (file: File): Promise<ValidationError | null> => {
     return new Promise((resolve) => {
-      // Sprawdź format
+      // Check format
       if (!["image/png", "image/jpeg"].includes(file.type)) {
         resolve({
           type: "format",
@@ -33,7 +33,7 @@ export function AvatarUploader({ initialAvatarUrl, characterId, onAvatarChange }
         return;
       }
 
-      // Sprawdź rozmiar (max 1MB)
+      // Check size (max 1MB)
       if (file.size > 1024 * 1024) {
         resolve({
           type: "size",
@@ -42,7 +42,7 @@ export function AvatarUploader({ initialAvatarUrl, characterId, onAvatarChange }
         return;
       }
 
-      // Sprawdź wymiary
+      // Check dimensions
       const img = new Image();
       img.src = URL.createObjectURL(file);
       img.onload = () => {
@@ -106,7 +106,7 @@ export function AvatarUploader({ initialAvatarUrl, characterId, onAvatarChange }
   };
 
   const handleRemove = async () => {
-    // Jeśli characterId nie istnieje, wykonaj lokalne usunięcie
+    // If characterId doesn't exist, perform local removal
     if (!characterId) {
       setPreviewUrl(null);
       onAvatarChange(null);
@@ -128,10 +128,10 @@ export function AvatarUploader({ initialAvatarUrl, characterId, onAvatarChange }
       toast.success("Portret został zdematerializowany");
     } catch (err) {
       if (err instanceof DailogiError && err.displayed) {
-        console.error("Błąd przy likwidacji portretu:", err);
+        console.error("Error when dematerializing portrait:", err);
       } else {
         toast.error("Portret oparł się próbom dematerializacji. Spróbuj ponownie później.");
-        console.error("Błąd przy likwidacji portretu:", err);
+        console.error("Error when dematerializing portrait:", err);
       }
     } finally {
       setIsUploading(false);

@@ -6,8 +6,10 @@ import com.github.vvojtas.dailogi_server.character.api.DeleteCharacterCommand;
 import com.github.vvojtas.dailogi_server.character.api.UpdateCharacterCommand;
 import com.github.vvojtas.dailogi_server.character.application.CharacterCommandService;
 import com.github.vvojtas.dailogi_server.character.application.CharacterQueryService;
+import com.github.vvojtas.dailogi_server.model.character.mapper.CharacterDropdownMapper;
 import com.github.vvojtas.dailogi_server.model.character.response.CharacterListDTO;
 import com.github.vvojtas.dailogi_server.model.character.response.CharacterDTO;
+import com.github.vvojtas.dailogi_server.model.character.response.CharacterDropdownDTO;
 import com.github.vvojtas.dailogi_server.service.auth.JwtTokenProvider;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -81,6 +83,9 @@ class CharacterControllerTest {
     
     @MockitoBean
     private CharacterCommandService characterCommandService;
+    
+    @MockitoBean
+    private CharacterDropdownMapper characterDropdownMapper;
 
     private static Stream<Arguments> invalidPaginationParameters() {
         return Stream.of(
@@ -289,5 +294,56 @@ class CharacterControllerTest {
                     """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Validation failed"));
+    }
+
+    @Test
+    @DisplayName("Should return character dropdown items")
+    void shouldReturnCharacterDropdownItems() throws Exception {
+        // Arrange
+        CharacterDTO characterDTO = new CharacterDTO(
+            1L, 
+            "Test Character", 
+            "Short desc",
+            "Description", 
+            true,
+            "/api/characters/1/avatar",
+            true,
+            1L,
+            OffsetDateTime.now(),
+            OffsetDateTime.now()
+        );
+        
+        CharacterListDTO characterListDTO = new CharacterListDTO(
+            List.of(characterDTO),
+            0,
+            Integer.MAX_VALUE,
+            1L,
+            1
+        );
+        
+        CharacterDropdownDTO dropdownDTO = new CharacterDropdownDTO(
+            1L,
+            "Test Character",
+            true,
+            true,
+            "/api/characters/1/avatar"
+        );
+        
+        when(characterQueryService.getCharacters(any(CharacterQuery.class)))
+            .thenReturn(characterListDTO);
+        
+        when(characterDropdownMapper.toDropdownDTOs(List.of(characterDTO)))
+            .thenReturn(List.of(dropdownDTO));
+
+        // Act & Assert
+        mockMvc.perform(get("/api/characters/dropdown"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].name").value("Test Character"))
+                .andExpect(jsonPath("$[0].is_global").value(true))
+                .andExpect(jsonPath("$[0].has_avatar").value(true))
+                .andExpect(jsonPath("$[0].avatar_url").value("/api/characters/1/avatar"));
     }
 } 

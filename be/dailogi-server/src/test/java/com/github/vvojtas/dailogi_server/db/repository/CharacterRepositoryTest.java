@@ -176,6 +176,7 @@ class CharacterRepositoryTest {
                 .user(user1)
                 .name("Test Dialogue")
                 .sceneDescription("Test Topic")
+                .isGlobal(false)
                 .status(DialogueStatus.COMPLETED)
                 .build();
         entityManager.persist(dialogue);

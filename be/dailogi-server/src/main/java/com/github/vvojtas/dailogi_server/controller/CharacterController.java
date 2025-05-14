@@ -6,11 +6,14 @@ import com.github.vvojtas.dailogi_server.character.api.DeleteCharacterCommand;
 import com.github.vvojtas.dailogi_server.character.api.UpdateCharacterCommand;
 import com.github.vvojtas.dailogi_server.character.application.CharacterCommandService;
 import com.github.vvojtas.dailogi_server.character.application.CharacterQueryService;
+import com.github.vvojtas.dailogi_server.model.character.mapper.CharacterDropdownMapper;
+import com.github.vvojtas.dailogi_server.model.character.response.CharacterDropdownDTO;
 import com.github.vvojtas.dailogi_server.model.character.response.CharacterListDTO;
 import com.github.vvojtas.dailogi_server.model.character.response.CharacterDTO;
 import com.github.vvojtas.dailogi_server.model.common.response.ErrorResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -39,6 +42,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.vvojtas.dailogi_server.service.util.UrlUtil;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/characters")
@@ -50,6 +54,7 @@ public class CharacterController {
     private static final int MAX_PAGE_SIZE = 50;
     private final CharacterQueryService characterQueryService;
     private final CharacterCommandService characterCommandService;
+    private final CharacterDropdownMapper characterDropdownMapper;
 
     @Operation(
         summary = "Get paginated list of characters",
@@ -419,5 +424,44 @@ public class CharacterController {
         DeleteCharacterCommand command = new DeleteCharacterCommand(id);
         characterCommandService.deleteCharacter(command);
         return ResponseEntity.ok("Character successfully deleted");
+    }
+
+    @Operation(
+        summary = "Get all available characters for dropdown selection",
+        description = """
+            Retrieves all characters available to the current user (owned and global characters).
+            Returns only essential fields needed for dropdown selection.
+            If the user is authenticated, includes both personal characters and global characters.
+            If the user is not authenticated, only global characters are returned.
+            Results are sorted with personal characters first, then global characters, both groups sorted by name.
+            Authentication is optional.
+            """
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Successfully retrieved characters",
+        content = @Content(
+            mediaType = "application/json",
+            array = @ArraySchema(schema = @Schema(implementation = CharacterDropdownDTO.class))
+        )
+    )
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - user not authenticated",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponseDTO.class)
+        )
+    )
+    @GetMapping("/dropdown")
+    public ResponseEntity<List<CharacterDropdownDTO>> getAllAvailableCharacters(Authentication authentication) {
+        // Get all characters with a large page size to ensure we get everything
+        CharacterQuery query = new CharacterQuery(true, PageRequest.of(0, Integer.MAX_VALUE), authentication);
+        CharacterListDTO allCharacters = characterQueryService.getCharacters(query);
+        
+        // Map CharacterDTO to CharacterDropdownDTO using the mapper
+        List<CharacterDropdownDTO> dropdownItems = characterDropdownMapper.toDropdownDTOs(allCharacters.content());
+            
+        return ResponseEntity.ok(dropdownItems);
     }
 }

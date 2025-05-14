@@ -16,6 +16,7 @@ import com.github.vvojtas.dailogi_server.exception.AuthenticationErrorException;
 import com.github.vvojtas.dailogi_server.exception.ResourceNotFoundException;
 import com.github.vvojtas.dailogi_server.exception.DuplicateResourceException;
 import com.github.vvojtas.dailogi_server.exception.InvalidJwtException;
+import com.github.vvojtas.dailogi_server.exception.NoApiKeyException;
 import com.github.vvojtas.dailogi_server.model.common.response.ErrorResponseDTO;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import com.github.vvojtas.dailogi_server.exception.CharacterLimitExceededException;
@@ -217,6 +218,25 @@ public class GlobalExceptionHandler {
                 e.getMessage(),
                 "CHARACTER_LIMIT_EXCEEDED",
                 Map.of("limit", e.getLimit()),
+                OffsetDateTime.now()
+            ));
+    }
+
+    @ExceptionHandler(NoApiKeyException.class)
+    public ResponseEntity<ErrorResponseDTO> handleNoApiKeyException(NoApiKeyException e) {
+        log.warn("API key required. User ID: {}, Operation: {}. Message: {}", 
+                e.getUserId(), e.getOperation(), e.getMessage(), e);
+        
+        Map<String, Object> details = new HashMap<>();
+        details.put("operation", e.getOperation());
+        
+        return ResponseEntity
+            .status(HttpStatus.PAYMENT_REQUIRED)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new ErrorResponseDTO(
+                e.getMessage(),
+                "API_KEY_REQUIRED",
+                details,
                 OffsetDateTime.now()
             ));
     }

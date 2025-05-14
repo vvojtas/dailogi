@@ -37,6 +37,9 @@ public class Dialogue {
     @Column(name = "scene_description", columnDefinition = "TEXT")
     private String sceneDescription;
 
+    @Column(nullable = false)
+    private Boolean isGlobal = false;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private DialogueStatus status;

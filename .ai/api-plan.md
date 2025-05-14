@@ -289,6 +289,25 @@
 - **Success Codes**: 204 No Content
 - **Error Codes**: 401 Unauthorized, 403 Forbidden (not owner or global character), 404 Not Found, 409 Conflict (character used in dialogues)
 
+#### Get Characters for Dropdown
+- **Method**: GET
+- **Path**: `/api/characters/dropdown`
+- **Description**: Get all available characters for dropdown selection
+- **Response Body**:
+  ```json
+  [
+    {
+      "id": "long",
+      "name": "string",
+      "has_avatar": "boolean",
+      "avatar_url": "string",
+      "is_global": "boolean"
+    }
+  ]
+  ```
+- **Success Codes**: 200 OK
+- **Error Codes**: 401 Unauthorized
+
 ### LLMs
 
 #### Get LLMs
@@ -306,7 +325,7 @@
   ]
   ```
 - **Success Codes**: 200 OK
-- **Error Codes**: 401 Unauthorized
+- **Error Codes**: 401 Unauthorized, 500 Internal Server Error
 
 ### Dialogues
 
@@ -413,18 +432,29 @@
       "character_configs": [
         {
           "character_id": "long",
-          "character_name": "string",
-          "has_avatar": "boolean",
-          "avatar_url": "string" 
+          "llm_id": "long"
         }
       ],
       "turn_count": 0
     }
     ```
+  - `character-start`: Signals the beginning of a character's turn
+    ```json
+    {
+      "character_config": {
+        "character_id": "long",
+        "llm_id": "long"
+      },
+      "id": "string" // Event ID for reconnection support
+    }
+    ```
   - `token`: Character response being generated token by token
     ```json
     {
-      "character_id": "long",
+      "character_config": {
+        "character_id": "long",
+        "llm_id": "long"
+      },
       "token": "string",
       "id": "string" // Event ID for reconnection support
     }
