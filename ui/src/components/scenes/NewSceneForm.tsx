@@ -8,7 +8,7 @@ import { CharacterSelectionList } from "./CharacterSelectionList.tsx";
 import { StartSceneButton } from "./StartSceneButton.tsx";
 import { SceneResult } from "./SceneResult.tsx";
 import { SaveSceneForm } from "./SaveSceneForm.tsx";
-import { useNewScene, type FormPhase } from "@/lib/hooks/useNewScene";
+import { useNewScene } from "@/lib/hooks/useNewScene";
 import { newSceneFormSchema, type NewSceneFormData } from "@/lib/validation/sceneSchema";
 import { useHydration } from "@/lib/hooks/useHydration";
 import { getAllAvailableCharacters } from "@/dailogi-api/characters/characters";
@@ -67,41 +67,6 @@ export default function NewSceneForm() {
     startScene(formData);
   };
 
-  const renderPhaseContent = (phase: FormPhase) => {
-    switch (phase) {
-      case "config":
-        return (
-          <>
-            <SceneDescriptionInput disabled={isLoading || !isHydrated} />
-            <CharacterSelectionList characters={characters} llms={llms} disabled={isLoading || !isHydrated} />
-            <div className="flex justify-end mt-6">
-              <StartSceneButton
-                onClick={form.handleSubmit(handleStartScene)}
-                disabled={isLoading || !isHydrated || !form.formState.isValid}
-                isLoading={isLoading}
-              />
-            </div>
-          </>
-        );
-      case "loading":
-      case "result":
-        return (
-          <>
-            <SceneDescriptionInput disabled={true} />
-            <CharacterSelectionList characters={characters} llms={llms} disabled={true} />
-            <SceneResult dialogueEvents={dialogueEvents} characters={characters} />
-            <SaveSceneForm
-              defaultName=""
-              onSave={(name: string) => console.log("Saving scene with name:", name)}
-              disabled={isLoading || !isHydrated}
-            />
-          </>
-        );
-      default:
-        return null;
-    }
-  };
-
   return (
     <div className="max-w-3xl mx-auto">
       <Card>
@@ -109,7 +74,36 @@ export default function NewSceneForm() {
           <FormProvider {...form}>
             <Form {...form}>
               <form data-testid="new-scene-form">
-                {renderPhaseContent(phase)}
+                <SceneDescriptionInput disabled={isLoading || !isHydrated || phase !== "config"} phase={phase} />
+
+                <CharacterSelectionList
+                  characters={characters}
+                  llms={llms}
+                  disabled={isLoading || !isHydrated || phase !== "config"}
+                  phase={phase}
+                />
+
+                {phase === "config" && (
+                  <div className="flex justify-end mt-6">
+                    <StartSceneButton
+                      onClick={form.handleSubmit(handleStartScene)}
+                      disabled={isLoading || !isHydrated || !form.formState.isValid}
+                      isLoading={isLoading}
+                    />
+                  </div>
+                )}
+
+                {(phase === "loading" || phase === "result") && (
+                  <>
+                    <SceneResult dialogueEvents={dialogueEvents} characters={characters} llms={llms} />
+                    <SaveSceneForm
+                      defaultName=""
+                      onSave={(name: string) => console.log("Saving scene with name:", name)}
+                      disabled={isLoading || !isHydrated}
+                    />
+                  </>
+                )}
+
                 {hasError && (
                   <div className="text-destructive mt-4 text-sm">
                     Wystąpił błąd podczas generowania dialogu. Zobacz powiadomienia, aby poznać szczegóły.

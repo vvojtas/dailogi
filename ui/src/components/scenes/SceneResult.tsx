@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { CharacterAvatar } from "@/components/characters/CharacterAvatar";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import type {
   DialogueEvent,
   CharacterStartEvent,
@@ -8,10 +10,12 @@ import type {
   CharacterCompleteEvent,
 } from "@/dailogi-api-custom/dialogues";
 import type { CharacterDropdownDTO } from "@/dailogi-api/model/characterDropdownDTO";
+import type { Llmdto } from "@/dailogi-api/model/llmdto";
 
 interface SceneResultProps {
   dialogueEvents?: DialogueEvent[];
   characters?: CharacterDropdownDTO[];
+  llms?: Llmdto[];
 }
 
 // Temporary type for messages
@@ -24,10 +28,44 @@ interface Message {
   isComplete: boolean;
 }
 
-export function SceneResult({ dialogueEvents = [], characters = [] }: SceneResultProps) {
+export function SceneResult({ dialogueEvents = [], characters = [], llms = [] }: SceneResultProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const processedEventsRef = useRef<Set<string>>(new Set());
   const [lastProcessedIndex, setLastProcessedIndex] = useState<number>(-1);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Function to scroll to the bottom of the messages container
+  const scrollToBottom = useCallback(() => {
+    // Attempt to scroll the viewport directly
+    if (viewportRef.current) {
+      viewportRef.current.scrollTop = viewportRef.current.scrollHeight;
+    }
+
+    // Also try to scroll to the end marker element, as a fallback
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, []);
+
+  // Apply scrolling after render and after messages update
+  useEffect(() => {
+    // Use a small timeout to ensure DOM is updated
+    const timeoutId = setTimeout(() => {
+      scrollToBottom();
+    }, 50);
+
+    return () => clearTimeout(timeoutId);
+  }, [messages, scrollToBottom]);
+
+  // Function to get LLM name by ID
+  const getLlmName = useCallback(
+    (llmId: number) => {
+      const llm = llms.find((l) => l.id === llmId);
+      return llm?.name || "Nieznany model";
+    },
+    [llms]
+  );
 
   // Optimized function for processing events
   const processEvent = useCallback(
@@ -162,35 +200,45 @@ export function SceneResult({ dialogueEvents = [], characters = [] }: SceneResul
 
   return (
     <div className="flex gap-4">
-      {/* Główny panel wiadomości */}
       <div className="space-y-6 py-4 flex-1">
         <h3 className="text-lg font-medium">Wystawiony dialog</h3>
 
-        <div className="space-y-4">
-          {messages.map((message, index) => (
-            <Card key={index} className="overflow-hidden">
-              <CardContent className="p-4">
-                <div className="flex items-start gap-4">
-                  <CharacterAvatar
-                    hasAvatar={!!message.avatarUrl}
-                    avatarUrl={message.avatarUrl}
-                    characterName={message.characterName}
-                    className="h-10 w-10"
-                  />
-                  <div className="flex-1">
-                    <p className="font-semibold">{message.characterName}</p>
-                    <p className="text-sm mt-1 text-muted-foreground">
-                      {message.content}
-                      {!message.isComplete && (
-                        <span className="animate-pulse inline-block h-4 w-2 ml-1 bg-muted-foreground rounded-sm"></span>
+        <ScrollArea className="h-[500px] pr-4" viewportRef={viewportRef}>
+          <div className="space-y-4">
+            {messages.map((message, index) => (
+              <Card key={index} className="overflow-hidden">
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-4">
+                    <div className="flex flex-col items-center gap-1">
+                      <CharacterAvatar
+                        hasAvatar={!!message.avatarUrl}
+                        avatarUrl={message.avatarUrl}
+                        characterName={message.characterName}
+                        className="h-10 w-10"
+                      />
+                      {message.llmId > 0 && (
+                        <Badge variant="secondary" className="text-xs px-2 py-0">
+                          {getLlmName(message.llmId)}
+                        </Badge>
                       )}
-                    </p>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold">{message.characterName}</p>
+                      <p className="text-sm mt-1 text-muted-foreground">
+                        {message.content}
+                        {!message.isComplete && (
+                          <span className="animate-pulse inline-block h-4 w-2 ml-1 bg-muted-foreground rounded-sm"></span>
+                        )}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                </CardContent>
+              </Card>
+            ))}
+            {/* Element referencyjny na końcu listy wiadomości */}
+            <div ref={messagesEndRef} className="h-1" />
+          </div>
+        </ScrollArea>
       </div>
     </div>
   );

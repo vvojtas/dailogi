@@ -12,6 +12,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import type { CharacterDTO } from "@/dailogi-api/model/characterDTO";
 import type { CharacterDropdownDTO } from "@/dailogi-api/model/characterDropdownDTO";
 import type { Llmdto } from "@/dailogi-api/model/llmdto";
+import type { FormPhase } from "@/lib/hooks/useNewScene";
+import { Badge } from "@/components/ui/badge";
 
 // Custom component for truncating select trigger content
 interface TruncatedSelectTriggerProps {
@@ -44,6 +46,7 @@ interface CharacterSlotProps {
   characters: CharacterDropdownDTO[];
   llms: Llmdto[];
   disabled?: boolean;
+  phase?: FormPhase;
 }
 
 // Custom hook to manage character selection and details
@@ -135,10 +138,18 @@ function useCharacterSlot(index: number, characters: CharacterDropdownDTO[]) {
   };
 }
 
-export function CharacterSlot({ index, characters, llms, disabled = false }: Readonly<CharacterSlotProps>) {
+export function CharacterSlot({
+  index,
+  characters,
+  llms,
+  disabled = false,
+  phase = "config",
+}: Readonly<CharacterSlotProps>) {
   const form = useFormContext();
   const { characterId, llmId, selectedCharacter, characterDetails, tooltipDescription, handleClearSelection } =
     useCharacterSlot(index, characters);
+
+  const isDisplayPhase = phase === "loading" || phase === "result";
 
   // Get selected LLM name
   const selectedLlm = llms.find((llm) => llm.id === llmId);
@@ -159,7 +170,7 @@ export function CharacterSlot({ index, characters, llms, disabled = false }: Rea
     >
       {/* Slot header with character number and clear button */}
       <div className="flex items-center justify-end mb-2 h-6">
-        {characterId && (
+        {characterId && !isDisplayPhase && (
           <Button
             variant="ghost"
             size="icon"
@@ -213,101 +224,114 @@ export function CharacterSlot({ index, characters, llms, disabled = false }: Rea
       </div>
 
       {/* Character selection field */}
-      <FormField
-        control={form.control}
-        name={`configs.${index}.characterId`}
-        render={({ field }) => (
-          <FormItem className="text-center">
-            <FormLabel className="flex justify-center">Wybierz postać</FormLabel>
-            <Select
-              key={`character-select-${index}-${characterId}`}
-              value={field.value?.toString() || ""}
-              onValueChange={(value) => {
-                field.onChange(value === "undefined" ? undefined : parseInt(value, 10));
-              }}
-              disabled={disabled}
-            >
-              <FormControl>
-                <TruncatedSelectTrigger
-                  placeholder="Zaangażuj postać..."
-                  selectedName={selectedCharacter?.name}
-                  disabled={disabled}
-                />
-              </FormControl>
-              <SelectContent className="max-w-[300px]">
-                {characters.map((character) => (
-                  <SelectItem
-                    key={character.id}
-                    value={character.id.toString()}
-                    className={`relative ${character.is_global ? "bg-secondary/80" : ""}`}
-                  >
-                    <div className="flex items-center gap-2 pr-6 w-full">
-                      <CharacterAvatar
-                        hasAvatar={character.has_avatar}
-                        avatarUrl={character.avatar_url}
-                        characterName={character.name}
-                        className="h-6 w-6 shrink-0"
-                      />
-                      <span className="truncate">{character.name}</span>
-                    </div>
-                    {character.is_global && (
-                      <div className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-                        <BookOpen className="h-3 w-3" />
+      {!isDisplayPhase && (
+        <FormField
+          control={form.control}
+          name={`configs.${index}.characterId`}
+          render={({ field }) => (
+            <FormItem className="text-center">
+              <FormLabel className="flex justify-center">Wybierz postać</FormLabel>
+              <Select
+                key={`character-select-${index}-${characterId}`}
+                value={field.value?.toString() || ""}
+                onValueChange={(value) => {
+                  field.onChange(value === "undefined" ? undefined : parseInt(value, 10));
+                }}
+                disabled={disabled}
+              >
+                <FormControl>
+                  <TruncatedSelectTrigger
+                    placeholder="Zaangażuj postać..."
+                    selectedName={selectedCharacter?.name}
+                    disabled={disabled}
+                  />
+                </FormControl>
+                <SelectContent className="max-w-[300px]">
+                  {characters.map((character) => (
+                    <SelectItem
+                      key={character.id}
+                      value={character.id.toString()}
+                      className={`relative ${character.is_global ? "bg-secondary/80" : ""}`}
+                    >
+                      <div className="flex items-center gap-2 pr-6 w-full">
+                        <CharacterAvatar
+                          hasAvatar={character.has_avatar}
+                          avatarUrl={character.avatar_url}
+                          characterName={character.name}
+                          className="h-6 w-6 shrink-0"
+                        />
+                        <span className="truncate">{character.name}</span>
                       </div>
-                    )}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+                      {character.is_global && (
+                        <div className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                          <BookOpen className="h-3 w-3" />
+                        </div>
+                      )}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      )}
 
       {/* LLM selection field */}
-      <FormField
-        control={form.control}
-        name={`configs.${index}.llmId`}
-        render={({ field }) => (
-          <FormItem className="text-center">
-            <FormLabel className="flex justify-center">Wybierz model LLM</FormLabel>
-            <Select
-              value={field.value?.toString() ?? ""}
-              onValueChange={(value) => {
-                field.onChange(value === "undefined" ? undefined : parseInt(value, 10));
-              }}
-              disabled={disabled || !characterId}
-            >
-              <FormControl>
-                <TruncatedSelectTrigger
-                  placeholder="LLM u steru"
-                  selectedName={selectedLlm?.name}
-                  disabled={disabled || !characterId}
-                />
-              </FormControl>
-              <SelectContent className="max-w-[300px]">
-                {llms.map((llm) => (
-                  <SelectItem
-                    key={llm.id}
-                    value={llm.id.toString()}
-                    className={`relative ${characterDetails?.default_llm_id === llm.id ? "font-medium bg-secondary/20" : ""}`}
-                  >
-                    <div className="flex items-center w-full pr-6">
-                      <span className="truncate">{llm.name}</span>
-                    </div>
-                    {characterDetails?.default_llm_id === llm.id && (
-                      <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                        <Star className="h-3 w-3 text-yellow-500" />
+      {!isDisplayPhase && (
+        <FormField
+          control={form.control}
+          name={`configs.${index}.llmId`}
+          render={({ field }) => (
+            <FormItem className="text-center">
+              <FormLabel className="flex justify-center">Wybierz model LLM</FormLabel>
+              <Select
+                value={field.value?.toString() || ""}
+                onValueChange={(value) => {
+                  field.onChange(value === "undefined" ? undefined : parseInt(value, 10));
+                }}
+                disabled={disabled || !characterId}
+              >
+                <FormControl>
+                  <TruncatedSelectTrigger
+                    placeholder="Przypisz model LLM..."
+                    selectedName={selectedLlm?.name}
+                    disabled={disabled || !characterId}
+                  />
+                </FormControl>
+                <SelectContent className="max-w-[300px]">
+                  {llms.map((llm) => (
+                    <SelectItem
+                      key={llm.id}
+                      value={llm.id.toString()}
+                      className={`relative ${characterDetails?.default_llm_id === llm.id ? "font-medium bg-secondary/20" : ""}`}
+                    >
+                      <div className="flex items-center w-full pr-6">
+                        <span className="truncate">{llm.name}</span>
                       </div>
-                    )}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+                      {characterDetails?.default_llm_id === llm.id && (
+                        <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                          <Star className="h-3 w-3 text-yellow-500" />
+                        </div>
+                      )}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      )}
+
+      {/* Display LLM info in display phase */}
+      {isDisplayPhase && selectedLlm && (
+        <div className="text-center mt-2">
+          <Badge variant="secondary" className="text-xs">
+            {selectedLlm.name}
+          </Badge>
+        </div>
+      )}
     </div>
   );
 }
