@@ -16,6 +16,7 @@ import {
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useLlms } from "@/lib/hooks/useLlms";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface CharacterCardProps {
   character: CharacterDTO;
@@ -112,9 +113,11 @@ export function CharacterCard({
           </div>
         </CardHeader>
         <CardContent>
-          <p className="h-24 overflow-y-auto text-sm text-muted-foreground scrollbar-thin scrollbar-thumb-secondary scrollbar-track-transparent">
-            {character.short_description || "Ta postać owiana jest tajemnicą."}
-          </p>
+          <ScrollArea className="h-24 pr-2">
+            <p className="text-sm text-muted-foreground">
+              {character.short_description || "Ta postać owiana jest tajemnicą."}
+            </p>
+          </ScrollArea>
         </CardContent>
         <CardFooter>
           <Button

@@ -216,14 +216,16 @@ export function SceneResult({ dialogueEvents = [], characters = [], llms = [] }:
                         characterName={message.characterName}
                         className="h-10 w-10"
                       />
-                      {message.llmId > 0 && (
-                        <Badge variant="secondary" className="text-xs px-2 py-0">
-                          {getLlmName(message.llmId)}
-                        </Badge>
-                      )}
                     </div>
                     <div className="flex-1">
-                      <p className="font-semibold">{message.characterName}</p>
+                      <p className="font-semibold">
+                        {message.characterName}
+                        {message.llmId > 0 && (
+                          <Badge variant="secondary" className="text-xs px-2 py-0 ml-2">
+                            {getLlmName(message.llmId)}
+                          </Badge>
+                        )}
+                      </p>
                       <p className="text-sm mt-1 text-muted-foreground">
                         {message.content}
                         {!message.isComplete && (
