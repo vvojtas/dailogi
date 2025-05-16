@@ -29,7 +29,7 @@ public record StartDialogueStreamRequest(
     @NotEmpty(message = "Character configurations are required")
     @Size(min = 2, max = 3, message = "Must include 2-3 characters")
     @Valid
-    @JsonProperty("character_configs") List<CharacterConfigDto> characterConfigs,
+    @JsonProperty("character_configs") List<CharacterConfigDTO> characterConfigs,
     
     @Schema(description = "Number of turns in the dialogue (1-50)",
            example = "5",

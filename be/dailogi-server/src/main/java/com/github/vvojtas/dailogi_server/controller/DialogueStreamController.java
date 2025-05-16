@@ -3,6 +3,7 @@ package com.github.vvojtas.dailogi_server.controller;
 import com.github.vvojtas.dailogi_server.dialogue.stream.api.StreamDialogueCommand;
 import com.github.vvojtas.dailogi_server.dialogue.stream.application.DialogueStreamService;
 import com.github.vvojtas.dailogi_server.model.common.response.ErrorResponseDTO;
+import com.github.vvojtas.dailogi_server.model.dialogue.request.CharacterConfigDTO;
 import com.github.vvojtas.dailogi_server.model.dialogue.request.StartDialogueStreamRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -93,12 +94,9 @@ public class DialogueStreamController {
         
         // Convert request to command
         StreamDialogueCommand command = new StreamDialogueCommand(
+            null,
                 request.sceneDescription(),
-                request.characterConfigs().stream()
-                        .map(config -> new com.github.vvojtas.dailogi_server.dialogue.stream.api.CharacterConfigDto(
-                                config.characterId(),
-                                config.llmId()))
-                        .toList(),
+                request.characterConfigs(),
                 request.length()
         );
         

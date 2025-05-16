@@ -13,3 +13,7 @@ spring:
 logging:
   level:
     com.github.vvojtas.dailogi_server.dialogue.stream.application.DialogueGenerationOrchestrator: TRACE
+
+openrouter:
+  api:
+    mock-enabled: true

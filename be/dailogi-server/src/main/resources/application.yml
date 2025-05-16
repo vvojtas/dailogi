@@ -42,6 +42,11 @@ openrouter:
     key: ${OPENROUTER_ENCRYPTION_KEY}
     iv-length: 12  # GCM initialization vector length in bytes (96 bits)
     tag-length: 128  # GCM tag length in bits
+  api:
+    base-url: https://openrouter.ai/api/v1
+    connect-timeout: 30s  # 30 seconds
+    read-timeout: 120s  # 120 seconds
+    mock-enabled: true  # Set to true to use mock instead of real API
 
 # Actuator configuration
 management:

@@ -224,8 +224,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoApiKeyException.class)
     public ResponseEntity<ErrorResponseDTO> handleNoApiKeyException(NoApiKeyException e) {
-        log.warn("API key required. User ID: {}, Operation: {}. Message: {}", 
-                e.getUserId(), e.getOperation(), e.getMessage(), e);
+        log.warn("API key required. Operation: {}. Message: {}", 
+                e.getOperation(), e.getMessage(), e);
         
         Map<String, Object> details = new HashMap<>();
         details.put("operation", e.getOperation());

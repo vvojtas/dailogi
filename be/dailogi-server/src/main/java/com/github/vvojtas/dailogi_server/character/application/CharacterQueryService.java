@@ -93,27 +93,42 @@ public class CharacterQueryService {
     public CharacterDTO getCharacter(Long id) {
         log.debug("Getting character with id={}", id);
         
+        Character character = getCharacterEntity(id);
+            
+        return characterMapper.toDTO(character);
+    }
+    
+    /**
+     * Retrieves a single character entity by its ID.
+     * The character must either be owned by the current user or be a global character.
+     * 
+     * @param id the ID of the character to retrieve
+     * @return the character entity
+     * @throws ResourceNotFoundException if the character does not exist
+     * @throws AccessDeniedException if the user does not have access to this character
+     */
+    public Character getCharacterEntity(Long id) {
+        log.debug("Getting character entity with id={}", id);
+        
         Character character = characterRepository.findById(id)
             .orElseThrow(() -> {
                 log.warn("Attempt to access non-existent character with id={}", id);
                 return new ResourceNotFoundException(CHARACTER_RESOURCE_NAME, "Character not found with id: " + id);
             });
             
-        log.debug("Found character: name={}, isGlobal={}", character.getName(), character.getIsGlobal());
-            
         AppUser currentUser = currentUserService.getCurrentAppUserOrNull();
         
         if (!authorizationService.canAccess(character, currentUser)) {
             String currentUserId = (currentUser != null) ? currentUser.getId().toString() : "anonymous";
-            log.warn("User {} attempted to access character {} which is not owned or global (Owner: {})", 
+            log.warn("User {} attempted to access character entity {} which is not owned or global (Owner: {})", 
                 currentUserId, id, character.getUser().getId());
             throw new AccessDeniedException("User does not have access to this character");
         }
-        
+
         String currentUserId = (currentUser != null) ? currentUser.getId().toString() : "anonymous";
         log.info("Retrieved character: id={}, name={}, isGlobal={} for user {}", 
             character.getId(), character.getName(), character.getIsGlobal(), currentUserId);
-            
-        return characterMapper.toDTO(character);
+        
+        return character;
     }
 } 

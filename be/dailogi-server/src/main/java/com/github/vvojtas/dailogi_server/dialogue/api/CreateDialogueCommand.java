@@ -1,21 +1,19 @@
-package com.github.vvojtas.dailogi_server.dialogue.stream.api;
+package com.github.vvojtas.dailogi_server.dialogue.api;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Max;
 import java.util.List;
 
 import com.github.vvojtas.dailogi_server.model.dialogue.request.CharacterConfigDTO;
 
 /**
- * Command for streaming a dialogue with real-time token generation
+ * Command for creating a new dialogue
  */
-public record StreamDialogueCommand(
+public record CreateDialogueCommand(
     @Size(max = 100, message = "Dialogue name must not exceed 100 characters")
-    String dialogueName,
+    String name,
     
     @NotBlank(message = "Scene description is required")
     @Size(max = 500, message = "Scene description must not exceed 500 characters")
@@ -26,7 +24,5 @@ public record StreamDialogueCommand(
     @Valid
     List<CharacterConfigDTO> characterConfigs,
     
-    @Min(value = 1, message = "Length must be at least 1")
-    @Max(value = 50, message = "Length must not exceed 50")
-    Integer length
+    Boolean isGlobal
 ) {} 

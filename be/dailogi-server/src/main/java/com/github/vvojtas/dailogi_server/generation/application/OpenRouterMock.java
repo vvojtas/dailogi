@@ -1,8 +1,13 @@
-package com.github.vvojtas.dailogi_server.llm.application;
+package com.github.vvojtas.dailogi_server.generation.application;
 
-import com.github.vvojtas.dailogi_server.llm.api.OpenRouterInterface;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+
+import com.github.vvojtas.dailogi_server.generation.api.ChatMessage;
+import com.github.vvojtas.dailogi_server.generation.api.OpenRouterInterface;
+
+import jakarta.annotation.PreDestroy;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +25,7 @@ import java.util.function.Consumer;
  */
 @Service
 @Slf4j
+@ConditionalOnProperty(prefix = "openrouter.api", name = "mock-enabled", havingValue = "true")
 public class OpenRouterMock implements OpenRouterInterface {
 
     private static final int INITIAL_DELAY_MS = 100; 
@@ -51,14 +57,15 @@ public class OpenRouterMock implements OpenRouterInterface {
     );
 
     @Override
-    public UUID generateText(
+    public UUID streamChat(
             String openRouterIdentifier,
-            String prompt,
+            List<ChatMessage> messages,
+            String apiKey, // API key is ignored in mock implementation
             Consumer<String> tokenConsumer,
             Runnable completionListener) {
         
         UUID requestId = UUID.randomUUID();
-        log.debug("Starting mock text generation with ID {}", requestId);
+        log.debug("Starting mock chat stream with ID {}", requestId);
         
         // Select a response based on model identifier or fallback to default
         List<String> possibleResponses = predefinedResponses.getOrDefault(
@@ -85,7 +92,7 @@ public class OpenRouterMock implements OpenRouterInterface {
     public boolean cancelGeneration(UUID requestId) {
         ScheduledFuture<?> future = activeGenerations.remove(requestId);
         if (future != null && !future.isDone()) {
-            log.debug("Cancelling mock text generation with ID {}", requestId);
+            log.debug("Cancelling mock chat stream with ID {}", requestId);
             future.cancel(true);
             return true;
         }
@@ -141,8 +148,22 @@ public class OpenRouterMock implements OpenRouterInterface {
                 // All tokens emitted, call completion listener
                 activeGenerations.remove(requestId);
                 completionListener.run();
-                log.debug("Completed mock text generation with ID {}", requestId);
+                log.debug("Completed mock chat stream with ID {}", requestId);
             }
+        }
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        log.info("Shutting down OpenRouterMock scheduler");
+        scheduler.shutdown();
+        try {
+            if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                scheduler.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            scheduler.shutdownNow();
+            Thread.currentThread().interrupt();
         }
     }
 } 

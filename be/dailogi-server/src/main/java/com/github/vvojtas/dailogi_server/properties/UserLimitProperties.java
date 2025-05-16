@@ -20,4 +20,10 @@ public class UserLimitProperties {
      */
     @Min(1)
     private int maxCharactersPerUser = 50;
+    
+    /**
+     * Maximum number of dialogues a user can create
+     */
+    @Min(1)
+    private int maxDialoguesPerUser = 50;
 } 

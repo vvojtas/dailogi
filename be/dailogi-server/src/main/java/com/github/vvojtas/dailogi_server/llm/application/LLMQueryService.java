@@ -30,7 +30,20 @@ public class LLMQueryService {
     }
 
     public LLMDTO findById(Long llmId) {
-        return llmMapper.toDTO(llmRepository.findById(llmId)
-            .orElseThrow(() -> new ResourceNotFoundException(LLM.class.getSimpleName().toLowerCase(), "LLM not found: " + llmId)));
+        return llmMapper.toDTO(findEntityById(llmId));
+    }
+    
+    /**
+     * Find LLM entity by ID
+     * 
+     * @param llmId the ID of the LLM
+     * @return the LLM entity
+     * @throws ResourceNotFoundException if LLM with given ID doesn't exist
+     */
+    public LLM findEntityById(Long llmId) {
+        return llmRepository.findById(llmId)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                LLM.class.getSimpleName().toLowerCase(), 
+                "LLM not found: " + llmId));
     }
 } 

@@ -12,31 +12,25 @@ import lombok.Getter;
 public class NoApiKeyException extends RuntimeException {
     
     @Getter
-    private final String userId;
-    
-    @Getter
     private final String operation;
     
     /**
      * Constructs a new NoApiKeyException
      * 
-     * @param userId ID of the user who needs an API key
      * @param operation The operation that requires an API key
      * @param message Detailed message
      */
-    public NoApiKeyException(String userId, String operation, String message) {
+    public NoApiKeyException(String operation, String message) {
         super(message);
-        this.userId = userId;
         this.operation = operation;
     }
     
     /**
      * Constructs a new NoApiKeyException with a standard message
      * 
-     * @param userId ID of the user who needs an API key
      * @param operation The operation that requires an API key
      */
-    public NoApiKeyException(String userId, String operation) {
-        this(userId, operation, "Valid API key required for operation: " + operation);
+    public NoApiKeyException(String operation) {
+        this(operation, "Valid API key required for operation: " + operation);
     }
 } 

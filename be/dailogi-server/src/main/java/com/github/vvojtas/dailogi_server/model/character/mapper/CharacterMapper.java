@@ -16,16 +16,7 @@ public class CharacterMapper {
         }
 
         boolean hasAvatar = character.getAvatarId() != null;
-        String avatarUrl = null;
-        
-        if (hasAvatar) {
-            // Use Spring HATEOAS to generate the avatar URL
-            String fullUri = WebMvcLinkBuilder.linkTo(
-                WebMvcLinkBuilder.methodOn(AvatarController.class)
-                    .getAvatar(character.getId(), null))
-                .toUri().toString();
-            avatarUrl = UrlUtil.toRelativeUri(fullUri);
-        }
+        String avatarUrl = getAvatarUrl(character, hasAvatar);
 
         return new CharacterDTO(
             character.getId(),
@@ -39,5 +30,19 @@ public class CharacterMapper {
             character.getCreatedAt(),
             character.getUpdatedAt()
         );
+    }
+
+    private String getAvatarUrl(Character character, boolean hasAvatar) {
+        String avatarUrl = null;
+        
+        if (hasAvatar) {
+            // Use Spring HATEOAS to generate the avatar URL
+            String fullUri = WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(AvatarController.class)
+                    .getAvatar(character.getId(), null))
+                .toUri().toString();
+            avatarUrl = UrlUtil.toRelativeUri(fullUri);
+        }
+        return avatarUrl;
     }
 } 

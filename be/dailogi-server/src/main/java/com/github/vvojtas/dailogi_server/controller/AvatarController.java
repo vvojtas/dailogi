@@ -20,6 +20,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequiredArgsConstructor
@@ -87,6 +89,8 @@ public class AvatarController {
         return ResponseEntity
             .ok()
             .contentType(contentType)
+            .cacheControl(CacheControl.maxAge(10, TimeUnit.MINUTES).cachePublic())
+            .eTag(String.valueOf(avatarData.data().hashCode())) // Using hash of data as ETag
             .body(avatarData.data());
     }
     

@@ -22,3 +22,7 @@ dailogi:
     user:
       name: test
       password: test-dailogi 
+
+openrouter:
+  api:
+    mock-enabled: true

@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
  * DTO for character configuration in dialogue stream
  */
 @Schema(description = "Configuration for a character in a dialogue stream")
-public record CharacterConfigDto(
+public record CharacterConfigDTO(
     @Schema(description = "ID of the character", 
            example = "1", 
            requiredMode = Schema.RequiredMode.REQUIRED)

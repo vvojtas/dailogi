@@ -23,6 +23,12 @@
       "type": "com.github.vvojtas.dailogi_server.properties.OpenRouterEncryptionProperties",
       "sourceType": "com.github.vvojtas.dailogi_server.properties.OpenRouterEncryptionProperties",
       "description": "Configuration properties for API key encryption."
+    },
+    {
+      "name": "openrouter.api",
+      "type": "com.github.vvojtas.dailogi_server.properties.OpenRouterProperties",
+      "sourceType": "com.github.vvojtas.dailogi_server.properties.OpenRouterProperties",
+      "description": "Configuration properties for OpenRouter API integration."
     }
   ],
   "properties": [
@@ -82,6 +88,30 @@
       "sourceType": "com.github.vvojtas.dailogi_server.properties.OpenRouterEncryptionProperties",
       "description": "GCM tag length in bits.",
       "defaultValue": 128
+    },
+    {
+      "name": "openrouter.api.base-url",
+      "type": "java.lang.String",
+      "description": "Base URL for the OpenRouter API.",
+      "defaultValue": "https://openrouter.ai/api/v1"
+    },
+    {
+      "name": "openrouter.api.connect-timeout",
+      "type": "java.time.Duration",
+      "description": "Connect timeout for the OpenRouter API client.",
+      "defaultValue": "30s"
+    },
+    {
+      "name": "openrouter.api.read-timeout",
+      "type": "java.time.Duration",
+      "description": "Read timeout for the OpenRouter API client.",
+      "defaultValue": "120s"
+    },
+    {
+      "name": "openrouter.api.mock-enabled",
+      "type": "java.lang.Boolean",
+      "description": "Flag to enable mocking OpenRouter API responses.",
+      "defaultValue": false
     }
   ]
 }

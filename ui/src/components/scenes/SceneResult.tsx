@@ -201,7 +201,7 @@ export function SceneResult({ dialogueEvents = [], characters = [], llms = [] }:
   return (
     <div className="flex gap-4">
       <div className="space-y-6 py-4 flex-1">
-        <h3 className="text-lg font-medium">Wystawiony dialog</h3>
+        <h3 className="text-lg font-medium">Twój dialog:</h3>
 
         <ScrollArea className="h-[500px] pr-4" viewportRef={viewportRef}>
           <div className="space-y-4">

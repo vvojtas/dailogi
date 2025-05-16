@@ -68,11 +68,7 @@ export function useDialogueStream() {
             eventData = {
               type: "dialogue-start",
               dialogue_id: data.dialogue_id,
-              character_configs:
-                data.character_configs?.map((config: { characterId: number; llmId: number }) => ({
-                  character_id: config.characterId,
-                  llm_id: config.llmId,
-                })) || [],
+              character_configs: data.character_configs || [],
               turn_count: data.turn_count,
             };
             break;
@@ -80,11 +76,8 @@ export function useDialogueStream() {
           case "character-start":
             eventData = {
               type: "character-start",
-              character_config: {
-                character_id: data.characterConfig?.characterId,
-                llm_id: data.characterConfig?.llmId,
-              },
-              id: data.eventId,
+              character_config: data.character_config,
+              id: data.id,
             };
 
             // Log the original data and transformed event
@@ -102,14 +95,6 @@ export function useDialogueStream() {
               token: data.token,
               id: data.id,
             };
-
-            // Handle both formats: direct character_id or nested in character_config
-            if (data.characterConfig) {
-              eventData.character_config = {
-                character_id: data.characterConfig.characterId,
-                llm_id: data.characterConfig.llmId || 0,
-              };
-            }
 
             console.log("Created token event:", eventData);
             break;
