@@ -46,7 +46,7 @@ openrouter:
     base-url: https://openrouter.ai/api/v1
     connect-timeout: 30s  # 30 seconds
     read-timeout: 120s  # 120 seconds
-    mock-enabled: true  # Set to true to use mock instead of real API
+    mock-enabled: false  # Set to true to use mock instead of real API
 
 # Actuator configuration
 management:
