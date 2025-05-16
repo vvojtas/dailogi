@@ -1,0 +1,51 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { buttonVariants } from "@/components/ui/button";
+import { ROUTES } from "@/lib/config/routes";
+
+const buttonClass = buttonVariants({ variant: "secondary", size: "lg" });
+---
+
+<Layout title="Sceny - Za kulisami">
+  <main class="container mx-auto px-4 py-16 flex flex-col items-center text-center">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="text-4xl md:text-5xl font-bold mb-6">Za kulisami trwają przygotowania!</h1>
+
+      <div class="bg-card rounded-xl border p-8 shadow-lg mb-8">
+        <div class="mb-6">
+          <div class="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="44"
+              height="44"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="text-primary"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <p class="text-xl text-muted-foreground">
+            Ta scena jeszcze nie została w pełni zaaranżowana. Scenograf i reżyser pracują nad jej finalnym kształtem.
+          </p>
+        </div>
+
+        <p class="text-lg mb-8">
+          Niebawem spektakl dialogów między postaciami zostanie zaprezentowany w pełnej krasie. Do tego czasu zachęcamy
+          do kreowania nowych postaci i eksplorowania istniejących.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href={ROUTES.HOME} class={buttonClass}> Powrót na scenę główną </a>
+          <a href={ROUTES.SCENE_NEW} class={buttonClass}> Spróbuj stworzyć nową scenę </a>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>

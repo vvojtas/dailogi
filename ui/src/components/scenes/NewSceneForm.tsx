@@ -7,7 +7,6 @@ import { SceneDescriptionInput } from "./SceneDescriptionInput.tsx";
 import { CharacterSelectionList } from "./CharacterSelectionList.tsx";
 import { StartSceneButton } from "./StartSceneButton.tsx";
 import { SceneResult } from "./SceneResult.tsx";
-import { SaveSceneForm } from "./SaveSceneForm.tsx";
 import { useNewScene } from "@/lib/hooks/useNewScene";
 import { newSceneFormSchema, type NewSceneFormData } from "@/lib/validation/sceneSchema";
 import { useHydration } from "@/lib/hooks/useHydration";
@@ -96,11 +95,6 @@ export default function NewSceneForm() {
                 {(phase === "loading" || phase === "result") && (
                   <>
                     <SceneResult dialogueEvents={dialogueEvents} characters={characters} llms={llms} />
-                    <SaveSceneForm
-                      defaultName=""
-                      onSave={(name: string) => console.log("Saving scene with name:", name)}
-                      disabled={isLoading || !isHydrated}
-                    />
                   </>
                 )}
 
