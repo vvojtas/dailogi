@@ -109,16 +109,15 @@ Nawigacja w strefie uwierzytelnionej odbywa się za pomocą stałego paska boczn
 
 *   **Nazwa widoku:** Nowa Scena
     *   **Ścieżka widoku:** `/scenes/new`
-    *   **Główny cel:** Umożliwienie użytkownikowi skonfigurowania parametrów nowej sceny i zainicjowania generowania sceny, a następnie wyświetlenie wyniku i opcji zapisu.
+    *   **Główny cel:** Umożliwienie użytkownikowi skonfigurowania parametrów nowej sceny i obserwacji generowanego dialogu w czasie rzeczywistym.
     *   **Kluczowe informacje do wyświetlenia:**
-        *   **Faza Konfiguracji:** Formularz ("Opis sceny", Wybór 2-3 postaci, Wybór LLM dla każdej postaci).
-        *   **Faza Generowania:** Wskaźnik ładowania.
-        *   **Faza Wyniku:** Wygenerowana scena lub komunikat o błędzie. Sekcja zapisu sceny ("Nazwa sceny" + przycisk "Zapisz scenę").
+        *   **Faza Konfiguracji:** Formularz ("Opis sceny", wybór 2–3 postaci, wybór LLM dla każdej postaci).
+        *   **Faza Generowania:** Komponent `SceneResult` wyświetla komunikat „Czekamy na rozpoczęcie rozmowy...”, a następnie dodaje w czasie rzeczywistym wiadomości w formie dymków z awatarami i nazwami postaci, ze wskaźnikiem pulsu przy trwającej wiadomości.
+        *   **Faza Wyniku:** Komponent `SceneResult` prezentuje zakończone wypowiedzi w formie czatu (dymki z awatarami i nazwami).
     *   **Kluczowe komponenty widoku:**
-        *   **Faza Konfiguracji:** `Form`, `Textarea` ("Opis sceny"), 2-3x `Select` ("Wybierz postać" - z awatarem i nazwą w opcjach), 2-3x `Select` ("Wybierz model LLM"), `Button` ("Rozpocznij scenę").
-        *   **Faza Generowania:** `Progress` / `Spinner`.
-        *   **Faza Wyniku:** Komponent wyświetlający chat, `Input` ("Nazwa sceny" - pre-filled), `Button` ("Zapisz scenę"). Komunikat o błędzie (jeśli wystąpił).
-    *   **UX, dostępność i względy bezpieczeństwa:** Chronione przez middleware. Walidacja (wymagany opis sceny, 2-3 postacie, wybrane LLM). Obsługa stanu ładowania. Obsługa błędów generowania (w tym 402 - "Brak klucza API OpenRouter lub niewystarczające środki na koncie globalnym." - dla zwykłych użytkowników/specjalnych bez klucza). Obsługa błędu 422 (limit scen) przy zapisie przez `AlertDialog` ("Osiągnięto limit 50 zapisanych scen."). Domyślna sugestia nazwy sceny ("Rozmowa |Postać1|Postać 2|Postać3| - Data").
+        *   **Faza Konfiguracji:** `Form`, `Textarea`, `Select` (postaci), `Select` (LLM), `StartSceneButton`.
+        *   **Faza Generowania i Wyniku:** `SceneResult` (używający `ScrollArea`, `Card`, `Badge` i wskaźnika pulsu dla trwających wiadomości).
+    *   **UX, dostępność i względy bezpieczeństwa:** Chronione przez middleware. Walidacja formularza przed generowaniem dialogu. Obsługa błędów API i wyświetlanie komunikatów w `ErrorBoundary` i `Toast`.
 
 ## 3. Mapa podróży użytkownika
 

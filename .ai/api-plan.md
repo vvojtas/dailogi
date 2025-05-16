@@ -344,7 +344,7 @@
         "id": "long",
         "name": "string",
         "scene_description": "string",
-        "status": "string (COMPLETED/FAILED)",
+        "status": "string (IN_PROGRESS/COMPLETED/FAILED)",
         "created_at": "timestamp",
         "updated_at": "timestamp",
         "characters": [
@@ -376,7 +376,7 @@
     "id": "long",
     "name": "string",
     "scene_description": "string",
-    "status": "string (COMPLETED/FAILED)",
+    "status": "string (IN_PROGRESS/COMPLETED/FAILED)",
     "created_at": "timestamp",
     "updated_at": "timestamp",
     "character_configs": [
@@ -407,10 +407,32 @@
 - **Success Codes**: 200 OK
 - **Error Codes**: 401 Unauthorized, 403 Forbidden (not owner), 404 Not Found
 
+#### Update Dialogue
+- **Method**: PUT
+- **Path**: `/api/dialogues/{id}`
+- **Description**: Update the name of an existing dialogue after generation.
+- **Request Body**:
+  ```json
+  {
+    "name": "string"
+  }
+  ```
+- **Response Body**:
+  ```json
+  {
+    "id": "long",
+    "name": "string",
+    "status": "string (IN_PROGRESS/COMPLETED/FAILED)",
+    "updated_at": "timestamp"
+  }
+  ```
+- **Success Codes**: 200 OK
+- **Error Codes**: 400 Bad Request (validation error), 401 Unauthorized, 403 Forbidden (not owner), 404 Not Found
+
 #### Stream Dialogue Generation
 - **Method**: POST
 - **Path**: `/api/dialogues/stream`
-- **Description**: Start dialogue generation with real-time streaming using Server-Sent Events (SSE)
+- **Description**: Creates a new dialogue record with a temporary name and status IN_PROGRESS, then starts dialogue generation with real-time streaming using Server-Sent Events (SSE)
 - **Request Body**:
   ```json
   {

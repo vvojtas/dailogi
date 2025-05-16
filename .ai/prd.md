@@ -34,8 +34,11 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
     *   Maksymalna długość dialogu: 50 tur (łącznie dla wszystkich postaci).
     *   Wizualizacja dialogu w formie dymków czatu, z widoczną nazwą i awatarem postaci mówiącej.
     *   Brak możliwości interwencji użytkownika lub zatrzymania dialogu w trakcie jego generowania.
+    *   Nowo tworzony dialog jest zapisywany w bazie danych przy rozpoczęciu generowania z tymczasową nazwą i statusem IN_PROGRESS.
 *   **FR-006: Zarządzanie historią dialogów:**
-    *   Automatyczne zapisywanie wygenerowanego dialogu po jego zakończeniu (limit 50 zapisanych dialogów na użytkownika).
+    *   Dialog jest automatycznie zapisywany w bazie danych podczas generowania, z tymczasową nazwą i statusem IN_PROGRESS (limit 50 dialogów na użytkownika).
+    *   Po zakończeniu generowania status dialogu jest aktualizowany na COMPLETED, a w przypadku błędu na FAILED.
+    *   Użytkownik może zaktualizować nazwę dialogu po zakończeniu generowania.
     *   Przeglądanie listy zapisanych dialogów.
     *   Możliwość otwarcia i odczytania zapisanego dialogu.
 *   **FR-007: Zarządzanie kluczem API OpenRouter:**
