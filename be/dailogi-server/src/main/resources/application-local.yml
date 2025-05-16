@@ -16,4 +16,4 @@ logging:
 
 openrouter:
   api:
-    mock-enabled: true
+    mock-enabled: false

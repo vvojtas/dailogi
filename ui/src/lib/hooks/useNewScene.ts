@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { ZodError } from "zod";
 import type { CharacterDropdownDTO } from "@/dailogi-api/model/characterDropdownDTO";
@@ -25,14 +25,7 @@ export function useNewScene() {
   const [phase, setPhase] = useState<FormPhase>("config");
 
   // Use the dialogue stream hook
-  const { dialogueEvents, isLoading, error: streamError, startStream } = useDialogueStream();
-
-  // Monitor stream errors and show toast when they occur
-  useEffect(() => {
-    if (streamError) {
-      toast.error(streamError);
-    }
-  }, [streamError]);
+  const { dialogueEvents, isLoading, startStream } = useDialogueStream();
 
   // Start scene generation
   const startScene = async (formData: NewSceneFormData) => {
@@ -92,7 +85,7 @@ export function useNewScene() {
     setLlms,
     phase,
     isLoading,
-    hasError: !!streamError,
+    hasError: false,
     dialogueEvents, // From dialogue stream hook
 
     // Actions

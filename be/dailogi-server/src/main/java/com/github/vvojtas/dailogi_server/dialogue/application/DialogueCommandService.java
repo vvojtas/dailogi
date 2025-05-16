@@ -12,10 +12,8 @@ import com.github.vvojtas.dailogi_server.model.dialogue.request.CharacterConfigD
 import com.github.vvojtas.dailogi_server.dialogue.api.CreateDialogueCommand;
 import com.github.vvojtas.dailogi_server.exception.DialogueLimitExceededException;
 import com.github.vvojtas.dailogi_server.llm.application.LLMQueryService;
-import com.github.vvojtas.dailogi_server.model.character.response.CharacterDTO;
 import com.github.vvojtas.dailogi_server.model.dialogue.mapper.DialogueMapper;
 import com.github.vvojtas.dailogi_server.model.dialogue.response.DialogueDTO;
-import com.github.vvojtas.dailogi_server.model.llm.response.LLMDTO;
 import com.github.vvojtas.dailogi_server.properties.UserLimitProperties;
 import com.github.vvojtas.dailogi_server.service.auth.CurrentUserService;
 
@@ -72,7 +70,7 @@ public class DialogueCommandService {
             .user(currentUser)
             .name(command.name() != null ? command.name() : "Whispered Dialogue")
             .sceneDescription(command.sceneDescription())
-            .isGlobal(command.isGlobal() != null ? command.isGlobal() : false)
+            .isGlobal(command.isGlobal() != null && command.isGlobal())
             .status(DialogueStatus.IN_PROGRESS)
             .build();
         

@@ -19,7 +19,7 @@ FROM
   llm l
 WHERE 
   u.name = 'Admin'
-  AND l.name = 'Claude 3 Sonnet';
+  AND l.name = 'DeepSeek V3 0324';
 
 
 INSERT INTO character (user_id, name, short_description, description, is_global, default_llm_id, created_at, updated_at)
@@ -42,7 +42,7 @@ FROM
   llm l
 WHERE 
   u.name = 'Admin'
-  AND l.name = 'Claude 3 Sonnet';
+  AND l.name = 'DeepSeek V3 0324';
 
 
 INSERT INTO character (user_id, name, short_description, description, is_global, default_llm_id, created_at, updated_at)
@@ -66,7 +66,7 @@ FROM
   llm l
 WHERE 
   u.name = 'Admin'
-  AND l.name = 'GPT-4';
+  AND l.name = 'GPT-4.1';
 
 
 INSERT INTO character (user_id, name, short_description, description, is_global, default_llm_id, created_at, updated_at)
@@ -90,7 +90,7 @@ FROM
   llm l
 WHERE 
   u.name = 'Admin'
-  AND l.name = 'Mistral Medium';
+  AND l.name = 'DeepSeek V3 0324';
 
 
 INSERT INTO character (user_id, name, short_description, description, is_global, default_llm_id, created_at, updated_at)
@@ -116,7 +116,7 @@ FROM
   llm l
 WHERE 
   u.name = 'Admin'
-  AND l.name = 'Llama 3 70B'; 
+  AND l.name = 'Mistral Medium 3'; 
 
 
 
@@ -143,4 +143,4 @@ FROM
   llm l
 WHERE 
   u.name = 'Admin'
-  AND l.name = 'Llama 3 70B'; 
+  AND l.name = 'Mistral Medium 3'; 

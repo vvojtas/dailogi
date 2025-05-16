@@ -20,6 +20,7 @@ import com.github.vvojtas.dailogi_server.exception.NoApiKeyException;
 import com.github.vvojtas.dailogi_server.model.common.response.ErrorResponseDTO;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import com.github.vvojtas.dailogi_server.exception.CharacterLimitExceededException;
+import com.github.vvojtas.dailogi_server.exception.CharacterInUseException;
 import com.github.vvojtas.dailogi_server.exception.CryptoException;
 
 import java.time.OffsetDateTime;
@@ -237,6 +238,21 @@ public class GlobalExceptionHandler {
                 e.getMessage(),
                 "API_KEY_REQUIRED",
                 details,
+                OffsetDateTime.now()
+            ));
+    }
+
+    @ExceptionHandler(CharacterInUseException.class)
+    public ResponseEntity<ErrorResponseDTO> handleCharacterInUseException(CharacterInUseException e) {
+        log.warn("Character in use. Character ID: {}. Message: {}", e.getCharacterId(), e.getMessage(), e);
+        
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new ErrorResponseDTO(
+                e.getMessage(),
+                "CHARACTER_IN_USE",
+                Map.of("characterId", e.getCharacterId()),
                 OffsetDateTime.now()
             ));
     }

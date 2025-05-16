@@ -8,5 +8,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public record CharacterCompleteEventDto(
     @JsonProperty("character_id") Long characterId,
     @JsonProperty("token_count") int tokenCount,
+    @JsonProperty("message_content") String messageContent,
     @JsonProperty("id") String id
 ) {} 

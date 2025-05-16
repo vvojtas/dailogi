@@ -8,16 +8,15 @@ import com.github.vvojtas.dailogi_server.db.entity.Character;
 import com.github.vvojtas.dailogi_server.db.entity.LLM;
 import com.github.vvojtas.dailogi_server.db.repository.CharacterRepository;
 import com.github.vvojtas.dailogi_server.db.repository.LLMRepository;
+import com.github.vvojtas.dailogi_server.exception.CharacterInUseException;
 import com.github.vvojtas.dailogi_server.exception.CharacterLimitExceededException;
 import com.github.vvojtas.dailogi_server.exception.DuplicateResourceException;
 import com.github.vvojtas.dailogi_server.exception.ResourceNotFoundException;
 import com.github.vvojtas.dailogi_server.properties.UserLimitProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
 @Component
@@ -133,10 +132,7 @@ public class CharacterValidator {
         // Check for dialogue references
         if (characterRepository.existsInDialogues(command.id())) {
             log.warn("Cannot delete character {} as it is used in dialogues", command.id());
-            throw new ResponseStatusException(
-                HttpStatus.CONFLICT,
-                "Character cannot be deleted because it is used in one or more dialogues"
-            );
+            throw new CharacterInUseException(command.id());
         }
     }
     

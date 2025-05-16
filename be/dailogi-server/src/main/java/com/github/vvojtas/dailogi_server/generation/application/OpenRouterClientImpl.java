@@ -1,5 +1,7 @@
 package com.github.vvojtas.dailogi_server.generation.application;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.vvojtas.dailogi_server.generation.api.ChatMessage;
 import com.github.vvojtas.dailogi_server.generation.api.OpenRouterInterface;
 import com.github.vvojtas.dailogi_server.generation.application.model.ChatCompletionRequest;
@@ -19,8 +21,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 /**
  * Real implementation of OpenRouterInterface for production use.
@@ -34,6 +34,7 @@ public class OpenRouterClientImpl implements OpenRouterInterface {
 
     private final WebClient openRouterWebClient;
     private final Map<UUID, Boolean> activeCalls = new ConcurrentHashMap<>();
+    private final ObjectMapper objectMapper = new ObjectMapper();
     
     @Override
     public UUID streamChat(
@@ -66,7 +67,9 @@ public class OpenRouterClientImpl implements OpenRouterInterface {
         ChatCompletionRequest requestBody = new ChatCompletionRequest(
                 openRouterIdentifier,
                 messages,
-                true  // Enable streaming
+                true,
+                1000,
+                new ChatCompletionRequest.ReasoningConfig(true)
         );
         
         // Make API request
@@ -92,9 +95,19 @@ public class OpenRouterClientImpl implements OpenRouterInterface {
                         .flatMap(body -> Mono.error(new RuntimeException("Server error: " + response.statusCode() + " - " + body)))
                 )
                 .bodyToFlux(String.class)
-                .filter(event -> event.startsWith("data:"))
-                .map(event -> event.substring(5).trim())  // Remove "data: " prefix
-                .filter(json -> !json.equals("[DONE]"))
+                .doOnEach(signal -> {
+                    if (signal.isOnNext()) {
+                        log.info("ROUTER event: {}", signal.get());
+                    }
+                })
+                .map(event -> {
+                    // Handle both SSE format (data: prefix) and raw JSON
+                    if (event.startsWith("data:")) {
+                        return event.substring(5).trim(); // Remove "data: " prefix
+                    }
+                    return event.trim(); // Keep as is if no prefix
+                })
+                .filter(json -> !json.isEmpty() && !json.equals("[DONE]"))
                 .flatMap(this::parseStreamingResponse)
                 .takeWhile(content -> isRequestActive(requestId))
                 .doOnNext(tokenConsumer)
@@ -130,21 +143,46 @@ public class OpenRouterClientImpl implements OpenRouterInterface {
     
     private Mono<String> parseStreamingResponse(String json) {
         try {
-            // Using regex for simple parsing without full deserialization
-            Pattern pattern = Pattern.compile("\"content\":\"([^\"]*)\"");
-            Matcher matcher = pattern.matcher(json);
-            
-            if (matcher.find()) {
-                String content = matcher.group(1);
-                // Unescape JSON string content
-                content = content.replace("\\\"", "\"")
-                        .replace("\\\\", "\\")
-                        .replace("\\n", "\n")
-                        .replace("\\t", "\t")
-                        .replace("\\r", "\r");
-                return Mono.just(content);
+            if (json == null || json.isBlank()) {
+                return Mono.empty();
             }
             
+            log.trace("Parsing streaming response: {}", json);
+            JsonNode rootNode = objectMapper.readTree(json);
+            
+            // Get choices array
+            JsonNode choices = rootNode.path("choices");
+            if (choices.isEmpty() || !choices.isArray() || choices.size() == 0) {
+                log.debug("No choices in response: {}", json);
+                return Mono.empty();
+            }
+            
+            // Get first choice
+            JsonNode choice = choices.get(0);
+            
+            // Check for delta structure (streaming format)
+            JsonNode delta = choice.path("delta");
+            if (!delta.isMissingNode()) {
+                JsonNode content = delta.path("content");
+                if (!content.isMissingNode() && content.isTextual()) {
+                    String token = content.asText();
+                    log.trace("Extracted token: {}", token);
+                    return Mono.just(token);
+                }
+            }
+            
+            // Check for standard message format as fallback
+            JsonNode message = choice.path("message");
+            if (!message.isMissingNode()) {
+                JsonNode content = message.path("content");
+                if (!content.isMissingNode() && content.isTextual()) {
+                    String token = content.asText();
+                    log.trace("Extracted content from message: {}", token);
+                    return Mono.just(token);
+                }
+            }
+            
+            log.debug("No content found in response: {}", json);
             return Mono.empty();
         } catch (Exception e) {
             log.error("Failed to parse streaming response: {}", json, e);

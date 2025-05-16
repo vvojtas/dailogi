@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import type { DialogueEvent } from "@/dailogi-api-custom/dialogues";
 import type { CharacterConfigDto } from "@/dailogi-api/model/characterConfigDto";
+import { useAuthStore } from "@/lib/stores/auth.store";
+import { navigate } from "@/lib/client/navigate";
+import { ROUTES } from "@/lib/config/routes";
 
 interface StartStreamParams {
   scene_description: string;
@@ -181,9 +184,36 @@ export function useDialogueStream() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("API error:", response.status, errorText);
-        const errorMessage = `HTTP error! Status: ${response.status}, Details: ${errorText || "No details"}`;
-        toast.error(errorMessage);
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { message: errorText };
+        }
+
+        const status = response.status;
+
+        if (status === 402 && errorData?.code === "API_KEY_REQUIRED") {
+          toast.error("Ustaw API key w swoim profilu", {
+            action: {
+              label: "Przejdź do profilu",
+              onClick: () => navigate(ROUTES.PROFILE),
+            },
+          });
+        } else if (status === 401) {
+          toast.error("Nie wiadomo kim jesteś - ujawnij się");
+          useAuthStore.getState().logout();
+          navigate(ROUTES.LOGIN);
+        } else if (status === 403) {
+          toast.error("Nie dla twoich oczu");
+        } else if (status >= 500) {
+          toast.error("Niefortunny zbieg okoliczności doprowadził do wystąpienia błędu");
+        } else {
+          const message = errorData?.message ?? "";
+          console.log("Error with backend call", status, message);
+          toast.error("Wystąpił błąd, nikt go nieoczekiwał, ale i tak wystąpił");
+        }
+
         return false;
       }
 

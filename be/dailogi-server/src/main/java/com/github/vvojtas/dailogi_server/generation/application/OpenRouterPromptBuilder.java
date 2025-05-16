@@ -1,13 +1,10 @@
 package com.github.vvojtas.dailogi_server.generation.application;
 
-import com.github.vvojtas.dailogi_server.dialogue.stream.api.StreamDialogueCommand;
 import com.github.vvojtas.dailogi_server.generation.api.ChatMessage;
 import com.github.vvojtas.dailogi_server.model.character.response.CharacterDTO;
-import com.github.vvojtas.dailogi_server.model.dialogue.request.CharacterConfigDTO;
 import com.github.vvojtas.dailogi_server.model.dialogue.response.DialogueCharacterConfigDTO;
 import com.github.vvojtas.dailogi_server.model.dialogue.response.DialogueDTO;
 import com.github.vvojtas.dailogi_server.model.dialogue.response.DialogueMessageDTO;
-import com.github.vvojtas.dailogi_server.model.llm.response.LLMDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
@@ -20,7 +17,6 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -70,7 +66,10 @@ public class OpenRouterPromptBuilder {
         // Add system message with character instructions
         messages.add(buildSystemMessage(dialogueDTO, activeCharacterConfig));
         
-        messages.addAll(buildConversationMessages(dialogueDTO.messages(), activeCharacterConfig));
+        List<CharacterDTO> characters = dialogueDTO.characterConfigs().stream()
+                .map(DialogueCharacterConfigDTO::character)
+                .toList();
+        messages.addAll(buildConversationMessages(dialogueDTO.messages(), activeCharacterConfig, characters));
 
         return messages;
     }
@@ -83,7 +82,7 @@ public class OpenRouterPromptBuilder {
         
         // Prepare placeholders
         String characterName = activeCharacterConfig.character().name();
-        String characterDescription = activeCharacterConfig.character().shortDescription();
+        String characterDescription = activeCharacterConfig.character().description();
         
         // Build other characters string
         String otherCharacters = dialogueDTO.characterConfigs().stream()
@@ -106,7 +105,8 @@ public class OpenRouterPromptBuilder {
      */
     public List<ChatMessage> buildConversationMessages(
             List<DialogueMessageDTO> dialogueMessages,
-            DialogueCharacterConfigDTO activeCharacterConfig) {
+            DialogueCharacterConfigDTO activeCharacterConfig,
+            List<CharacterDTO> characters) {
         
         List<ChatMessage> messages = new ArrayList<>();
         
@@ -125,7 +125,11 @@ public class OpenRouterPromptBuilder {
             } else {
                 // Message from another character
                 role = ChatMessage.ROLE_USER;
-                content = activeCharacterConfig.character().name() + " powiedział \"" + message.content() + "\"";
+                CharacterDTO character = characters.stream()
+                        .filter(config -> config.id().equals(message.characterId()))
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("Character not found"));
+                content = "Wypowiedź " + character.name() + " : \"" + message.content() + "\"";
             }
             
             messages.add(new ChatMessage(role, content));

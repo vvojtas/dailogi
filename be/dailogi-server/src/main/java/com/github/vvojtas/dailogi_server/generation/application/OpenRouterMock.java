@@ -133,7 +133,7 @@ public class OpenRouterMock implements OpenRouterInterface {
         @Override
         public void run() {
             // Emit current token
-            tokenConsumer.accept(tokens[currentIndex]);
+            tokenConsumer.accept(tokens[currentIndex] + " ");
             
             // Schedule next token or complete
             if (currentIndex < tokens.length - 1) {

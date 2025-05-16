@@ -32,7 +32,7 @@ export function ProfileApiKeyManager() {
                   </p>
                   <p>
                     Nie zapomnij ustawić limitów, żeby zabezpieczyć swoje środki. Sprawdź cenniki OpenRoutera, niektóre
-                    z wykorzystywanych modeli są darmowe.
+                    z wykorzystywanych modeli są darmowe. [Choć jeszcze nie są wspierane w d-ai-logi]
                   </p>
                 </TooltipContent>
               </Tooltip>

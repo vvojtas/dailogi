@@ -127,7 +127,7 @@ export function SceneResult({ dialogueEvents = [], characters = [], llms = [] }:
             const newMessages = [...prev];
             newMessages[actualIndex] = {
               ...newMessages[actualIndex],
-              content: newMessages[actualIndex].content + " " + tokenEvent.token,
+              content: newMessages[actualIndex].content + tokenEvent.token,
             };
 
             console.log(`Updated message at index ${actualIndex} with token: "${tokenEvent.token}"`);

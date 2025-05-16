@@ -51,3 +51,37 @@ export function handleCharacterCreateUpdateError(error: unknown): string | null 
 
   return errorMsg;
 }
+
+/**
+ * Function to handle API error responses and return appropriate Polish error messages
+ * for character deletion operations
+ */
+export function handleCharacterDeleteError(error: unknown): string | null {
+  // If it's already a DailogiError and was displayed, don't show another toast
+  if (error instanceof DailogiError && error.displayed) {
+    return null;
+  }
+
+  // Get error code and message from response
+  let errorCode: string | undefined;
+
+  if (error instanceof DailogiError) {
+    errorCode = error.errorData?.code;
+  }
+
+  // Default error message
+  let errorMsg = "Niewiarygodne. Postać uniknęła likwidacji. Możesz ponowić próbę później.";
+
+  if (errorCode) {
+    switch (errorCode) {
+      case "CHARACTER_IN_USE":
+        errorMsg = "Nie można usunąć postaci, ponieważ udziela się w dialogach. Ucisz najpierw dialogi z tą postacią.";
+        break;
+      case "RESOURCE_NOT_FOUND":
+        errorMsg = "Nie odnaleziono postaci w rejestrze";
+        break;
+    }
+  }
+
+  return errorMsg;
+}

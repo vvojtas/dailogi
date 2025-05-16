@@ -1,8 +1,6 @@
 package com.github.vvojtas.dailogi_server.model.dialogue.response; 
  
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.github.vvojtas.dailogi_server.model.dialogue.request.CharacterConfigDTO;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.OffsetDateTime; 
 import java.util.List; 

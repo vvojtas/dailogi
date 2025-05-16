@@ -8,12 +8,13 @@ import { CharacterDetails } from "@/components/characters/CharacterDetails";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { toast } from "sonner";
 import { DailogiError } from "@/lib/errors/DailogiError";
+import { handleCharacterDeleteError } from "@/lib/utils/errorHandlers/characterErrors";
 
 interface CharacterDetailsWrapperProps {
   characterId: number;
 }
 
-export function CharacterDetailsWrapper({ characterId }: CharacterDetailsWrapperProps) {
+export function CharacterDetailsWrapper({ characterId }: Readonly<CharacterDetailsWrapperProps>) {
   const { llms, isLoading: isLoadingLlms } = useLlms();
   const [character, setCharacter] = useState<CharacterDTO | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -66,13 +67,11 @@ export function CharacterDetailsWrapper({ characterId }: CharacterDetailsWrapper
         return;
       }
 
-      const errorMsg =
-        err instanceof DailogiError
-          ? err.errorData?.message || "Nie udało się zlikwidować postaci"
-          : "Nie udało się zlikwidować postaci";
-
-      setError(errorMsg);
-      toast.error(errorMsg);
+      const errorMsg = handleCharacterDeleteError(err);
+      if (errorMsg) {
+        setError(errorMsg);
+        toast.error(errorMsg);
+      }
       setIsDeleting(false);
     }
   };

@@ -10,5 +10,14 @@ import com.github.vvojtas.dailogi_server.generation.api.ChatMessage;
 public record ChatCompletionRequest(
         String model,
         List<ChatMessage> messages,
-        boolean stream
-) {}
+        boolean stream,
+        int max_tokens,
+        ReasoningConfig reasoning
+) {
+    /**
+     * Configuration for model reasoning behavior
+     */
+    public record ReasoningConfig(
+            boolean exclude
+    ) {}
+}

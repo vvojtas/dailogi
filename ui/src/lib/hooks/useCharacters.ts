@@ -3,6 +3,7 @@ import type { CharacterDTO } from "@/dailogi-api/model";
 import { deleteCharacter, getCharacters } from "@/dailogi-api/characters/characters";
 import { toast } from "sonner";
 import { DailogiError } from "@/lib/errors/DailogiError";
+import { handleCharacterDeleteError } from "../utils/errorHandlers/characterErrors";
 
 interface UseCharactersOptions {
   pageSize?: number;
@@ -124,8 +125,10 @@ export function useCharacters({ pageSize = 12 }: UseCharactersOptions = {}) {
           return;
         }
 
-        const message = "Niewiarygodne. Postać uniknęła likwidacji. Możesz ponowić próbę później.";
-        toast.error(message);
+        const message = handleCharacterDeleteError(err);
+        if (message) {
+          toast.error(message);
+        }
         console.error("Error deleting character:", err);
       } finally {
         setState((prev) => ({

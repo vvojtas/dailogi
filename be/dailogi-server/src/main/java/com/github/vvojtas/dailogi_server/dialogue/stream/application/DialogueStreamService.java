@@ -6,7 +6,6 @@ import com.github.vvojtas.dailogi_server.dialogue.stream.api.StreamDialogueComma
 import com.github.vvojtas.dailogi_server.dialogue.stream.api.DialogueEventHandler;
 import com.github.vvojtas.dailogi_server.model.dialogue.response.DialogueDTO;
 import com.github.vvojtas.dailogi_server.model.dialogue.mapper.DialogueEventMapper;
-import com.github.vvojtas.dailogi_server.service.auth.CurrentUserService;
 import com.github.vvojtas.dailogi_server.apikey.application.ApiKeyQueryService;
 import com.github.vvojtas.dailogi_server.exception.NoApiKeyException;
 
@@ -31,7 +30,6 @@ public class DialogueStreamService {
 
     private static final long SSE_TIMEOUT = 1800000L; // 30 minutes timeout
     
-    private final CurrentUserService currentUserService;
     private final DialogueGenerationOrchestrator dialogueGenerationOrchestrator;
     private final DialogueEventMapper dialogueEventMapper;
     private final ApiKeyQueryService apiKeyQueryService;
@@ -78,7 +76,7 @@ public class DialogueStreamService {
             log.debug("Emitter for dialogue {} registered. Active emitters: {}", dialogueId, activeEmitters.size());
             
             // Create callback for when the handler becomes inactive
-            Consumer<Long> onInactivate = (id) -> {
+            Consumer<Long> onInactivate = id -> {
                 activeEmitters.remove(id);
                 log.debug("Removed emitter for dialogue {} from active emitters. Remaining: {}", id, activeEmitters.size());
             };
