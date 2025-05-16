@@ -53,6 +53,7 @@ public class DialogueEventMapper {
         return new CharacterCompleteEventDto(
                 apiEvent.characterId(), 
                 apiEvent.tokenCount(), 
+                apiEvent.messageSequenceNumber(),
                 apiEvent.id()
         );
     }

@@ -9,5 +9,6 @@ public record CharacterCompleteEventDto(
     @JsonProperty("character_id") Long characterId,
     @JsonProperty("token_count") int tokenCount,
     @JsonProperty("message_content") String messageContent,
+    @JsonProperty("message_sequence_number") int messageSequenceNumber,
     @JsonProperty("id") String id
 ) {} 

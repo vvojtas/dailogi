@@ -1,6 +1,7 @@
 package com.github.vvojtas.dailogi_server.dialogue.application;
 
 import com.github.vvojtas.dailogi_server.character.application.CharacterAuthorizationService;
+import com.github.vvojtas.dailogi_server.character.application.CharacterQueryService;
 import com.github.vvojtas.dailogi_server.db.entity.AppUser;
 import com.github.vvojtas.dailogi_server.db.entity.Character;
 import com.github.vvojtas.dailogi_server.db.entity.Dialogue;
@@ -10,6 +11,7 @@ import com.github.vvojtas.dailogi_server.db.repository.DialogueRepository;
 import com.github.vvojtas.dailogi_server.db.repository.LLMRepository;
 import com.github.vvojtas.dailogi_server.model.dialogue.request.CharacterConfigDTO;
 import com.github.vvojtas.dailogi_server.dialogue.api.CreateDialogueCommand;
+import com.github.vvojtas.dailogi_server.dialogue.api.DialogueMessageSaveCommand;
 import com.github.vvojtas.dailogi_server.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,8 @@ public class DialogueValidator {
     private final CharacterRepository characterRepository;
     private final LLMRepository llmRepository;
     private final CharacterAuthorizationService characterAuthorizationService;
+    private final CharacterQueryService characterQueryService;
+    private final DialogueAuthorizationService authorizationService;
     
     /**
      * Validates a dialogue creation command
@@ -95,4 +99,71 @@ public class DialogueValidator {
                     "Dialogue not found with id: " + id);
             });
     }
+    
+    /**
+     * Validates a message save operation for a dialogue
+     * 
+     * @param dialogueId the ID of the dialogue
+     * @param command the message save command
+     * @param currentUser the current user
+     * @return the validated dialogue and character entities
+     * @throws ResourceNotFoundException if dialogue or character doesn't exist
+     * @throws AccessDeniedException if user doesn't own the dialogue
+     */
+    public DialogueValidationResult validateForMessageSave(Long dialogueId, DialogueMessageSaveCommand command, AppUser currentUser) {
+        // Validate dialogue exists
+        Dialogue dialogue = dialogueRepository.findById(dialogueId)
+            .orElseThrow(() -> {
+                log.warn("Attempt to save message to non-existent dialogue with id={}", dialogueId);
+                return new ResourceNotFoundException(DIALOGUE_RESOURCE_NAME, 
+                    "Dialogue not found with id: " + dialogueId);
+            });
+        
+        // Validate ownership
+        if (!authorizationService.canModify(dialogue, currentUser)) {
+            log.warn("User {} attempted to save message to dialogue {} owned by user {}", 
+                currentUser.getId(), dialogueId, dialogue.getUser().getId());
+            throw new AccessDeniedException(
+                "Cannot save message to a dialogue you don't own");
+        }
+        
+        // Validate character exists
+        Character character = characterQueryService.getCharacterEntity(command.characterId());
+        
+        return new DialogueValidationResult(dialogue, character);
+    }
+    
+    /**
+     * Validates a status update operation for a dialogue
+     * 
+     * @param dialogueId the ID of the dialogue
+     * @param currentUser the current user
+     * @return the validated dialogue entity
+     * @throws ResourceNotFoundException if dialogue doesn't exist
+     * @throws AccessDeniedException if user doesn't own the dialogue
+     */
+    public Dialogue validateForStatusUpdate(Long dialogueId, AppUser currentUser) {
+        // Validate dialogue exists
+        Dialogue dialogue = dialogueRepository.findById(dialogueId)
+            .orElseThrow(() -> {
+                log.warn("Attempt to update status of non-existent dialogue with id={}", dialogueId);
+                return new ResourceNotFoundException(DIALOGUE_RESOURCE_NAME, 
+                    "Dialogue not found with id: " + dialogueId);
+            });
+        
+        // Validate ownership
+        if (!authorizationService.canModify(dialogue, currentUser)) {
+            log.warn("User {} attempted to update status of dialogue {} owned by user {}", 
+                currentUser.getId(), dialogueId, dialogue.getUser().getId());
+            throw new AccessDeniedException(
+                "Cannot update status of a dialogue you don't own");
+        }
+        
+        return dialogue;
+    }
+    
+    /**
+     * Container for validated dialogue entities
+     */
+    public record DialogueValidationResult(Dialogue dialogue, Character character) {}
 } 

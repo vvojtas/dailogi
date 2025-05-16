@@ -40,11 +40,8 @@ public class DialogueGenerationOrchestrator {
      * This method runs in a separate thread managed by Spring's TaskExecutor.
      * Events are delivered through the provided event handler.
      *
-     * @param dialogueId    Unique ID for the dialogue session.
-     * @param command       The command containing dialogue configuration.
-     * @param characters    Map of character IDs to CharacterDTOs involved in the dialogue.
-     * @param llms          Map of LLM IDs to LLMDTOs used by the characters.
-     * @param apiKey        The decrypted API key for OpenRouter.
+     * @param dialogueDTO   The dialogue data transfer object
+     * @param apiKey        The decrypted API key for OpenRouter
      * @param eventHandler  Handler for dialogue generation events (token generation, completion, etc.)
      */
     @Async // Marks this method for asynchronous execution
@@ -175,7 +172,7 @@ public class DialogueGenerationOrchestrator {
             String completeId = UUID.randomUUID().toString();
             log.debug("Dialogue {} sending character-complete event for character {} ({} tokens).", dialogueId, characterId, tokenCount);
             
-            // Create a new message and add it to the history
+            // Create a new message and add it to the history for in-memory use
             DialogueMessageDTO newMessage = new DialogueMessageDTO(
                 (long) (messageHistory.size() + 1), // Generate next message ID
                 turnNumber,
@@ -187,7 +184,15 @@ public class DialogueGenerationOrchestrator {
             messageHistory.add(newMessage);
             log.debug("Added message from character {} to history. Total messages: {}", characterId, messageHistory.size());
             
-            eventHandler.onCharacterComplete(new CharacterCompleteEventDto(characterId, tokenCount, messageContent, completeId));
+            // Send character complete event with message sequence number
+            // Persistence will be handled by PersistenceDialogueEventHandler
+            eventHandler.onCharacterComplete(new CharacterCompleteEventDto(
+                characterId, 
+                tokenCount, 
+                messageContent,
+                turnNumber, 
+                completeId
+            ));
         } catch (Exception e) {
             log.error("Error sending character-complete event for dialogue {}, character {}", dialogueId, characterId, e);
             eventHandler.onError(dialogueId, e);

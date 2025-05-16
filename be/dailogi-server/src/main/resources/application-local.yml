@@ -10,10 +10,7 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
 
-logging:
-  level:
-    com.github.vvojtas.dailogi_server.dialogue.stream.application.DialogueGenerationOrchestrator: TRACE
 
 openrouter:
   api:
-    mock-enabled: false
+    mock-enabled: true

@@ -215,9 +215,8 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
 *   Tytuł: Obserwacja generowanego dialogu
 *   Opis: Jako zalogowany użytkownik, po zainicjowaniu generowania dialogu, chcę móc obserwować pojawiające się wypowiedzi postaci w czasie rzeczywistym (lub z niewielkim opóźnieniem), wyświetlane w formie dymków czatu z awatarem i nazwą postaci.
 *   Kryteria akceptacji:
-    *   Widok dialogu prezentuje rozmowę w formie czatu (dymki).
-    *   Każdy dymek zawiera treść wypowiedzi, nazwę postaci mówiącej i jej awatar (lub placeholder).
-    *   Nowe wypowiedzi pojawiają się automatycznie w miarę ich generowania przez LLM (tura po turze, round-robin).
+    *   Widok dialogu prezentuje rozmowę w formie czatu (dymki) z awatarami i nazwami postaci.
+    *   Nowe wypowiedzi pojawiają się automatycznie w miarę generowania przez LLM w trybie round-robin.
     *   Dialog kończy się automatycznie po osiągnięciu limitu 50 tur lub w przypadku błędu.
 
 *   ID: US-016
@@ -229,16 +228,6 @@ Aplikacja w wersji MVP (Minimum Viable Product) będzie posiadała następujące
     *   Pod dialogiem (lub w innym widocznym miejscu) pojawia się komunikat informujący o rodzaju błędu (np. "Błąd API OpenRouter: Nieprawidłowy klucz API.", "Generowanie przerwane z powodu błędu serwera.").
     *   Dialog w takim stanie również jest zapisywany w historii.
 
-### Historia Dialogów
-
-*   ID: US-017
-*   Tytuł: Zapisywanie zakończonego dialogu
-*   Opis: Jako zalogowany użytkownik, chcę móc wybrane najciekawsze dialogi zapisać w mojej historii dialogów (do limitu 50), abym mógł do nich wrócić później.
-*   Kryteria akceptacji:
-    *   Istnieje przycisk inicjujący zapis zakończonego dialogu (po osiągnięciu limitu tur lub błądzie)
-    *   Użytkownik podaje nazwę pod którą chce zapisać dialog
-    *   Cała konwersacja wraz z informacją o uczestniczących postaciach i opisie sceny jest zapisywana w bazie danych powiązanej z użytkownikiem.
-    *   Jeśli użytkownik osiągnął limit 50 zapisanych dialogów, zapis nowego dialogu jest blokowany.
 
 *   ID: US-018
 *   Tytuł: Przeglądanie historii dialogów

@@ -2,8 +2,9 @@ package com.github.vvojtas.dailogi_server.dialogue.stream.application;
 
 import com.github.vvojtas.dailogi_server.dialogue.api.CreateDialogueCommand;
 import com.github.vvojtas.dailogi_server.dialogue.application.DialogueCommandService;
+import com.github.vvojtas.dailogi_server.dialogue.application.DialogueMessageCommandService;
+import com.github.vvojtas.dailogi_server.dialogue.application.DialogueStatusCommandService;
 import com.github.vvojtas.dailogi_server.dialogue.stream.api.StreamDialogueCommand;
-import com.github.vvojtas.dailogi_server.dialogue.stream.api.DialogueEventHandler;
 import com.github.vvojtas.dailogi_server.model.dialogue.response.DialogueDTO;
 import com.github.vvojtas.dailogi_server.model.dialogue.mapper.DialogueEventMapper;
 import com.github.vvojtas.dailogi_server.apikey.application.ApiKeyQueryService;
@@ -15,6 +16,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -34,6 +37,9 @@ public class DialogueStreamService {
     private final DialogueEventMapper dialogueEventMapper;
     private final ApiKeyQueryService apiKeyQueryService;
     private final DialogueCommandService dialogueCommandService;
+    private final DialogueMessageCommandService dialogueMessageCommandService;
+    private final DialogueStatusCommandService dialogueStatusCommandService;
+    
     // Store active emitters to be able to close them if needed
     private final Map<Long, SseEmitter> activeEmitters = new ConcurrentHashMap<>();
     
@@ -81,21 +87,31 @@ public class DialogueStreamService {
                 log.debug("Removed emitter for dialogue {} from active emitters. Remaining: {}", id, activeEmitters.size());
             };
                    
-            
-            // Create the event handler that will send events through SSE
-            DialogueEventHandler eventHandler = new SseDialogueEventHandler(
+            // Create the SSE event handler for streaming responses to the client
+            SseDialogueEventHandler sseEventHandler = new SseDialogueEventHandler(
                     dialogueId, 
                     emitter,
                     onInactivate,
                     dialogueEventMapper);
+            
+            // Create the persistence event handler for saving dialogue messages and updating status
+            PersistenceDialogueEventHandler persistenceEventHandler = new PersistenceDialogueEventHandler(
+                    dialogueId,
+                    dialogueMessageCommandService,
+                    dialogueStatusCommandService);
+            
+            // Create the composite handler that delegates to both handlers
+            CompositeDialogueEventHandler compositeEventHandler = new CompositeDialogueEventHandler(
+                    dialogueId,
+                    Arrays.asList(sseEventHandler, persistenceEventHandler));
 
-            // Start dialogue generation asynchronously using the event handler
+            // Start dialogue generation asynchronously using the composite event handler
             dialogueGenerationOrchestrator.generateDialogue(
                     dialogueDTO,
                     apiKey,
-                    eventHandler);
+                    compositeEventHandler);
             
-            log.info("Delegated dialogue {} generation to orchestrator with event handler.", dialogueId);
+            log.info("Delegated dialogue {} generation to orchestrator with composite event handler.", dialogueId);
 
             // Return emitter immediately to the client
             return emitter;
